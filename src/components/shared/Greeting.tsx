@@ -67,7 +67,7 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
   const initials = (name || "V")
     .split(" ")
     .filter(Boolean)
-    .map((p) => p[0])
+    .map((p) => [...p][0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
