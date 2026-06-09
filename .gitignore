@@ -1,3 +1,5 @@
+env
+
 # Logs
 logs
 *.log
@@ -33,4 +35,3 @@ dist-ssr
 *.sw?
 
 #supabase
-supabase
