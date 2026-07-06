@@ -80,6 +80,13 @@ export function ModulesList() {
                   >
                     Acessar
                   </Link>
+                ) : m.id === "hydration" ? (
+                  <Link
+                    to="/hidratacao"
+                    className="block w-full rounded-lg bg-card/80 px-3 py-1.5 text-center text-xs font-medium text-foreground transition-colors hover:bg-card sm:text-sm cursor-pointer"
+                  >
+                    Acessar
+                  </Link>
                 ) : (
                   <button
                     type="button"
@@ -89,6 +96,7 @@ export function ModulesList() {
                   </button>
                 )}
               </div>
+
             </article>
           ))}
         </div>

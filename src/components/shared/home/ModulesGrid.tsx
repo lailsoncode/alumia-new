@@ -39,6 +39,7 @@ export function ModulesGrid() {
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {modules.map((m) => {
           const isTasks = m.label === "Tarefas";
+          const isHydration = m.label === "Hidratação";
           const content = (
             <>
               <HugeiconsIcon
@@ -63,6 +64,18 @@ export function ModulesGrid() {
             );
           }
 
+          if (isHydration) {
+            return (
+              <Link
+                key={m.label}
+                to="/hidratacao"
+                className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+              >
+                {content}
+              </Link>
+            );
+          }
+
           return (
             <button
               key={m.label}
@@ -72,6 +85,7 @@ export function ModulesGrid() {
             </button>
           );
         })}
+
       </div>
     </section>
   );

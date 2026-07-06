@@ -14,6 +14,7 @@ import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
 import { Route as ModulosRouteImport } from './routes/modulos'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HidratacaoRouteImport } from './routes/hidratacao'
 import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
 import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as IndexRouteImport } from './routes/index'
@@ -43,6 +44,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HidratacaoRoute = HidratacaoRouteImport.update({
+  id: '/hidratacao',
+  path: '/hidratacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompletarPerfilRoute = CompletarPerfilRouteImport.update({
   id: '/completar-perfil',
   path: '/completar-perfil',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/completar-perfil'
+    | '/hidratacao'
     | '/login'
     | '/modulos'
     | '/nova-senha'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/completar-perfil'
+    | '/hidratacao'
     | '/login'
     | '/modulos'
     | '/nova-senha'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/completar-perfil'
+    | '/hidratacao'
     | '/login'
     | '/modulos'
     | '/nova-senha'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AjustesRoute: typeof AjustesRoute
   CompletarPerfilRoute: typeof CompletarPerfilRoute
+  HidratacaoRoute: typeof HidratacaoRoute
   LoginRoute: typeof LoginRoute
   ModulosRoute: typeof ModulosRoute
   NovaSenhaRoute: typeof NovaSenhaRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hidratacao': {
+      id: '/hidratacao'
+      path: '/hidratacao'
+      fullPath: '/hidratacao'
+      preLoaderRoute: typeof HidratacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/completar-perfil': {
       id: '/completar-perfil'
       path: '/completar-perfil'
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AjustesRoute: AjustesRoute,
   CompletarPerfilRoute: CompletarPerfilRoute,
+  HidratacaoRoute: HidratacaoRoute,
   LoginRoute: LoginRoute,
   ModulosRoute: ModulosRoute,
   NovaSenhaRoute: NovaSenhaRoute,

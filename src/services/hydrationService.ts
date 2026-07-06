@@ -88,3 +88,47 @@ export async function undoLastWaterLog(dateStr: string): Promise<void> {
     if (deleteError) throw deleteError;
   }
 }
+
+/**
+ * Busca o consumo diário de água dos últimos 7 dias para o usuário autenticado.
+ * Retorna uma lista com a data (YYYY-MM-DD) e o total em mL.
+ *
+ * @returns {Promise<{ date: string; total: number }[]>} Uma lista de consumo por dia.
+ */
+export async function getPastWeekHydration(): Promise<{ date: string; total: number }[]> {
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  const user = sessionData.session?.user;
+  if (!user) return [];
+
+  // Data de 7 dias atrás
+  const pastDate = new Date();
+  pastDate.setDate(pastDate.getDate() - 7);
+  const year = pastDate.getFullYear();
+  const month = String(pastDate.getMonth() + 1).padStart(2, "0");
+  const day = String(pastDate.getDate()).padStart(2, "0");
+  const pastDateStr = `${year}-${month}-${day}`;
+
+  const { data, error } = await supabase
+    .from("hydration_logs")
+    .select("amount_ml, date")
+    .eq("user_id", user.id)
+    .gte("date", pastDateStr)
+    .order("date", { ascending: true });
+
+  if (error) throw error;
+
+  // Agrupar e somar por data
+  const totalsMap: { [key: string]: number } = {};
+  data?.forEach((log) => {
+    totalsMap[log.date] = (totalsMap[log.date] || 0) + log.amount_ml;
+  });
+
+  return Object.keys(totalsMap)
+    .sort()
+    .map((date) => ({
+      date,
+      total: totalsMap[date],
+    }));
+}
+
