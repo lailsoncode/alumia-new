@@ -45,7 +45,7 @@ export function ResetPasswordPage() {
         <h1 className="mt-2 text-3xl font-bold leading-tight text-foreground sm:text-4xl">Crie uma nova senha.</h1>
         <p className="mt-3 text-base leading-relaxed text-muted-foreground">Escolha uma senha de pelo menos 6 caracteres.</p>
 
-        <form onSubmit={handleUpdatePassword} className="mt-8 space-y-5" noValidate>
+        <form onSubmit={handleUpdatePassword} className="mt-6 space-y-4" noValidate>
           <AuthInput id="reset-password" label="Nova senha" type="password" placeholder="Pelo menos 6 caracteres" value={password} onChange={setPassword} autoComplete="new-password" autoFocus />
           <AuthInput id="reset-confirm-password" label="Confirmar nova senha" type="password" placeholder="Digite a senha novamente" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" />
           {error && <InlineFeedback tone="danger">{error}</InlineFeedback>}
@@ -55,7 +55,7 @@ export function ResetPasswordPage() {
           </Button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Lembrou a senha?{" "}
           <Link to="/login" className="font-semibold text-primary underline-offset-4 hover:underline">Voltar ao login</Link>
         </p>

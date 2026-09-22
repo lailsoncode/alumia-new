@@ -43,27 +43,27 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
   };
 
   return (
-    <Surface className="p-5 sm:p-7">
+    <Surface className="p-4 sm:p-5">
       <SectionHeader
         title="Gestos para hoje"
         description="O que merece atenção primeiro, sempre no seu ritmo."
         icon={SparklesIcon}
         iconClassName="bg-tone-sun text-tone-sun-fg"
-        action={<Button variant="outline" size="sm" onClick={() => setSheetOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="xs" />Adicionar</Button>}
+        action={<Button variant="outline" size="sm" className="min-h-11 w-11 px-0 sm:w-auto sm:px-3" onClick={() => setSheetOpen(true)} aria-label="Adicionar tarefa"><AlumiaIcon icon={AddCircleIcon} size="xs" /><span className="hidden sm:inline">Adicionar</span></Button>}
       />
 
       {loading ? (
-        <div className="mt-6 space-y-3" aria-label="Carregando cuidados">
+        <div className="mt-5 space-y-3" aria-label="Carregando cuidados">
           {[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-muted" />)}
         </div>
       ) : pending.length === 0 ? (
-        <div className="mt-7 rounded-[1.4rem] bg-surface-subtle px-5 py-11 text-center shadow-inner">
+        <div className="mt-5 rounded-[1.4rem] bg-surface-subtle px-4 py-6 text-center shadow-inner">
           <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-surface text-tone-sun-fg"><AlumiaIcon icon={SparklesIcon} size="sm" /></span>
-          <p className="mt-4 font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
+          <p className="mt-3 font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
           <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">Hoje não há nenhum gesto pendente. Aproveite esse espaço ou adicione algo quando fizer sentido.</p>
         </div>
       ) : (
-        <ul className="mt-6 space-y-3">
+        <ul className="mt-5 space-y-3">
           {pending.slice(0, 3).map((task) => (
             <li key={task.id} className="flex min-h-20 items-center gap-3 rounded-[1.25rem] bg-surface-subtle/75 p-3.5 transition-colors hover:bg-surface-subtle">
               <button type="button" onClick={() => completeTask(task.id)} aria-label={`Concluir ${task.title}`} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl hover:bg-success/60">
@@ -83,7 +83,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
         </ul>
       )}
 
-      <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3">
         <p className="text-sm text-muted-foreground">{pending.length ? `${pending.length} ${pending.length === 1 ? "cuidado" : "cuidados"} para hoje` : "Tudo em paz por aqui"}</p>
         <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tarefas" })}>Ver todas</Button>
       </div>

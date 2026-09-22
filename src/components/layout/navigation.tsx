@@ -42,7 +42,7 @@ export function BottomNavigation() {
 export function SidebarNavigation() {
   const { pathname } = useLocation();
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-sidebar-border bg-sidebar px-5 py-7 lg:flex lg:flex-col">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-sidebar-border bg-sidebar px-5 py-6 lg:flex lg:flex-col">
       <Link to="/" className="flex items-center gap-3 rounded-xl px-2 py-1 text-sidebar-foreground">
         <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <AlumiaIcon icon={SparklesIcon} size="md" />
@@ -54,7 +54,7 @@ export function SidebarNavigation() {
       </Link>
 
       <nav aria-label="Navegação principal" className="mt-10">
-        <ul className="space-y-2">
+        <ul className="space-y-1">
           {items.map((item) => {
             const active = isItemActive(pathname, item.matches);
             return (
@@ -63,7 +63,7 @@ export function SidebarNavigation() {
                   to={item.to}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex min-h-12 items-center gap-3 rounded-xl px-4 text-sm font-semibold transition-colors",
+                    "flex min-h-12 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors",
                     active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
@@ -76,7 +76,7 @@ export function SidebarNavigation() {
         </ul>
       </nav>
 
-      <div className="mt-auto rounded-[1.5rem] bg-tone-lavender p-5 text-tone-lavender-fg shadow-[var(--shadow-card)]">
+      <div className="mt-auto rounded-[1.5rem] bg-tone-lavender p-4 text-tone-lavender-fg shadow-[var(--shadow-card)]">
         <p className="font-display text-sm font-semibold">Seu espaço continua aqui.</p>
         <p className="mt-1 text-xs leading-relaxed opacity-80">Volte quando fizer sentido para você.</p>
       </div>

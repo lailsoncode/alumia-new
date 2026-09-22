@@ -19,7 +19,7 @@ export function ModulesGrid() {
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
         {modules.map((module) => (
           <Surface key={module.title} as="article" variant="interactive">
-            <button type="button" onClick={() => navigate({ to: module.to })} className="flex min-h-24 w-full items-center gap-4 p-5 text-left">
+            <button type="button" onClick={() => navigate({ to: module.to })} className="flex min-h-20 w-full items-center gap-3 p-4 text-left">
               <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${module.tone}`}><AlumiaIcon icon={module.icon} size="md" /></span>
               <span><span className="block text-sm font-semibold text-foreground">{module.title}</span><span className="mt-0.5 block text-xs text-muted-foreground">{module.description}</span></span>
             </button>

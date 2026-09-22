@@ -13,7 +13,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 ## Entrega concentrada
 
 - paleta clara original com viés lavanda, cartões amplos, cantos generosos e sombras difusas;
-- mais espaço entre cabeçalhos, seções e ações;
+- densidade equilibrada, com intervalos menores entre cabeçalhos, seções e ações;
 - saudação com acento visual, avatar e troca de tema sempre acessível;
 - navegação inferior em cápsula flutuante no mobile e sidebar preservada no desktop;
 - textos de cuidado mais humanos, com “gestos”, “no seu ritmo” e “sem cobrança”;
@@ -45,6 +45,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 | 768 × 1024 | sem overflow horizontal; navegação inferior ativa |
 | 1024 × 768 | sem overflow horizontal; sidebar ativa |
 | 1440 × 900 | tarefas inspecionadas em duas colunas |
+| aproveitamento de tela | home móvel reduzida de 1.451 para 1.277 px e tarefas de 1.219 para 1.044 px de altura no estado vazio |
 | temas claro e escuro | inspecionados visualmente |
 | console da prévia | sem erros ou avisos |
 | contraste dos pares recorrentes | mínimo medido de 6,00:1 no claro e 6,46:1 no escuro |

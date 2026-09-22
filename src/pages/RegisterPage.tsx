@@ -54,7 +54,7 @@ export function RegisterPage() {
         <h1 className="mt-2 text-3xl font-bold leading-tight text-foreground sm:text-4xl">Comece com leveza.</h1>
         <p className="mt-3 text-base leading-relaxed text-muted-foreground">Crie sua conta e escolha os cuidados que fazem sentido para você.</p>
 
-        <form onSubmit={handleRegister} className="mt-8 space-y-5" noValidate>
+        <form onSubmit={handleRegister} className="mt-6 space-y-4" noValidate>
           <AuthInput id="register-email" label="E-mail" type="email" placeholder="voce@exemplo.com" value={email} onChange={setEmail} autoComplete="email" autoFocus />
           <AuthInput id="register-password" label="Senha" type="password" placeholder="Pelo menos 6 caracteres" value={password} onChange={setPassword} autoComplete="new-password" />
           <AuthInput id="register-confirm-password" label="Confirmar senha" type="password" placeholder="Digite a senha novamente" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" />
@@ -65,13 +65,13 @@ export function RegisterPage() {
           </Button>
         </form>
 
-        <div className="my-6 flex items-center gap-3" aria-hidden="true">
+        <div className="my-5 flex items-center gap-3" aria-hidden="true">
           <div className="h-px flex-1 bg-border" />
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">ou</span>
           <div className="h-px flex-1 bg-border" />
         </div>
         <GoogleButton label="Criar com o Google" onClick={handleGoogle} disabled={loading} />
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Já tem uma conta?{" "}
           <Link to="/login" className="font-semibold text-primary underline-offset-4 hover:underline">Entrar</Link>
         </p>

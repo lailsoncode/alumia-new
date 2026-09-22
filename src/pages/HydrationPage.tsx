@@ -86,13 +86,13 @@ export function HydrationPage() {
 
   return (
     <AppShell>
-      <div className="space-y-9">
+      <div className="space-y-6">
         <Greeting role="Cada pausa pode ser um gesto de carinho com você." />
         {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
-          <div className="space-y-7">
-            <Surface className="p-5 sm:p-7">
+        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
+          <div className="space-y-5">
+            <Surface className="p-4 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tone-sky text-tone-sky-fg"><AlumiaIcon icon={GlassWaterIcon} size="lg" /></span>
@@ -101,10 +101,10 @@ export function HydrationPage() {
                 <Button variant="ghost" size="sm" onClick={() => setGoalOpen(true)}><AlumiaIcon icon={Settings01Icon} size="xs" />Referência: {goal} ml</Button>
               </div>
 
-              <div className="mt-6 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={intake} /></div>
+              <div className="mt-5 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={intake} /></div>
               <p className="mt-2 text-sm text-muted-foreground">Seu corpo recebeu {Math.round(progress)}% da referência que você configurou.</p>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <Button variant="outline" onClick={() => addWater(200)} disabled={loading}><AlumiaIcon icon={CupSodaIcon} size="sm" />Copo 200 ml</Button>
                 <Button variant="outline" onClick={() => addWater(500)} disabled={loading}><AlumiaIcon icon={GlassWaterIcon} size="sm" />Garrafa 500 ml</Button>
                 <Button variant="outline" onClick={() => setCustomOpen((value) => !value)} disabled={loading}><AlumiaIcon icon={DrinkIcon} size="sm" />Outro valor</Button>
@@ -115,9 +115,9 @@ export function HydrationPage() {
               {intake > 0 && <Button variant="ghost" size="sm" className="mt-4" onClick={undo}><AlumiaIcon icon={ArrowReloadHorizontalIcon} size="xs" />Desfazer último registro</Button>}
             </Surface>
 
-            <Surface className="p-5 sm:p-7">
+            <Surface className="p-4 sm:p-6">
               <SectionHeader icon={Calendar01Icon} iconClassName="bg-tone-mint text-tone-mint-fg" title="Últimos 7 dias" description="Um panorama simples do seu ritmo, sem cobrança." />
-              <div className="mt-6 space-y-4">
+              <div className="mt-5 space-y-3">
                 {loading ? [0, 1, 2, 3].map((item) => <div key={item} className="h-5 animate-pulse rounded-full bg-muted" />) : history.map((item) => (
                   <div key={item.dayName} className="grid grid-cols-[3.75rem_4rem_1fr] items-center gap-3 text-sm"><span className="font-semibold">{item.dayName}</span><span className="text-right text-xs text-muted-foreground">{item.total} ml</span><div className="h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary/75" style={{ width: `${Math.min(100, item.total / maxHistory * 100)}%` }} /></div></div>
                 ))}
@@ -127,7 +127,7 @@ export function HydrationPage() {
 
           <Surface variant="subtle" className="overflow-hidden">
             <img src={hydrationImage} alt="Personagem da Alumia segurando uma garrafa de água" className="aspect-[4/3] w-full object-cover" />
-            <div className="p-6"><h2 className="text-lg font-semibold">No seu ritmo.</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">A referência diária é configurável e serve para acompanhar seus próprios hábitos. Ajuste o valor ao que foi orientado para você.</p></div>
+            <div className="p-5"><h2 className="text-lg font-semibold">No seu ritmo.</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">A referência diária é configurável e serve para acompanhar seus próprios hábitos. Ajuste o valor ao que foi orientado para você.</p></div>
           </Surface>
         </div>
       </div>

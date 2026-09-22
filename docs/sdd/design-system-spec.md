@@ -95,6 +95,9 @@ P0:
 - navegação inferior B2C mostra no máximo cinco destinos primários.
 - navegação inferior B2C usa uma superfície flutuante com safe area e não encobre o fim do conteúdo;
 - a partir do breakpoint desktop, a navegação inferior dá lugar à sidebar.
+- páginas B2C usam 16–24 px entre blocos relacionados e 20–32 px nas margens estruturais;
+- cartões usam normalmente 16–24 px de padding, mantendo alvos de toque com pelo menos 44 × 44 px;
+- a largura útil cresce no desktop até 1280 px para evitar grandes áreas laterais vazias.
 
 ## 6. Acessibilidade
 

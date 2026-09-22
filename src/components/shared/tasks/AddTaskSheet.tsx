@@ -29,14 +29,14 @@ export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
   return (
     <>
       <button type="button" className="fixed inset-0 z-40 cursor-default bg-foreground/25 backdrop-blur-sm" onClick={onClose} aria-label="Fechar criação de tarefa" />
-      <section role="dialog" aria-modal="true" aria-labelledby="add-task-title" className="alumia-elevated fixed inset-x-0 bottom-0 z-50 max-h-[92svh] overflow-y-auto rounded-t-3xl p-5 sm:left-1/2 sm:bottom-6 sm:max-w-2xl sm:-translate-x-1/2 sm:rounded-3xl sm:p-7">
-        <div className="mx-auto mb-5 h-1 w-12 rounded-full bg-muted-foreground/30 sm:hidden" />
+      <section role="dialog" aria-modal="true" aria-labelledby="add-task-title" className="alumia-elevated fixed inset-x-0 bottom-0 z-50 max-h-[92svh] overflow-y-auto rounded-t-3xl p-5 sm:left-1/2 sm:bottom-6 sm:max-w-2xl sm:-translate-x-1/2 sm:rounded-3xl sm:p-6">
+        <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-muted-foreground/30 sm:hidden" />
         <div className="flex items-start justify-between gap-4">
           <div><h2 id="add-task-title" className="text-xl font-bold">Adicionar tarefa</h2><p className="mt-1 text-sm text-muted-foreground">Registre o essencial. Você pode ajustar depois.</p></div>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fechar"><AlumiaIcon icon={Cancel01Icon} size="sm" /></Button>
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-5 space-y-3">
           <div><label htmlFor="task-title" className="text-sm font-semibold">Título</label><input id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} autoFocus className="mt-2 min-h-12 w-full rounded-xl border border-input bg-background px-4 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30" /></div>
           <div><label htmlFor="task-description" className="text-sm font-semibold">Descrição <span className="font-normal text-muted-foreground">(opcional)</span></label><textarea id="task-description" value={description} onChange={(event) => setDescription(event.target.value)} rows={2} className="mt-2 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30" /></div>
         </div>
@@ -49,7 +49,7 @@ export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
         {active === "prioridade" && <PrioritySelector selectedPriority={priority} onChangePriority={setPriority} />}
         {active === "lembrete" && <ReminderSelector selectedReminder={reminder} onChangeReminder={setReminder} />}
 
-        <div className="mt-7 flex justify-end gap-3 border-t border-border pt-5">
+        <div className="mt-5 flex justify-end gap-3 border-t border-border pt-4">
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
           <Button type="button" onClick={save} disabled={!title.trim()}>Salvar tarefa<AlumiaIcon icon={ArrowRight01Icon} size="xs" /></Button>
         </div>
