@@ -23,6 +23,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 | Manifesto e ideação | cuidado voluntário, linguagem gentil e autonomia |
 | Protótipo FlutterFlow | onboarding, home, modelo de tarefas, check-in, mindfulness e hidratação como referências |
 | Auditoria do protótipo | reescrever stack; adiar comunidade, IA, estudante e insígnias; corrigir acessibilidade e roteamento |
+| Comparação entre as versões B2C | fundo frio visível, superfícies suaves, maior respiro, orientação persistente, linguagem humana e navegação flutuante |
 | Pitch deck | ofertas Freemium, PRO e Empresas como hipóteses comerciais |
 | Blueprint MeAgende.Me | React/Vite/Supabase, multi-tenancy, RLS, platform admin e verticais completas |
 | Materiais NR-1 | foco em condições de trabalho, métodos múltiplos, participação, inventário, ações e eficácia |
@@ -65,4 +66,3 @@ Ao concluir um requisito, registrar:
 - resultado;
 - risco residual;
 - pessoa revisora quando o requisito exigir revisão técnica, editorial, jurídica ou de privacidade.
-

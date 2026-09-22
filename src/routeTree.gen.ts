@@ -9,49 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TarefasRouteImport } from './routes/tarefas'
-import { Route as RegistroRouteImport } from './routes/registro'
-import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
-import { Route as ModulosRouteImport } from './routes/modulos'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as HidratacaoRouteImport } from './routes/hidratacao'
-import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
-import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AjustesRouteImport } from './routes/ajustes'
+import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
+import { Route as HidratacaoRouteImport } from './routes/hidratacao'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ModulosRouteImport } from './routes/modulos'
+import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
+import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as TarefasRouteImport } from './routes/tarefas'
 
-const TarefasRoute = TarefasRouteImport.update({
-  id: '/tarefas',
-  path: '/tarefas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegistroRoute = RegistroRouteImport.update({
-  id: '/registro',
-  path: '/registro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NovaSenhaRoute = NovaSenhaRouteImport.update({
-  id: '/nova-senha',
-  path: '/nova-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModulosRoute = ModulosRouteImport.update({
-  id: '/modulos',
-  path: '/modulos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HidratacaoRoute = HidratacaoRouteImport.update({
-  id: '/hidratacao',
-  path: '/hidratacao',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompletarPerfilRoute = CompletarPerfilRouteImport.update({
-  id: '/completar-perfil',
-  path: '/completar-perfil',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AjustesRoute = AjustesRouteImport.update({
@@ -59,9 +29,39 @@ const AjustesRoute = AjustesRouteImport.update({
   path: '/ajustes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CompletarPerfilRoute = CompletarPerfilRouteImport.update({
+  id: '/completar-perfil',
+  path: '/completar-perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HidratacaoRoute = HidratacaoRouteImport.update({
+  id: '/hidratacao',
+  path: '/hidratacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModulosRoute = ModulosRouteImport.update({
+  id: '/modulos',
+  path: '/modulos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NovaSenhaRoute = NovaSenhaRouteImport.update({
+  id: '/nova-senha',
+  path: '/nova-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistroRoute = RegistroRouteImport.update({
+  id: '/registro',
+  path: '/registro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarefasRoute = TarefasRouteImport.update({
+  id: '/tarefas',
+  path: '/tarefas',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -149,53 +149,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tarefas': {
-      id: '/tarefas'
-      path: '/tarefas'
-      fullPath: '/tarefas'
-      preLoaderRoute: typeof TarefasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/registro': {
-      id: '/registro'
-      path: '/registro'
-      fullPath: '/registro'
-      preLoaderRoute: typeof RegistroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nova-senha': {
-      id: '/nova-senha'
-      path: '/nova-senha'
-      fullPath: '/nova-senha'
-      preLoaderRoute: typeof NovaSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/modulos': {
-      id: '/modulos'
-      path: '/modulos'
-      fullPath: '/modulos'
-      preLoaderRoute: typeof ModulosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hidratacao': {
-      id: '/hidratacao'
-      path: '/hidratacao'
-      fullPath: '/hidratacao'
-      preLoaderRoute: typeof HidratacaoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/completar-perfil': {
-      id: '/completar-perfil'
-      path: '/completar-perfil'
-      fullPath: '/completar-perfil'
-      preLoaderRoute: typeof CompletarPerfilRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ajustes': {
@@ -205,11 +163,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AjustesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/completar-perfil': {
+      id: '/completar-perfil'
+      path: '/completar-perfil'
+      fullPath: '/completar-perfil'
+      preLoaderRoute: typeof CompletarPerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hidratacao': {
+      id: '/hidratacao'
+      path: '/hidratacao'
+      fullPath: '/hidratacao'
+      preLoaderRoute: typeof HidratacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modulos': {
+      id: '/modulos'
+      path: '/modulos'
+      fullPath: '/modulos'
+      preLoaderRoute: typeof ModulosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nova-senha': {
+      id: '/nova-senha'
+      path: '/nova-senha'
+      fullPath: '/nova-senha'
+      preLoaderRoute: typeof NovaSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registro': {
+      id: '/registro'
+      path: '/registro'
+      fullPath: '/registro'
+      preLoaderRoute: typeof RegistroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarefas': {
+      id: '/tarefas'
+      path: '/tarefas'
+      fullPath: '/tarefas'
+      preLoaderRoute: typeof TarefasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

@@ -5,7 +5,7 @@ import { TasksView } from "@/components/shared/tasks/TasksView";
 export function TasksPage() {
   return (
     <AppShell>
-      <div className="space-y-7">
+      <div className="space-y-9">
         <Greeting role="Organize o seu dia, do seu jeito." />
         <TasksView />
       </div>

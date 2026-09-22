@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { CheckListIcon, GlassWaterIcon, SmileIcon, Yoga01Icon } from "@hugeicons/core-free-icons";
+import { CheckListIcon, Clock01Icon, GlassWaterIcon, Grid2X2Icon, SmileIcon, Yoga01Icon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { SectionHeader, Surface } from "@/components/ui/surface";
@@ -17,13 +17,13 @@ const upcomingModules = [
 export function ModulesList() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-9">
+    <div className="space-y-10">
       <section>
-        <SectionHeader title="Seus cuidados" description="Recursos disponíveis agora na sua Alumia." />
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <SectionHeader icon={Grid2X2Icon} iconClassName="bg-tone-lavender text-tone-lavender-fg" title="Seus espaços de cuidado" description="Escolha somente o que fizer sentido para você hoje." />
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
           {activeModules.map((module) => (
             <Surface key={module.id} as="article" variant="interactive" className="overflow-hidden">
-              <div className="p-5 sm:p-6">
+              <div className="p-6 sm:p-7">
                 <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${module.tone}`}><AlumiaIcon icon={module.icon} size="lg" /></span>
                 <h3 className="mt-5 text-xl font-semibold">{module.name}</h3>
                 <p className="mt-2 min-h-12 text-sm leading-relaxed text-muted-foreground">{module.description}</p>
@@ -35,10 +35,10 @@ export function ModulesList() {
       </section>
 
       <section>
-        <SectionHeader title="Em breve" description="Estes cuidados ainda estão sendo preparados. Eles não estão ativos na sua conta." />
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <SectionHeader icon={Clock01Icon} iconClassName="bg-tone-sky text-tone-sky-fg" title="Em breve" description="Mais cuidados estão sendo preparados com calma. Eles ainda não estão ativos." />
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
           {upcomingModules.map((module) => (
-            <Surface key={module.id} as="article" variant="subtle" className="p-5 sm:p-6">
+            <Surface key={module.id} as="article" variant="subtle" className="p-6 sm:p-7">
               <div className="flex items-start gap-4">
                 <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${module.tone}`}><AlumiaIcon icon={module.icon} size="md" /></span>
                 <div><div className="flex flex-wrap items-center gap-2"><h3 className="text-base font-semibold">{module.name}</h3><span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">Em breve</span></div><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{module.description}</p></div>

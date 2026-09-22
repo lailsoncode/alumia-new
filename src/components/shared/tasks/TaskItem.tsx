@@ -18,8 +18,8 @@ function formatTaskDate(dateString?: string) {
 export function TaskItem({ task, onToggle }: TaskItemProps) {
   const priorityTone = task.priority === "alta" ? "text-destructive" : task.priority === "media" ? "text-warning-foreground" : "text-info-foreground";
   return (
-    <li className={`flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 shadow-[var(--shadow-card)] ${task.done ? "opacity-65" : ""}`}>
-      <button type="button" aria-label={task.done ? `Marcar ${task.title} como pendente` : `Concluir ${task.title}`} onClick={() => onToggle?.(task.id)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl hover:bg-muted">
+    <li className={`flex min-h-20 items-center gap-3 rounded-[1.4rem] border border-border/80 bg-surface p-4 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5 ${task.done ? "opacity-65" : ""}`}>
+      <button type="button" aria-label={task.done ? `Marcar ${task.title} como pendente` : `Concluir ${task.title}`} onClick={() => onToggle?.(task.id)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl hover:bg-muted">
         <span className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${task.done ? "border-primary bg-primary" : "border-primary/55"}`}>{task.done && <span className="h-2 w-2 rounded-full bg-primary-foreground" />}</span>
       </button>
       <div className="min-w-0 flex-1">

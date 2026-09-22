@@ -1,7 +1,9 @@
 # Especificação do design system
 
-**ID:** `DS`  
-**Versão:** 0.1.0  
+**ID:** `DS`
+
+**Versão:** 0.2.0
+
 **Estado:** proposed
 
 ## 1. Direção visual
@@ -15,6 +17,18 @@ O sistema preserva do protótipo FlutterFlow:
 - módulos apresentados como escolhas, sem cobrança.
 
 A implementação deve corrigir contraste baixo, controles sem rótulo, inconsistências de nome e navegação sem URL própria.
+
+A camada de conforto B2C deve usar:
+
+- fundo azul acinzentado visível, com superfícies claras e separação suave;
+- cartões amplos, cantos generosos e sombras difusas;
+- respiro entre blocos para que a tela não pareça uma sequência de cobranças;
+- pequenos acentos em amarelo, ciano, menta, pêssego e lavanda para orientar seções;
+- saudação personalizada, acesso rápido ao tema e navegação inferior flutuante no mobile;
+- orientação visível quando a organização de uma tela não for autoevidente;
+- estados vazios que preservem a estrutura da jornada e usem linguagem acolhedora.
+
+Essas escolhas não autorizam dados simulados, módulos incompletos apresentados como ativos ou perda de contraste para obter uma aparência mais suave.
 
 ## 2. Tokens
 
@@ -79,6 +93,8 @@ P0:
 - formulários nunca dependem de hover;
 - tabelas críticas oferecem alternativa responsiva por cartões ou rolagem com cabeçalho contextual;
 - navegação inferior B2C mostra no máximo cinco destinos primários.
+- navegação inferior B2C usa uma superfície flutuante com safe area e não encobre o fim do conteúdo;
+- a partir do breakpoint desktop, a navegação inferior dá lugar à sidebar.
 
 ## 6. Acessibilidade
 
@@ -118,4 +134,5 @@ Glossário inicial:
 - `DS-AC-004`: componentes de formulário funcionam apenas com teclado;
 - `DS-AC-005`: os quatro estados de dados existem: loading, vazio, erro e sucesso;
 - `DS-AC-006`: não há strings “Adcionar”, “Modulos”, “crecer” ou variações do nome oficial no produto novo.
-
+- `DS-AC-007`: telas de cuidado mantêm orientação e estados vazios compreensíveis sem ocultar a estrutura principal.
+- `DS-AC-008`: pares de texto recorrente e tons editoriais atingem contraste AA nos temas claro e escuro.

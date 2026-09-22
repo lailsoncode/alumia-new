@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowReloadHorizontalIcon, Cancel01Icon, CupSodaIcon, DrinkIcon, GlassWaterIcon, Settings01Icon } from "@hugeicons/core-free-icons";
+import { ArrowReloadHorizontalIcon, Calendar01Icon, Cancel01Icon, CupSodaIcon, DrinkIcon, GlassWaterIcon, Settings01Icon } from "@hugeicons/core-free-icons";
 import { AppShell } from "@/components/layout";
 import { Greeting } from "@/components/shared/Greeting";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
@@ -47,7 +47,7 @@ export function HydrationPage() {
       }
       setHistory(totals);
     } catch {
-      setError("Não foi possível carregar seu histórico de hidratação.");
+      setError("Não conseguimos preparar seu ritmo de hidratação agora.");
     } finally {
       setLoading(false);
     }
@@ -62,14 +62,14 @@ export function HydrationPage() {
       await logWaterIntake(amount, getLocalDateString());
       await load();
     } catch {
-      setError("O registro não foi salvo. Tente novamente.");
+      setError("Esse gesto ainda não foi salvo. Vamos tentar mais uma vez?");
       await load();
     }
   };
 
   const undo = async () => {
     try { await undoLastWaterLog(getLocalDateString()); await load(); }
-    catch { setError("Não foi possível desfazer o último registro."); }
+    catch { setError("Não conseguimos desfazer o último registro agora."); }
   };
 
   const saveGoal = (event: React.FormEvent) => {
@@ -86,27 +86,27 @@ export function HydrationPage() {
 
   return (
     <AppShell>
-      <div className="space-y-7">
-        <Greeting role="Cada pausa pode ser um gesto de cuidado." />
+      <div className="space-y-9">
+        <Greeting role="Cada pausa pode ser um gesto de carinho com você." />
         {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
-          <div className="space-y-6">
+          <div className="space-y-7">
             <Surface className="p-5 sm:p-7">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tone-sky text-tone-sky-fg"><AlumiaIcon icon={GlassWaterIcon} size="lg" /></span>
-                  <div><p className="text-sm font-semibold text-muted-foreground">Hoje</p><h2 className="text-2xl font-bold">{loading ? "…" : `${intake} ml`}</h2></div>
+                  <div><p className="text-sm font-semibold text-muted-foreground">Seu ritmo hoje</p><h2 className="text-2xl font-bold">{loading ? "…" : `${intake} ml de cuidado`}</h2></div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setGoalOpen(true)}><AlumiaIcon icon={Settings01Icon} size="xs" />Referência: {goal} ml</Button>
               </div>
 
               <div className="mt-6 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={intake} /></div>
-              <p className="mt-2 text-sm text-muted-foreground">{Math.round(progress)}% da sua referência diária configurada.</p>
+              <p className="mt-2 text-sm text-muted-foreground">Seu corpo recebeu {Math.round(progress)}% da referência que você configurou.</p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <Button variant="outline" onClick={() => addWater(200)} disabled={loading}><AlumiaIcon icon={CupSodaIcon} size="sm" />Adicionar 200 ml</Button>
-                <Button variant="outline" onClick={() => addWater(500)} disabled={loading}><AlumiaIcon icon={GlassWaterIcon} size="sm" />Adicionar 500 ml</Button>
+                <Button variant="outline" onClick={() => addWater(200)} disabled={loading}><AlumiaIcon icon={CupSodaIcon} size="sm" />Copo 200 ml</Button>
+                <Button variant="outline" onClick={() => addWater(500)} disabled={loading}><AlumiaIcon icon={GlassWaterIcon} size="sm" />Garrafa 500 ml</Button>
                 <Button variant="outline" onClick={() => setCustomOpen((value) => !value)} disabled={loading}><AlumiaIcon icon={DrinkIcon} size="sm" />Outro valor</Button>
               </div>
 
@@ -116,7 +116,7 @@ export function HydrationPage() {
             </Surface>
 
             <Surface className="p-5 sm:p-7">
-              <SectionHeader title="Últimos 7 dias" description="Um panorama simples, sem cobrança." />
+              <SectionHeader icon={Calendar01Icon} iconClassName="bg-tone-mint text-tone-mint-fg" title="Últimos 7 dias" description="Um panorama simples do seu ritmo, sem cobrança." />
               <div className="mt-6 space-y-4">
                 {loading ? [0, 1, 2, 3].map((item) => <div key={item} className="h-5 animate-pulse rounded-full bg-muted" />) : history.map((item) => (
                   <div key={item.dayName} className="grid grid-cols-[3.75rem_4rem_1fr] items-center gap-3 text-sm"><span className="font-semibold">{item.dayName}</span><span className="text-right text-xs text-muted-foreground">{item.total} ml</span><div className="h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary/75" style={{ width: `${Math.min(100, item.total / maxHistory * 100)}%` }} /></div></div>
@@ -127,12 +127,12 @@ export function HydrationPage() {
 
           <Surface variant="subtle" className="overflow-hidden">
             <img src={hydrationImage} alt="Personagem da Alumia segurando uma garrafa de água" className="aspect-[4/3] w-full object-cover" />
-            <div className="p-5"><h2 className="text-lg font-semibold">Encontre o seu ritmo.</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">A referência diária é configurável e serve apenas para acompanhamento pessoal. Ajuste o valor ao que foi orientado para você.</p></div>
+            <div className="p-6"><h2 className="text-lg font-semibold">No seu ritmo.</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">A referência diária é configurável e serve para acompanhar seus próprios hábitos. Ajuste o valor ao que foi orientado para você.</p></div>
           </Surface>
         </div>
       </div>
 
-      {goalOpen && <><button type="button" className="fixed inset-0 z-40 cursor-default bg-foreground/25 backdrop-blur-sm" onClick={() => setGoalOpen(false)} aria-label="Fechar ajuste da referência" /><section role="dialog" aria-modal="true" aria-labelledby="goal-title" className="alumia-elevated fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl p-6"><div className="flex items-start justify-between gap-4"><div><h2 id="goal-title" className="text-xl font-bold">Referência diária</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Defina um valor pessoal entre 250 e 10.000 ml.</p></div><Button variant="ghost" size="icon" onClick={() => setGoalOpen(false)} aria-label="Fechar"><AlumiaIcon icon={Cancel01Icon} size="sm" /></Button></div><form onSubmit={saveGoal} className="mt-6"><label htmlFor="goal-value" className="text-sm font-semibold">Quantidade em ml<input id="goal-value" type="number" min="250" max="10000" step="50" value={goalInput} onChange={(event) => setGoalInput(event.target.value)} className="mt-2 min-h-12 w-full rounded-xl border border-input bg-background px-4 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30" /></label><div className="mt-6 flex justify-end gap-3"><Button type="button" variant="ghost" onClick={() => setGoalOpen(false)}>Cancelar</Button><Button type="submit">Salvar referência</Button></div></form></section></>}
+      {goalOpen && <><button type="button" className="fixed inset-0 z-40 cursor-default bg-foreground/25 backdrop-blur-sm" onClick={() => setGoalOpen(false)} aria-label="Fechar ajuste da referência" /><section role="dialog" aria-modal="true" aria-labelledby="goal-title" className="alumia-elevated fixed left-1/2 top-1/2 z-50 w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl p-6"><div className="flex items-start justify-between gap-4"><div><h2 id="goal-title" className="text-xl font-bold">Referência diária</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Defina um valor pessoal entre 250 e 10.000 ml.</p></div><Button variant="ghost" size="icon" onClick={() => setGoalOpen(false)} aria-label="Fechar"><AlumiaIcon icon={Cancel01Icon} size="sm" /></Button></div><form onSubmit={saveGoal} className="mt-6"><label htmlFor="goal-value" className="text-sm font-semibold">Quantidade em ml<input id="goal-value" type="number" min="250" max="10000" step="50" value={goalInput} onChange={(event) => setGoalInput(event.target.value)} className="mt-2 min-h-12 w-full rounded-xl border border-input bg-background px-4 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30" /></label><div className="mt-6 flex justify-end gap-3"><Button type="button" variant="ghost" onClick={() => setGoalOpen(false)}>Cancelar</Button><Button type="submit">Salvar referência</Button></div></form></section></>}
     </AppShell>
   );
 }

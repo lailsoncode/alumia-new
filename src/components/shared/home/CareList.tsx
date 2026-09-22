@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { AddCircleIcon, BellIcon, Calendar01Icon, Clock01Icon, Flag01Icon } from "@hugeicons/core-free-icons";
+import { AddCircleIcon, BellIcon, Calendar01Icon, Clock01Icon, Flag01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { SectionHeader, Surface } from "@/components/ui/surface";
@@ -43,10 +43,12 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
   };
 
   return (
-    <Surface className="p-5 sm:p-6">
+    <Surface className="p-5 sm:p-7">
       <SectionHeader
-        title="Para hoje"
-        description="O que importa primeiro, no seu ritmo."
+        title="Gestos para hoje"
+        description="O que merece atenção primeiro, sempre no seu ritmo."
+        icon={SparklesIcon}
+        iconClassName="bg-tone-sun text-tone-sun-fg"
         action={<Button variant="outline" size="sm" onClick={() => setSheetOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="xs" />Adicionar</Button>}
       />
 
@@ -55,14 +57,15 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
           {[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-muted" />)}
         </div>
       ) : pending.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-subtle px-5 py-10 text-center">
-          <p className="font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
-          <p className="mt-1 text-sm text-muted-foreground">Você pode adicionar um cuidado quando quiser.</p>
+        <div className="mt-7 rounded-[1.4rem] bg-surface-subtle px-5 py-11 text-center shadow-inner">
+          <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-surface text-tone-sun-fg"><AlumiaIcon icon={SparklesIcon} size="sm" /></span>
+          <p className="mt-4 font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">Hoje não há nenhum gesto pendente. Aproveite esse espaço ou adicione algo quando fizer sentido.</p>
         </div>
       ) : (
         <ul className="mt-6 space-y-3">
           {pending.slice(0, 3).map((task) => (
-            <li key={task.id} className="flex items-center gap-3 rounded-2xl border border-border bg-background p-3.5">
+            <li key={task.id} className="flex min-h-20 items-center gap-3 rounded-[1.25rem] bg-surface-subtle/75 p-3.5 transition-colors hover:bg-surface-subtle">
               <button type="button" onClick={() => completeTask(task.id)} aria-label={`Concluir ${task.title}`} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl hover:bg-success/60">
                 <span className="h-5 w-5 rounded-full border-2 border-primary/55" />
               </button>
@@ -81,7 +84,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
       )}
 
       <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
-        <p className="text-sm text-muted-foreground">{pending.length ? `${pending.length} ${pending.length === 1 ? "cuidado" : "cuidados"} em aberto` : "Sem pendências"}</p>
+        <p className="text-sm text-muted-foreground">{pending.length ? `${pending.length} ${pending.length === 1 ? "cuidado" : "cuidados"} para hoje` : "Tudo em paz por aqui"}</p>
         <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tarefas" })}>Ver todas</Button>
       </div>
 

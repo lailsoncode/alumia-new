@@ -14,8 +14,8 @@ const items = [
 export function BottomNavigation() {
   const { pathname } = useLocation();
   return (
-    <nav aria-label="Navegação principal" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 backdrop-blur-lg lg:hidden">
-      <ul className="mx-auto grid max-w-lg grid-cols-4 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
+    <nav aria-label="Navegação principal" className="alumia-floating fixed inset-x-4 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-lg rounded-[1.75rem] p-1.5 lg:hidden">
+      <ul className="grid grid-cols-4 gap-1">
         {items.map((item) => {
           const active = isItemActive(pathname, item.matches);
           return (
@@ -24,8 +24,8 @@ export function BottomNavigation() {
                 to={item.to}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 text-xs font-semibold transition-colors",
-                  active ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-[1.25rem] px-1 text-xs font-semibold transition-colors",
+                  active ? "bg-tone-sky text-tone-sky-fg" : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 <AlumiaIcon icon={item.icon} size="md" strokeWidth={active ? 2 : 1.6} />
@@ -76,7 +76,7 @@ export function SidebarNavigation() {
         </ul>
       </nav>
 
-      <div className="mt-auto rounded-2xl bg-tone-lavender p-4 text-tone-lavender-fg">
+      <div className="mt-auto rounded-[1.5rem] bg-tone-lavender p-5 text-tone-lavender-fg shadow-[var(--shadow-card)]">
         <p className="font-display text-sm font-semibold">Seu espaço continua aqui.</p>
         <p className="mt-1 text-xs leading-relaxed opacity-80">Volte quando fizer sentido para você.</p>
       </div>

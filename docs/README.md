@@ -34,6 +34,7 @@ Esta pasta reúne a documentação de produto, arquitetura, pesquisa e planejame
 | [Plano de desenvolvimento v1.4](planning/plano-desenvolvimento-alumia.md) | Visão consolidada do produto e da execução |
 | [Plano de correção do design](planning/plano-correcao-design.md) | Execução objetiva da repaginação B2C antes de novas features |
 | [Resultado da repaginação](planning/resultado-repaginacao-design.md) | Mudanças realizadas e evidências da validação final |
+| [Sprint de conforto visual](planning/sprint-conforto-visual.md) | Ajustes concentrados que recuperam o acolhimento da versão anterior sem perder a base atual |
 
 ### Pesquisa e auditorias
 

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { Moon01Icon, SparklesIcon, Sun01Icon } from "@hugeicons/core-free-icons";
+import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { useAuth } from "../../hooks/use-auth";
+import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "../../lib/theme";
 import { getUserProfile } from "../../services/authService";
 
 interface GreetingProps {
@@ -23,10 +26,14 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
   const [name, setName] = useState(propName || "você");
   const [avatarUrl, setAvatarUrl] = useState(propAvatarUrl || "");
   const [greeting, setGreeting] = useState("Boa noite");
+  const [profileLine, setProfileLine] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const hour = new Date().getHours();
     setGreeting(getPeriodGreeting(hour));
+    setDarkMode(getStoredTheme() === "dark");
+    return subscribeToThemeChanges((theme) => setDarkMode(theme === "dark"));
   }, []);
 
   useEffect(() => {
@@ -40,6 +47,7 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
         .then((profile) => {
           if (profile) {
             setName(profile.firstName || user.email?.split("@")[0] || "você");
+            setProfileLine(profile.bio?.split(/[.!?]/)[0]?.trim().slice(0, 64) || "");
             if (profile.avatarUrl && !propAvatarUrl) {
               if (!profile.avatarUrl.startsWith("blob:")) {
                 setAvatarUrl(profile.avatarUrl);
@@ -72,15 +80,25 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
     .join("")
     .toUpperCase();
 
+  const toggleTheme = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    applyTheme(next ? "dark" : "light");
+  };
+
   return (
     <header className="flex items-start justify-between gap-4 py-1">
       <div className="min-w-0 flex-1">
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          {greeting}, <span className="font-bold">{name}</span>
+        <h1 className="flex flex-wrap items-center gap-x-2 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <span>{greeting}, <strong className="font-bold">{name}</strong></span>
+          <AlumiaIcon icon={SparklesIcon} size="sm" className="text-tone-sun-fg" />
         </h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted-foreground sm:text-base">{role ?? subtitleByPeriod()}</p>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">{role || profileLine || subtitleByPeriod()}</p>
       </div>
-      <div className="shrink-0">
+      <div className="flex shrink-0 items-center gap-2">
+        <button type="button" onClick={toggleTheme} aria-label={darkMode ? "Usar tema claro" : "Usar tema escuro"} className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface text-muted-foreground shadow-[var(--shadow-card)] transition-colors hover:bg-surface-subtle hover:text-foreground">
+          <AlumiaIcon icon={darkMode ? Sun01Icon : Moon01Icon} size="sm" />
+        </button>
         <div
           className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card text-sm font-semibold text-foreground shadow-sm"
           role={avatarUrl ? undefined : "img"}

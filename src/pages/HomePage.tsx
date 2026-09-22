@@ -26,21 +26,23 @@ export function HomePage() {
   const today = getLocalDateString();
   const pendingToday = tasks.filter((task) => !task.done && (task.date ? task.date <= today : true));
   const message = loading
-    ? "Preparando o seu dia com calma…"
+    ? "Preparando seus cuidados com calma…"
     : pendingToday.length === 0
-      ? "Não há nada esperando por você agora. Aproveite esse espaço."
-      : `${pendingToday.length} ${pendingToday.length === 1 ? "cuidado pode receber" : "cuidados podem receber"} sua atenção hoje.`;
+      ? "Hoje não há nada pedindo sua atenção. Tudo bem — este espaço também é seu."
+      : pendingToday.length === 1
+        ? "Há um cuidado esperando por você hoje. Sem pressa, no seu ritmo."
+        : `Há ${pendingToday.length} cuidados esperando por você hoje. Um gesto de cada vez.`;
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-8 lg:space-y-9">
         <Greeting />
         <InfoCard>{message}</InfoCard>
         {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={loadTasks} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
+        <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)] lg:gap-8">
           <CareList tasks={tasks} loading={loading} onRefresh={loadTasks} />
-          <div className="space-y-6">
+          <div className="space-y-7">
             <HydrationCard />
             <ModulesGrid />
           </div>

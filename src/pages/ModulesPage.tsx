@@ -5,8 +5,8 @@ import { ModulesList } from "@/components/shared/modules";
 export function ModulesPage() {
   return (
     <AppShell>
-      <div className="space-y-7">
-        <Greeting role="Escolha os cuidados que fazem sentido para você." />
+      <div className="space-y-9">
+        <Greeting role="Escolha só o que fizer sentido para você agora." />
         <ModulesList />
       </div>
     </AppShell>

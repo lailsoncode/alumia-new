@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { applyTheme, getStoredTheme } from "./theme";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "./theme";
 
 describe("theme", () => {
   beforeEach(() => {
@@ -18,5 +18,15 @@ describe("theme", () => {
     applyTheme("light");
     expect(document.documentElement).not.toHaveClass("dark");
     expect(getStoredTheme()).toBe("light");
+  });
+
+  it("sincroniza controles que observam a troca de tema", () => {
+    const listener = vi.fn();
+    const unsubscribe = subscribeToThemeChanges(listener);
+
+    applyTheme("dark");
+
+    expect(listener).toHaveBeenCalledWith("dark");
+    unsubscribe();
   });
 });
