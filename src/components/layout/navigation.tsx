@@ -25,7 +25,7 @@ export function BottomNavigation() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-[1.25rem] px-1 text-xs font-semibold transition-colors",
-                  active ? "bg-tone-sky text-tone-sky-fg" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  active ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 <AlumiaIcon icon={item.icon} size="md" strokeWidth={active ? 2 : 1.6} />

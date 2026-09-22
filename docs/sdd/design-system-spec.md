@@ -20,7 +20,7 @@ A implementação deve corrigir contraste baixo, controles sem rótulo, inconsis
 
 A camada de conforto B2C deve usar:
 
-- fundo azul acinzentado visível, com superfícies claras e separação suave;
+- fundo muito claro com o viés lavanda da paleta original, superfícies claras e separação suave;
 - cartões amplos, cantos generosos e sombras difusas;
 - respiro entre blocos para que a tela não pareça uma sequência de cobranças;
 - pequenos acentos em amarelo, ciano, menta, pêssego e lavanda para orientar seções;

@@ -12,7 +12,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 
 ## Entrega concentrada
 
-- fundo frio mais presente, cartões claros, cantos amplos e sombras difusas;
+- paleta clara original com viés lavanda, cartões amplos, cantos generosos e sombras difusas;
 - mais espaço entre cabeçalhos, seções e ações;
 - saudação com acento visual, avatar e troca de tema sempre acessível;
 - navegação inferior em cápsula flutuante no mobile e sidebar preservada no desktop;
@@ -47,8 +47,8 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 | 1440 × 900 | tarefas inspecionadas em duas colunas |
 | temas claro e escuro | inspecionados visualmente |
 | console da prévia | sem erros ou avisos |
-| contraste dos pares recorrentes | mínimo medido de 5,82:1 no claro e 6,92:1 no escuro |
+| contraste dos pares recorrentes | mínimo medido de 6,00:1 no claro e 6,46:1 no escuro |
 
 ## Resultado
 
-A versão atual conserva sua organização e maturidade técnica, mas agora usa os elementos que tornavam o protótipo anterior mais confortável: fundo respirável, superfícies macias, orientação explícita, cor em pequenas doses e linguagem que acompanha sem pressionar.
+A versão atual conserva sua organização e maturidade técnica, mas agora usa os elementos que tornavam o protótipo anterior mais confortável: superfícies macias, orientação explícita, cor em pequenas doses e linguagem que acompanha sem pressionar. Após a revisão visual, a paleta anterior à camada de conforto foi restaurada, preservando todos os demais ajustes do sprint.
