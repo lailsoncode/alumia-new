@@ -1,21 +1,14 @@
-import { HugeiconsIcon } from "@hugeicons/react";
-import { SparklesIcon } from "@hugeicons/core-free-icons";
 import type { ReactNode } from "react";
+import { SparklesIcon } from "@hugeicons/core-free-icons";
+import { AlumiaIcon } from "@/components/ui/alumia-icon";
 
-/**
- * InfoCard — faixa informativa simples.
- * Design original: pill muted com texto centralizado e ícone decorativo.
- */
 export function InfoCard({ children }: { children: ReactNode }) {
   return (
-    <section className="flex items-center justify-center gap-2 rounded-xl bg-muted px-4 py-3 text-sm text-foreground sm:text-base">
-      <HugeiconsIcon
-        icon={SparklesIcon}
-        size={16}
-        strokeWidth={1.5}
-        className="shrink-0 text-tone-peach-fg"
-      />
-      <span className="text-center">{children}</span>
+    <section className="flex items-center gap-3 rounded-2xl bg-tone-lavender px-4 py-3.5 text-tone-lavender-fg sm:px-5">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface/65">
+        <AlumiaIcon icon={SparklesIcon} size="sm" />
+      </span>
+      <p className="text-sm font-medium leading-relaxed sm:text-base">{children}</p>
     </section>
   );
 }

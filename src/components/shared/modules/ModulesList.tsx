@@ -1,151 +1,52 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { StarIcon, AddCircleIcon, Grid2X2PlusIcon } from "@hugeicons/core-free-icons";
-import { activeModulesMock, initialAvailableModulesMock } from "../../../lib/mockData";
+import { useNavigate } from "@tanstack/react-router";
+import { CheckListIcon, GlassWaterIcon, SmileIcon, Yoga01Icon } from "@hugeicons/core-free-icons";
+import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { Button } from "@/components/ui/button";
+import { SectionHeader, Surface } from "@/components/ui/surface";
 
-/**
- * Toggle — Componente interno auxiliar para alternar ativação de módulos.
- */
-function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; label: string }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      aria-label={label}
-      onClick={onClick}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-        on ? "bg-primary" : "bg-muted"
-      }`}
-    >
-      <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-card shadow transition-all ${
-          on ? "left-[1.375rem]" : "left-0.5"
-        }`}
-      />
-    </button>
-  );
-}
+const activeModules = [
+  { id: "tasks", name: "Tarefas", description: "Organize o que precisa da sua atenção, sem transformar o dia em cobrança.", icon: CheckListIcon, tone: "bg-tone-lavender text-tone-lavender-fg", to: "/tarefas" as const },
+  { id: "hydration", name: "Hidratação", description: "Registre pausas para beber água e acompanhe seu ritmo ao longo da semana.", icon: GlassWaterIcon, tone: "bg-tone-sky text-tone-sky-fg", to: "/hidratacao" as const },
+];
 
-/**
- * ModulesList — Grade de módulos ativos e lista de módulos disponíveis.
- * Permite ao usuário gerenciar quais recursos quer no seu painel.
- */
+const upcomingModules = [
+  { id: "checkin", name: "Check-in emocional", description: "Um espaço privado para perceber como você está.", icon: SmileIcon, tone: "bg-tone-mint text-tone-mint-fg" },
+  { id: "mindfulness", name: "Mindfulness", description: "Práticas curtas para respirar e voltar ao presente.", icon: Yoga01Icon, tone: "bg-tone-peach text-tone-peach-fg" },
+];
+
 export function ModulesList() {
-  const [available, setAvailable] = useState(initialAvailableModulesMock);
-
-  const toggleModule = (id: string) => {
-    setAvailable((prev) => prev.map((m) => (m.id === id ? { ...m, enabled: !m.enabled } : m)));
-  };
-
+  const navigate = useNavigate();
   return (
-    <section className="space-y-5">
-      {/* Módulos Ativos */}
-      <div>
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground sm:text-base">
-          <HugeiconsIcon
-            icon={Grid2X2PlusIcon}
-            size={16}
-            strokeWidth={1.5}
-            className="text-tone-sky-fg"
-            aria-hidden
-          />
-          Módulos ativos
-        </h2>
-        <div className="grid grid-cols-2 gap-3">
-          {activeModulesMock.map((m) => (
-            <article
-              key={m.id}
-              className={`${m.tone} flex flex-col items-center rounded-xl p-3 text-center sm:p-4`}
-            >
-              <header className="flex w-full items-center justify-center gap-1.5">
-                <HugeiconsIcon icon={m.icon} size={20} strokeWidth={1.5} aria-hidden />
-                <h3 className="truncate text-sm font-bold sm:text-base">{m.name}</h3>
-                {m.pro && (
-                  <span className="inline-flex items-center gap-0.5 rounded-md bg-card/80 px-1.5 py-0.5 text-[10px] font-bold text-tone-sun-fg">
-                    <HugeiconsIcon icon={StarIcon} size={10} strokeWidth={2} />
-                    PRO
-                  </span>
-                )}
-              </header>
-              <p className="mt-2 line-clamp-3 text-xs leading-snug opacity-80 sm:text-sm">
-                {m.description}
-              </p>
-              <div className="mt-3 w-full border-t border-current/15 pt-3">
-                {m.id === "tasks" ? (
-                  <Link
-                    to="/tarefas"
-                    className="block w-full rounded-lg bg-card/80 px-3 py-1.5 text-center text-xs font-medium text-foreground transition-colors hover:bg-card sm:text-sm cursor-pointer"
-                  >
-                    Acessar
-                  </Link>
-                ) : m.id === "hydration" ? (
-                  <Link
-                    to="/hidratacao"
-                    className="block w-full rounded-lg bg-card/80 px-3 py-1.5 text-center text-xs font-medium text-foreground transition-colors hover:bg-card sm:text-sm cursor-pointer"
-                  >
-                    Acessar
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    className="w-full rounded-lg bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-card sm:text-sm"
-                  >
-                    Acessar
-                  </button>
-                )}
+    <div className="space-y-9">
+      <section>
+        <SectionHeader title="Seus cuidados" description="Recursos disponíveis agora na sua Alumia." />
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {activeModules.map((module) => (
+            <Surface key={module.id} as="article" variant="interactive" className="overflow-hidden">
+              <div className="p-5 sm:p-6">
+                <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${module.tone}`}><AlumiaIcon icon={module.icon} size="lg" /></span>
+                <h3 className="mt-5 text-xl font-semibold">{module.name}</h3>
+                <p className="mt-2 min-h-12 text-sm leading-relaxed text-muted-foreground">{module.description}</p>
+                <Button className="mt-5 w-full" onClick={() => navigate({ to: module.to })}>Abrir {module.name.toLowerCase()}</Button>
               </div>
-
-            </article>
+            </Surface>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Módulos Disponíveis */}
-      <div>
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground sm:text-base">
-          <HugeiconsIcon
-            icon={AddCircleIcon}
-            size={16}
-            strokeWidth={1.5}
-            className="text-muted-foreground"
-            aria-hidden
-          />
-          Módulos disponíveis
-        </h2>
-        <ul className="space-y-2">
-          {available.map((m) => (
-            <li
-              key={m.id}
-              className={`flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 ${m.enabled ? `border-current/20 ${m.tone}` : ""}`}
-              style={m.enabled ? { backgroundColor: "var(--card)" } : undefined}
-            >
-              <HugeiconsIcon
-                icon={m.icon}
-                size={20}
-                strokeWidth={1.5}
-                className={m.enabled ? "" : "text-muted-foreground"}
-                aria-hidden
-              />
-              <span className="flex-1 truncate text-sm font-medium text-foreground sm:text-base">
-                {m.name}
-              </span>
-              {m.pro && (
-                <span className="inline-flex items-center gap-0.5 rounded-md bg-tone-sun px-1.5 py-0.5 text-[10px] font-bold text-tone-sun-fg">
-                  <HugeiconsIcon icon={StarIcon} size={10} strokeWidth={2} />
-                  PRO
-                </span>
-              )}
-              <Toggle
-                on={m.enabled}
-                onClick={() => toggleModule(m.id)}
-                label={`Ativar ${m.name}`}
-              />
-            </li>
+      <section>
+        <SectionHeader title="Em breve" description="Estes cuidados ainda estão sendo preparados. Eles não estão ativos na sua conta." />
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {upcomingModules.map((module) => (
+            <Surface key={module.id} as="article" variant="subtle" className="p-5 sm:p-6">
+              <div className="flex items-start gap-4">
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${module.tone}`}><AlumiaIcon icon={module.icon} size="md" /></span>
+                <div><div className="flex flex-wrap items-center gap-2"><h3 className="text-base font-semibold">{module.name}</h3><span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">Em breve</span></div><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{module.description}</p></div>
+              </div>
+            </Surface>
           ))}
-        </ul>
-      </div>
-    </section>
+        </div>
+      </section>
+    </div>
   );
 }

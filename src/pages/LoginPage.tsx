@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { AuthHero } from "../components/shared/auth/AuthHero";
-import { AuthInput } from "../components/shared/auth/AuthInput";
-import { GoogleButton } from "../components/shared/auth/GoogleButton";
-import { signInWithEmail, signInWithGoogle, resetPassword } from "../services/authService";
+import { AuthLayout } from "@/components/shared/auth/AuthLayout";
+import { AuthInput } from "@/components/shared/auth/AuthInput";
+import { GoogleButton } from "@/components/shared/auth/GoogleButton";
+import { Button } from "@/components/ui/button";
+import { InlineFeedback } from "@/components/ui/surface";
+import { resetPassword, signInWithEmail, signInWithGoogle } from "@/services/authService";
+import welcomeHero from "@/assets/welcome.webp";
 
-import welcomeHero from "../assets/welcome.webp";
-
-/**
- * LoginPage — Tela de login da Alumia.
- * Oferece autenticação por email/senha ou Google OAuth.
- */
 export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -19,31 +16,32 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
     setError(null);
     setLoading(true);
     try {
       await signInWithEmail({ email, password });
       navigate({ to: "/" });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erro ao entrar. Tente novamente.");
+    } catch (caught: unknown) {
+      setError(caught instanceof Error ? caught.message : "Não foi possível entrar. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogle = async () => {
+    setError(null);
     try {
       await signInWithGoogle();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erro ao entrar com Google.");
+    } catch (caught: unknown) {
+      setError(caught instanceof Error ? caught.message : "Não foi possível entrar com Google.");
     }
   };
 
   const handleReset = async () => {
     if (!email) {
-      setError("Digite seu email acima para redefinir a senha.");
+      setError("Informe seu e-mail para receber o link de recuperação.");
       return;
     }
     setLoading(true);
@@ -51,98 +49,49 @@ export function LoginPage() {
       await resetPassword(email);
       setResetSent(true);
       setError(null);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erro ao enviar email.");
+    } catch (caught: unknown) {
+      setError(caught instanceof Error ? caught.message : "Não foi possível enviar o e-mail.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#ebf4f8]">
-      {/* Hero image */}
-      <AuthHero src={welcomeHero} alt="Personagem acenando na porta de entrada" />
+    <AuthLayout src={welcomeHero} alt="Personagem da Alumia dando boas-vindas">
+      <div>
+        <p className="text-sm font-semibold text-primary">Que bom ter você de volta</p>
+        <h1 className="mt-2 text-3xl font-bold leading-tight text-foreground sm:text-4xl">A casa é sua.</h1>
+        <p className="mt-3 text-base leading-relaxed text-muted-foreground">Entre para continuar cuidando do que importa, no seu ritmo.</p>
 
-      {/* Form container */}
-      <div className="mx-auto w-full max-w-md flex-1 px-6 pb-10 pt-6 flex flex-col justify-between">
-        <div>
-          <h1 className="font-display text-[26px] font-bold leading-tight text-[#1a2530]">
-            A casa é sua. Entre e fique à vontade.
-          </h1>
-          <p className="mt-2 text-sm text-[#8a99a8]">
-            Você chegou. Agora é hora de cuidar do que importa: você.
-          </p>
+        <form onSubmit={handleLogin} className="mt-8 space-y-5" noValidate>
+          <AuthInput id="login-email" label="E-mail" type="email" placeholder="voce@exemplo.com" value={email} onChange={setEmail} autoComplete="email" autoFocus />
+          <AuthInput id="login-password" label="Senha" type="password" placeholder="Digite sua senha" value={password} onChange={setPassword} autoComplete="current-password" />
 
-          <form onSubmit={handleLogin} className="mt-6 space-y-4">
-            <AuthInput
-              id="login-email"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={setEmail}
-              autoComplete="email"
-              autoFocus
-            />
-            <AuthInput
-              id="login-password"
-              type="password"
-              placeholder="Senha"
-              value={password}
-              onChange={setPassword}
-              autoComplete="current-password"
-            />
+          {error && <InlineFeedback tone="danger">{error}</InlineFeedback>}
+          {resetSent && <InlineFeedback tone="success">Enviamos o link de recuperação. Verifique sua caixa de entrada.</InlineFeedback>}
 
-            {/* Error / success feedback */}
-            {error && (
-              <p className="rounded-xl bg-destructive/10 px-4 py-3 text-xs text-destructive">
-                {error}
-              </p>
-            )}
-            {resetSent && (
-              <p className="rounded-xl bg-tone-mint px-4 py-3 text-xs text-tone-mint-fg">
-                Email de recuperação enviado! Verifique sua caixa de entrada.
-              </p>
-            )}
+          <Button type="submit" size="lg" className="w-full" disabled={loading || !email || !password}>
+            {loading ? "Entrando…" : "Entrar"}
+          </Button>
+        </form>
 
-            <button
-              type="submit"
-              disabled={loading || !email || !password}
-              className="w-full rounded-2xl bg-[#cde2f2] py-4 text-base font-bold text-[#2a405a] shadow-[0_4px_12px_rgba(44,64,90,0.08)] hover:bg-[#bed5e8] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Entrando…" : "Entrar"}
-            </button>
-          </form>
-
-          {/* Reset password */}
-          <div className="mt-4 text-center text-sm text-[#8a99a8]">
-            Esqueceu?{" "}
-            <button
-              type="button"
-              onClick={handleReset}
-              className="font-bold text-[#5d85a6] hover:underline"
-            >
-              Resete sua senha
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-[#d5e3ef]" />
-            <span className="text-xs font-bold text-[#8a99a8] tracking-wider">OU</span>
-            <div className="h-px flex-1 bg-[#d5e3ef]" />
-          </div>
-
-          <GoogleButton label="Entrar com o Google" onClick={handleGoogle} disabled={loading} />
+        <div className="mt-4 text-center text-sm text-muted-foreground">
+          Esqueceu a senha?{" "}
+          <button type="button" onClick={handleReset} className="min-h-11 font-semibold text-primary underline-offset-4 hover:underline">Recuperar acesso</button>
         </div>
 
-        {/* Navigate to register */}
-        <p className="mt-8 text-center text-sm text-[#8a99a8]">
-          Não tem uma conta?{" "}
-          <Link to="/registro" className="font-bold text-[#5d85a6] hover:underline">
-            Crie agora
-          </Link>
+        <div className="my-6 flex items-center gap-3" aria-hidden="true">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">ou</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <GoogleButton label="Entrar com o Google" onClick={handleGoogle} disabled={loading} />
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Ainda não tem uma conta?{" "}
+          <Link to="/registro" className="font-semibold text-primary underline-offset-4 hover:underline">Criar conta</Link>
         </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

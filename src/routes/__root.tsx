@@ -7,16 +7,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          O endereço que você tentou acessar não existe ou foi movido.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            Voltar ao início
           </Link>
         </div>
       </div>
@@ -33,16 +33,16 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Alumia: organize seus cuidados, humor, hidratação e tarefas com leveza. Mobile-first.",
+          "Alumia: organize seus cuidados, hidratação e tarefas com leveza.",
       },
       { name: "author", content: "Alumia" },
       { property: "og:title", content: "Alumia — seu espaço de cuidado diário" },
       {
         property: "og:description",
-        content: "Cuide de você com leveza: humor, tarefas, hidratação e mais.",
+        content: "Cuide de você com leveza: tarefas, hidratação e mais.",
       },
       { property: "og:type", content: "website" },
-      { name: "theme-color", content: "#f5f3ff" },
+      { name: "theme-color", content: "oklch(0.985 0.008 280)" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -61,7 +61,7 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>

@@ -1,132 +1,57 @@
-import { HugeiconsIcon } from "@hugeicons/react";
-import { GlassWaterIcon, CupSodaIcon, DrinkIcon } from "@hugeicons/core-free-icons";
-import { RotateCcw } from "lucide-react";
-import { useState, useEffect } from "react";
-import { getTodayHydration, logWaterIntake, undoLastWaterLog } from "@/services/hydrationService";
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowReloadHorizontalIcon, CupSodaIcon, GlassWaterIcon } from "@hugeicons/core-free-icons";
+import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { Button } from "@/components/ui/button";
+import { Surface } from "@/components/ui/surface";
 import { getLocalDateString } from "@/lib/utils";
+import { getTodayHydration, logWaterIntake, undoLastWaterLog } from "@/services/hydrationService";
 
 const GOAL = 2000;
 
-const cups = [
-  { label: "Copo 200ml", icon: CupSodaIcon, ml: 200 },
-  { label: "Jarra 500ml", icon: GlassWaterIcon, ml: 500 },
-  { label: "Out...", icon: DrinkIcon, ml: 100 },
-];
-
-/**
- * HydrationCard — acompanhamento de hidratação do dia.
- * Exibe o total ingerido, barra de progresso e botões de adição por tipo de copo.
- */
 export function HydrationCard() {
+  const navigate = useNavigate();
   const [intake, setIntake] = useState(0);
   const [loading, setLoading] = useState(true);
-  const pct = Math.min(100, (intake / GOAL) * 100);
+  const progress = Math.min(100, (intake / GOAL) * 100);
 
-  const loadTodayHydration = async () => {
-    try {
-      const today = getLocalDateString();
-      const total = await getTodayHydration(today);
-      setIntake(total);
-    } catch (err) {
-      console.error("Erro ao carregar hidratação:", err);
-    } finally {
-      setLoading(false);
-    }
+  const load = async () => {
+    try { setIntake(await getTodayHydration(getLocalDateString())); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, []);
+
+  const add = async (amount: number) => {
+    setIntake((value) => Math.min(GOAL, value + amount));
+    await logWaterIntake(amount, getLocalDateString());
+    await load();
   };
 
-  useEffect(() => {
-    loadTodayHydration();
-  }, []);
-
-  const handleAddWater = async (ml: number) => {
-    const today = getLocalDateString();
-    try {
-      // Atualização otimista
-      setIntake((v) => Math.min(GOAL, v + ml));
-      await logWaterIntake(ml, today);
-      // Sincroniza com o banco
-      const total = await getTodayHydration(today);
-      setIntake(total);
-    } catch (err) {
-      console.error("Erro ao registrar água:", err);
-      // Reverte em caso de erro
-      loadTodayHydration();
-    }
-  };
-
-  const handleUndo = async () => {
-    const today = getLocalDateString();
-    try {
-      await undoLastWaterLog(today);
-      // Sincroniza com o banco
-      const total = await getTodayHydration(today);
-      setIntake(total);
-    } catch (err) {
-      console.error("Erro ao desfazer registro de água:", err);
-      loadTodayHydration();
-    }
+  const undo = async () => {
+    await undoLastWaterLog(getLocalDateString());
+    await load();
   };
 
   return (
-    <section className="alumia-card p-4 sm:p-5">
-      <div className="flex items-center justify-between">
-        <p className="flex items-center gap-2 text-sm sm:text-base">
-          <HugeiconsIcon
-            icon={GlassWaterIcon}
-            size={18}
-            strokeWidth={1.5}
-            className="shrink-0 text-tone-sky-fg"
-          />
-          <span>
-            {loading ? (
-              "Buscando hidratação do dia..."
-            ) : (
-              <>
-                Seu corpo já recebeu <strong>{intake}ml</strong> de carinho!
-              </>
-            )}
-          </span>
-        </p>
-
-        {!loading && intake > 0 && (
-          <button
-            onClick={handleUndo}
-            title="Desfazer última entrada"
-            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-destructive cursor-pointer"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            <span>Desfazer</span>
-          </button>
-        )}
+    <Surface className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-tone-sky text-tone-sky-fg"><AlumiaIcon icon={GlassWaterIcon} size="md" /></span>
+          <div>
+            <h2 className="text-lg font-semibold">Hidratação</h2>
+            <p className="text-sm text-muted-foreground">{loading ? "Carregando…" : `${intake} ml de ${GOAL} ml`}</p>
+          </div>
+        </div>
+        {intake > 0 && <Button variant="ghost" size="icon" aria-label="Desfazer último registro" onClick={undo}><AlumiaIcon icon={ArrowReloadHorizontalIcon} size="sm" /></Button>}
       </div>
-
-      {/* Barra de progresso cinza — preenche com primary ao adicionar */}
-      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full rounded-full bg-primary/70 transition-all duration-500"
-          style={{ width: `${pct}%` }}
-          role="progressbar"
-          aria-valuenow={intake}
-          aria-valuemin={0}
-          aria-valuemax={GOAL}
-          aria-label="Progresso de hidratação"
-        />
+      <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-muted">
+        <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={GOAL} aria-valuenow={intake} />
       </div>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        {cups.map((c) => (
-          <button
-            key={c.label}
-            disabled={loading}
-            onClick={() => handleAddWater(c.ml)}
-            className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50 cursor-pointer"
-          >
-            {c.label}
-            <HugeiconsIcon icon={c.icon} size={14} strokeWidth={1.5} className="text-tone-sky-fg" />
-          </button>
-        ))}
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Button variant="outline" size="sm" onClick={() => add(200)} disabled={loading}><AlumiaIcon icon={CupSodaIcon} size="xs" />200 ml</Button>
+        <Button variant="outline" size="sm" onClick={() => add(500)} disabled={loading}><AlumiaIcon icon={GlassWaterIcon} size="xs" />500 ml</Button>
       </div>
-    </section>
+      <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => navigate({ to: "/hidratacao" })}>Ver detalhes</Button>
+    </Surface>
   );
 }
-

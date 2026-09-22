@@ -1,25 +1,11 @@
-# Módulo Home (`src/components/shared/home/`)
+# Componentes da Home
 
-Este diretório contém os blocos e cartões de controle exibidos na página inicial (Dashboard) do aplicativo Alumia.
+A home resume somente os recursos B2C funcionais da versão atual.
 
-## Estrutura de Componentes
+- `InfoCard.tsx`: mensagem contextual e discreta;
+- `CareList.tsx`: resumo das tarefas do dia e acesso ao fluxo de criação;
+- `HydrationCard.tsx`: progresso e registro rápido de água;
+- `ModulesGrid.tsx`: atalhos para tarefas e hidratação;
+- `index.ts`: exportações públicas do conjunto.
 
-O painel inicial é composto por pequenos widgets interativos focados no bem-estar diário do usuário:
-
-```
-src/components/shared/home/
-├── MoodCard.tsx       # Check-in emocional diário ("Como você está se sentindo?")
-├── InfoCard.tsx       # Cartão informativo e motivacional com mensagens curtas
-├── CareList.tsx       # Lista de hábitos e rituais de autocuidado ("Meus autocuidados")
-├── HydrationCard.tsx  # Marcador e controle rápido de ingestão de água diária
-├── ModulesGrid.tsx    # Acesso rápido para os módulos ativos do aplicativo
-└── index.ts           # Exportação consolidada dos componentes do Dashboard
-```
-
----
-
-## Fluxo de Estado
-
-- **Check-in Emocional:** Registra de forma rápida o humor do usuário e salva em estado local (a ser persistido no Supabase na tabela de check-ins).
-- **Controle de Hidratação:** Registra visualmente copos de água consumidos com botões de incremento e decremento.
-- **Autocuidados (CareList):** Permite riscar ou marcar atividades de cuidado essenciais do dia como feitas (ex: meditar, alongar, tomar remédio).
+Check-in emocional, comunidade, Alum.IA e outros módulos futuros não são apresentados como disponíveis até que tenham fluxo e persistência reais.

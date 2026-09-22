@@ -20,7 +20,7 @@ function getPeriodGreeting(hour: number) {
  */
 export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: GreetingProps) {
   const { user } = useAuth();
-  const [name, setName] = useState(propName || "😊");
+  const [name, setName] = useState(propName || "você");
   const [avatarUrl, setAvatarUrl] = useState(propAvatarUrl || "");
   const [greeting, setGreeting] = useState("Boa noite");
 
@@ -39,22 +39,22 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
       getUserProfile(user.id)
         .then((profile) => {
           if (profile) {
-            setName(profile.firstName || user.email?.split("@")[0] || "😊");
+            setName(profile.firstName || user.email?.split("@")[0] || "você");
             if (profile.avatarUrl && !propAvatarUrl) {
               if (!profile.avatarUrl.startsWith("blob:")) {
                 setAvatarUrl(profile.avatarUrl);
               }
             }
           } else {
-            setName(user.email?.split("@")[0] || "😊");
+            setName(user.email?.split("@")[0] || "você");
           }
         })
         .catch((err) => {
           console.error("Erro ao carregar perfil no Greeting:", err);
-          setName(user.email?.split("@")[0] || "😊");
+          setName(user.email?.split("@")[0] || "você");
         });
     } else if (!user && !propName) {
-      setName("😊");
+      setName("você");
     }
   }, [user, propName, propAvatarUrl]);
 
@@ -73,20 +73,21 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
     .toUpperCase();
 
   return (
-    <header className="flex items-start justify-between gap-3 px-1 py-1">
+    <header className="flex items-start justify-between gap-4 py-1">
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           {greeting}, <span className="font-bold">{name}</span>
         </h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">{role ?? subtitleByPeriod()}</p>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground sm:text-base">{role ?? subtitleByPeriod()}</p>
       </div>
       <div className="shrink-0">
         <div
-          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary/60 bg-card text-sm font-semibold text-foreground overflow-hidden"
-          aria-label={`Avatar de ${name}`}
+          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card text-sm font-semibold text-foreground shadow-sm"
+          role={avatarUrl ? undefined : "img"}
+          aria-label={avatarUrl ? undefined : `Avatar de ${name}`}
         >
           {avatarUrl ? (
-            <img src={avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
+            <img src={avatarUrl} alt={`Avatar de ${name}`} className="h-full w-full object-cover" />
           ) : (
             initials
           )}

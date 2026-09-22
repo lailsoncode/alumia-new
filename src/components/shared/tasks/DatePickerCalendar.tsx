@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Calendar01Icon,
   ArrowLeft01Icon,
   ArrowRight01Icon as ArrowRightIcon,
 } from "@hugeicons/core-free-icons";
+import { AlumiaIcon } from "@/components/ui/alumia-icon";
 
 const MONTHS = [
   "janeiro",
@@ -48,6 +48,7 @@ export function DatePickerCalendar({ selectedDate, onSelectDate }: DatePickerCal
     ...Array(firstDay).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
+  const monthLabel = `${MONTHS[calendarMonth][0].toUpperCase()}${MONTHS[calendarMonth].slice(1)} de ${calendarYear}`;
 
   const prevMonth = () => {
     if (calendarMonth === 0) {
@@ -83,29 +84,26 @@ export function DatePickerCalendar({ selectedDate, onSelectDate }: DatePickerCal
     <div className="w-full">
       {/* Calendar header */}
       <div className="my-3 flex items-center justify-between">
-        <span className="text-sm font-semibold text-foreground capitalize">
-          {MONTHS[calendarMonth]} de {calendarYear}
+        <span className="text-sm font-semibold text-foreground">
+          {monthLabel}
         </span>
         <div className="flex items-center gap-1">
-          <HugeiconsIcon
-            icon={Calendar01Icon}
-            size={16}
-            strokeWidth={1.5}
-            className="mr-1 text-muted-foreground"
-          />
+          <AlumiaIcon icon={Calendar01Icon} size="xs" className="mr-1 text-muted-foreground" />
           <button
             type="button"
             onClick={prevMonth}
-            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-muted"
+            className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-muted"
+            aria-label="Mês anterior"
           >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={1.5} />
+            <AlumiaIcon icon={ArrowLeft01Icon} size="xs" />
           </button>
           <button
             type="button"
             onClick={nextMonth}
-            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-muted"
+            className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-muted"
+            aria-label="Próximo mês"
           >
-            <HugeiconsIcon icon={ArrowRightIcon} size={15} strokeWidth={1.5} />
+            <AlumiaIcon icon={ArrowRightIcon} size="xs" />
           </button>
         </div>
       </div>
@@ -113,7 +111,7 @@ export function DatePickerCalendar({ selectedDate, onSelectDate }: DatePickerCal
       {/* Day headers */}
       <div className="mb-1 grid grid-cols-7 text-center">
         {["dom.", "seg.", "ter.", "qua.", "qui.", "sex.", "sáb."].map((d) => (
-          <span key={d} className="text-[10px] text-muted-foreground">
+          <span key={d} className="text-xs text-muted-foreground">
             {d}
           </span>
         ))}
@@ -127,7 +125,9 @@ export function DatePickerCalendar({ selectedDate, onSelectDate }: DatePickerCal
               <button
                 type="button"
                 onClick={() => onSelectDate(new Date(calendarYear, calendarMonth, day))}
-                className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors ${
+                aria-label={`${day} de ${MONTHS[calendarMonth]} de ${calendarYear}${isToday(day) ? ", hoje" : ""}`}
+                aria-pressed={isSelectedDay(day)}
+                className={`mx-auto flex h-11 w-11 items-center justify-center rounded-xl text-sm transition-colors ${
                   isSelectedDay(day)
                     ? "bg-primary font-bold text-primary-foreground"
                     : isToday(day)
@@ -138,7 +138,7 @@ export function DatePickerCalendar({ selectedDate, onSelectDate }: DatePickerCal
                 {day}
               </button>
             ) : (
-              <div className="h-8" />
+              <div className="h-11" />
             )}
           </div>
         ))}

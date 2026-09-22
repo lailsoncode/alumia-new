@@ -1,19 +1,13 @@
 import { useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Sun01Icon,
-  Calendar01Icon,
-  Clock01Icon,
-  BellIcon,
-  Flag01Icon,
-  Leaf01Icon,
-  AddCircleIcon,
-} from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
-import type { Task, AddTaskData } from "../../../types";
+import { AddCircleIcon, BellIcon, Calendar01Icon, Clock01Icon, Flag01Icon } from "@hugeicons/core-free-icons";
+import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { Button } from "@/components/ui/button";
+import { SectionHeader, Surface } from "@/components/ui/surface";
+import { getLocalDateString } from "@/lib/utils";
+import { createTask, updateTask } from "@/services/tasksService";
+import type { AddTaskData, Task } from "@/types";
 import { AddTaskSheet } from "../tasks/AddTaskSheet";
-import { updateTask, createTask } from "../../../services/tasksService";
 
 interface CareListProps {
   tasks: Task[];
@@ -21,214 +15,77 @@ interface CareListProps {
   onRefresh: () => void;
 }
 
-function formatTaskDate(dateStr: string | undefined) {
-  if (!dateStr) return "";
-  try {
-    if (
-      dateStr.includes("jan") ||
-      dateStr.includes("fev") ||
-      dateStr.includes("mar") ||
-      dateStr.includes("abr") ||
-      dateStr.includes("mai") ||
-      dateStr.includes("jun") ||
-      dateStr.includes("jul") ||
-      dateStr.includes("ago") ||
-      dateStr.includes("set") ||
-      dateStr.includes("out") ||
-      dateStr.includes("nov") ||
-      dateStr.includes("dez")
-    ) {
-      return dateStr;
-    }
-
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const d = new Date(year, month - 1, day);
-    
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
-    if (
-      d.getDate() === today.getDate() &&
-      d.getMonth() === today.getMonth() &&
-      d.getFullYear() === today.getFullYear()
-    ) {
-      return "Hoje";
-    }
-
-    if (
-      d.getDate() === tomorrow.getDate() &&
-      d.getMonth() === tomorrow.getMonth() &&
-      d.getFullYear() === tomorrow.getFullYear()
-    ) {
-      return "Amanhã";
-    }
-
-    return d.toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
-  } catch (e) {
-    return dateStr;
-  }
+function formatTaskDate(dateString?: string) {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  const today = getLocalDateString();
+  if (dateString === today) return "Hoje";
+  return date.toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
 }
 
-/**
- * CareList — lista de cuidados importantes do dia carregados do Supabase.
- */
 export function CareList({ tasks, loading, onRefresh }: CareListProps) {
   const navigate = useNavigate();
-  const [addSheetOpen, setAddSheetOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const today = getLocalDateString();
+  const pending = tasks
+    .filter((task) => !task.done && (task.date ? task.date <= today : true))
+    .sort((a, b) => (a.priority === "alta" && b.priority !== "alta" ? -1 : 0));
 
-  const toggleDone = async (id: string) => {
-    try {
-      await updateTask(id, { done: true });
-      onRefresh();
-    } catch (err) {
-      console.error("Erro ao completar tarefa:", err);
-    }
+  const completeTask = async (id: string) => {
+    await updateTask(id, { done: true });
+    onRefresh();
   };
 
-  const handleCreateTask = async (data: AddTaskData) => {
-    try {
-      await createTask(data);
-      onRefresh();
-    } catch (err) {
-      console.error("Erro ao criar tarefa:", err);
-    }
+  const addTask = async (data: AddTaskData) => {
+    await createTask(data);
+    onRefresh();
   };
-
-  const todayStr = new Date().toISOString().split("T")[0];
-  const pendingToday = tasks.filter((t) => !t.done && (t.date ? t.date <= todayStr : true));
-
-  // Ordena para exibir tarefas importantes (alta prioridade) no topo
-  const displayTasks = [...pendingToday]
-    .sort((a, b) => {
-      if (a.priority === "alta" && b.priority !== "alta") return -1;
-      if (a.priority !== "alta" && b.priority === "alta") return 1;
-      return 0;
-    })
-    .slice(0, 3);
 
   return (
-    <section className="alumia-card p-4 sm:p-5">
-      <h2 className="flex items-center gap-2 text-sm font-medium text-foreground sm:text-base">
-        <HugeiconsIcon
-          icon={Sun01Icon}
-          size={16}
-          strokeWidth={1.5}
-          className="text-tone-sun-fg shrink-0"
-        />
-        Isso aqui parece importante pra você:
-      </h2>
+    <Surface className="p-5 sm:p-6">
+      <SectionHeader
+        title="Para hoje"
+        description="O que importa primeiro, no seu ritmo."
+        action={<Button variant="outline" size="sm" onClick={() => setSheetOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="xs" />Adicionar</Button>}
+      />
 
       {loading ? (
-        <p className="mt-3 text-xs text-muted-foreground">Carregando seus cuidados...</p>
-      ) : displayTasks.length === 0 ? (
-        <p className="mt-3 text-xs text-muted-foreground bg-muted/30 px-3 py-4 rounded-xl border border-dashed border-border text-center">
-          Nenhum cuidado pendente para hoje. Curta o seu momento! 🌸
-        </p>
+        <div className="mt-6 space-y-3" aria-label="Carregando cuidados">
+          {[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-muted" />)}
+        </div>
+      ) : pending.length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-subtle px-5 py-10 text-center">
+          <p className="font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Você pode adicionar um cuidado quando quiser.</p>
+        </div>
       ) : (
-        <ul className="mt-3 space-y-1.5">
-          {displayTasks.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5"
-            >
-              {/* Círculo de seleção (radio) */}
-              <button
-                type="button"
-                onClick={() => toggleDone(item.id)}
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-muted-foreground/40 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer focus:outline-none"
-                aria-label="Concluir tarefa"
-              />
-
+        <ul className="mt-6 space-y-3">
+          {pending.slice(0, 3).map((task) => (
+            <li key={task.id} className="flex items-center gap-3 rounded-2xl border border-border bg-background p-3.5">
+              <button type="button" onClick={() => completeTask(task.id)} aria-label={`Concluir ${task.title}`} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl hover:bg-success/60">
+                <span className="h-5 w-5 rounded-full border-2 border-primary/55" />
+              </button>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-foreground sm:text-base">
-                  {item.title}
-                </p>
-                {(item.date || item.time || item.reminder || item.priority) && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                    {item.date && (
-                      <>
-                        <HugeiconsIcon icon={Calendar01Icon} size={11} strokeWidth={1.5} />
-                        <span>{formatTaskDate(item.date)}</span>
-                      </>
-                    )}
-                    {item.time && (
-                      <>
-                        {item.date && <span className="mx-0.5">·</span>}
-                        <HugeiconsIcon icon={Clock01Icon} size={11} strokeWidth={1.5} />
-                        <span>{item.time}</span>
-                      </>
-                    )}
-                    {item.reminder && (
-                      <>
-                        {(item.date || item.time) && <span className="mx-0.5">·</span>}
-                        <HugeiconsIcon icon={BellIcon} size={11} strokeWidth={1.5} />
-                      </>
-                    )}
-                    {item.priority && (
-                      <>
-                        {(item.date || item.time || item.reminder) && <span className="mx-0.5">·</span>}
-                        <HugeiconsIcon
-                          icon={Flag01Icon}
-                          size={11}
-                          strokeWidth={1.5}
-                          className={
-                            item.priority === "alta"
-                              ? "text-red-500 fill-red-500/10 shrink-0"
-                              : item.priority === "media"
-                                ? "text-yellow-500 fill-yellow-500/10 shrink-0"
-                                : "text-blue-500 fill-blue-500/10 shrink-0"
-                          }
-                        />
-                      </>
-                    )}
-                  </p>
-                )}
+                <p className="truncate text-sm font-semibold text-foreground sm:text-base">{task.title}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                  {task.date && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={Calendar01Icon} size="xs" />{formatTaskDate(task.date)}</span>}
+                  {task.time && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={Clock01Icon} size="xs" />{task.time}</span>}
+                  {task.reminder && <AlumiaIcon icon={BellIcon} size="xs" label="Com lembrete" />}
+                  {task.priority && <AlumiaIcon icon={Flag01Icon} size="xs" label={`Prioridade ${task.priority}`} className={task.priority === "alta" ? "text-destructive" : "text-muted-foreground"} />}
+                </div>
               </div>
             </li>
           ))}
         </ul>
       )}
 
-      {!loading && (
-        <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <HugeiconsIcon
-            icon={Leaf01Icon}
-            size={13}
-            strokeWidth={1.5}
-            className="text-tone-mint-fg"
-          />
-          {pendingToday.length === 1
-            ? "Hoje você tem 1 cuidado aguardando por você."
-            : `Hoje você tem ${pendingToday.length} cuidados aguardando por você.`}
-        </p>
-      )}
-
-      <div className="mt-2 flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-lg text-xs"
-          onClick={() => navigate({ to: "/tarefas" })}
-        >
-          Ver todas
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1.5 rounded-lg text-xs"
-          onClick={() => setAddSheetOpen(true)}
-        >
-          <HugeiconsIcon icon={AddCircleIcon} size={13} strokeWidth={1.5} />
-          Adicionar nova
-        </Button>
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
+        <p className="text-sm text-muted-foreground">{pending.length ? `${pending.length} ${pending.length === 1 ? "cuidado" : "cuidados"} em aberto` : "Sem pendências"}</p>
+        <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tarefas" })}>Ver todas</Button>
       </div>
 
-      <AddTaskSheet
-        open={addSheetOpen}
-        onClose={() => setAddSheetOpen(false)}
-        onSave={handleCreateTask}
-      />
-    </section>
+      <AddTaskSheet open={sheetOpen} onClose={() => setSheetOpen(false)} onSave={addTask} />
+    </Surface>
   );
 }
