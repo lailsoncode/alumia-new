@@ -104,7 +104,7 @@ export function CheckinPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4">
       <Surface className="module-surface flex items-start gap-3 p-3.5 shadow-none sm:p-4">
         <AlumiaIcon icon={SmileIcon} size="lg" className="module-text mt-0.5" />
         <div>
@@ -123,15 +123,19 @@ export function CheckinPage() {
       )}
 
       {result ? (
-        <div className="mx-auto max-w-3xl space-y-4">
-          <MoodSummaryCard result={result} />
-          <CareSuggestionCard
-            suggestion={result.suggestion}
-            onRestart={restart}
-            onAddTask={() => setTaskSheetOpen(true)}
-          />
-          {taskFeedback && <InlineFeedback tone={taskFeedback.tone}>{taskFeedback.message}</InlineFeedback>}
-          <MoodCalendar items={history} onSelect={setSelectedHistoryItem} />
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)]">
+          <div className="space-y-4">
+            <MoodSummaryCard result={result} />
+            <CareSuggestionCard
+              suggestion={result.suggestion}
+              onRestart={restart}
+              onAddTask={() => setTaskSheetOpen(true)}
+            />
+            {taskFeedback && <InlineFeedback tone={taskFeedback.tone}>{taskFeedback.message}</InlineFeedback>}
+          </div>
+          <div className="lg:rounded-[1.5rem] lg:border lg:border-border lg:bg-surface lg:p-4 lg:shadow-[var(--shadow-card)]">
+            <MoodCalendar items={history} onSelect={setSelectedHistoryItem} />
+          </div>
           <CheckinDetailDialog
             item={selectedHistoryItem}
             onOpenChange={(open) => {

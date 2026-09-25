@@ -33,8 +33,14 @@ export function HomePage() {
 
   return (
     <div className="space-y-4">
-      <EmotionalCheckinCard />
-      <InfoCard>{message}</InfoCard>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
+        <div className="lg:col-start-2 lg:row-start-1">
+          <EmotionalCheckinCard />
+        </div>
+        <div className="lg:col-start-1 lg:row-start-1">
+          <InfoCard>{message}</InfoCard>
+        </div>
+      </div>
       {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={loadTasks} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
