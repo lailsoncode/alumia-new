@@ -81,13 +81,10 @@ export function TasksView() {
         <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-3 min-[380px]:grid-cols-[6.5rem_minmax(0,1fr)] sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
           <img src={tasksImage} alt="Personagem da Alumia organizando ideias com calma" className="h-full min-h-40 w-full rounded-[0.875rem] object-cover" />
           <div className="py-0.5">
-            <div className="flex items-start justify-between gap-3">
-              <h2 className="flex items-start gap-2 font-display text-base font-semibold leading-snug text-foreground sm:text-lg">
-                <AlumiaIcon icon={BulbIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
-                Como a Alumia organiza seus gestos?
-              </h2>
-              <Button size="sm" className="hidden shrink-0 md:inline-flex" onClick={() => setSheetOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="xs" />Adicionar tarefa</Button>
-            </div>
+            <h2 className="flex items-start gap-2 font-display text-base font-semibold leading-snug text-foreground sm:text-lg">
+              <AlumiaIcon icon={BulbIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
+              Como a Alumia organiza seus gestos?
+            </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Primeiro, o que você marcou como importante. Depois, o que tem data ou horário. E, por fim, o que pode esperar. Sempre no seu ritmo. Sem pressão, sem cobrança.
           </p>
@@ -135,7 +132,7 @@ export function TasksView() {
 
       <Button
         size="icon-lg"
-        className="fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-5 z-30 rounded-full shadow-[var(--shadow-floating)] sm:hidden"
+        className="fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-5 z-30 rounded-full shadow-[var(--shadow-floating)] lg:bottom-8 lg:right-8"
         onClick={() => setSheetOpen(true)}
         aria-label="Adicionar tarefa"
       >
