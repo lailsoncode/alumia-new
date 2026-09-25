@@ -38,7 +38,6 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
     <Surface className="p-4 sm:p-5">
       <SectionHeader
         title="Gestos para hoje"
-        description="O que merece atenção primeiro, sempre no seu ritmo."
         icon={SparklesIcon}
         iconClassName="text-tone-sun-fg"
         action={<Button variant="outline" size="sm" className="min-h-11 w-11 px-0 sm:w-auto sm:px-3" onClick={() => setSheetOpen(true)} aria-label="Adicionar tarefa"><AlumiaIcon icon={AddCircleIcon} size="xs" /><span className="hidden sm:inline">Adicionar</span></Button>}
