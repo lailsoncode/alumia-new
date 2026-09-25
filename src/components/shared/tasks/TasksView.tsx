@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { AddCircleIcon, AlertCircleIcon, Clock01Icon, HelpCircleIcon, StarIcon } from "@hugeicons/core-free-icons";
+import { AddCircleIcon, AlertCircleIcon, BulbIcon, Clock01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
-import { InlineFeedback, SectionHeader, Surface } from "@/components/ui/surface";
+import { InlineFeedback, Surface } from "@/components/ui/surface";
 import { getLocalDateString } from "@/lib/utils";
 import { createTask, getTasks, updateTask } from "@/services/tasksService";
 import type { AddTaskData, Task } from "@/types";
+import tasksImage from "@/assets/tasks.webp";
 import { AddTaskSheet } from "./AddTaskSheet";
 import { TaskItem } from "./TaskItem";
 
@@ -76,29 +77,29 @@ export function TasksView() {
 
   return (
     <section>
-      <SectionHeader
-        icon={StarIcon}
-        iconClassName="text-tone-lavender-fg"
-        title="Seus gestos"
-        description="Organize o seu dia do seu jeito. O que não couber agora pode esperar."
-        action={<Button className="hidden sm:inline-flex" onClick={() => setSheetOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="sm" />Adicionar tarefa</Button>}
-      />
-
-      <Surface className="mt-4 flex items-start gap-3 p-4 sm:p-5">
-        <AlumiaIcon icon={HelpCircleIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
-        <div>
-          <h3 className="font-display text-base font-semibold text-foreground">Como a Alumia organiza seus gestos?</h3>
+      <Surface className="overflow-hidden rounded-[1.25rem] border-tone-sky-fg/25 bg-tone-sky/70 p-3 sm:p-4">
+        <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-3 min-[380px]:grid-cols-[6.5rem_minmax(0,1fr)] sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+          <img src={tasksImage} alt="Personagem da Alumia organizando ideias com calma" className="h-full min-h-40 w-full rounded-[0.875rem] object-cover" />
+          <div className="py-0.5">
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="flex items-start gap-2 font-display text-base font-semibold leading-snug text-foreground sm:text-lg">
+                <AlumiaIcon icon={BulbIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
+                Como a Alumia organiza seus gestos?
+              </h2>
+              <Button size="sm" className="hidden shrink-0 md:inline-flex" onClick={() => setSheetOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="xs" />Adicionar tarefa</Button>
+            </div>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Primeiro vêm os gestos importantes, depois os que têm data e, por fim, o que pode esperar. Sem pressão, sem cobrança.
+              Primeiro, o que você marcou como importante. Depois, o que tem data ou horário. E, por fim, o que pode esperar. Sempre no seu ritmo. Sem pressão, sem cobrança.
           </p>
+          </div>
         </div>
       </Surface>
 
       {error && <div className="mt-4"><InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback></div>}
 
-      <div className="mt-5 flex gap-2 rounded-[1.4rem] bg-muted/80 p-1.5" role="tablist" aria-label="Período das tarefas">
+      <div className="mt-5 grid grid-cols-2 border-b border-border" role="tablist" aria-label="Período das tarefas">
         {(["hoje", "em_breve"] as const).map((value) => (
-          <button key={value} type="button" role="tab" aria-selected={tab === value} onClick={() => setTab(value)} className={`min-h-11 flex-1 rounded-2xl px-4 text-sm font-semibold transition-colors ${tab === value ? "bg-surface text-foreground shadow-[var(--shadow-card)]" : "text-muted-foreground hover:text-foreground"}`}>
+          <button key={value} type="button" role="tab" aria-selected={tab === value} onClick={() => setTab(value)} className={`-mb-px min-h-12 border-b-2 px-4 text-sm font-semibold transition-colors ${tab === value ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"}`}>
             {value === "hoje" ? "Hoje" : "Em breve"}
           </button>
         ))}
