@@ -12,7 +12,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 
 ## Entrega concentrada
 
-- paleta clara original com viés lavanda, cartões amplos, cantos generosos e sombras difusas;
+- paleta clara original com viés lavanda, cartões amplos, cantos generosos e sombras leves;
 - densidade equilibrada, com intervalos menores entre cabeçalhos, seções e ações;
 - saudação com acento visual, avatar e troca de tema sempre acessível;
 - cabeçalho organizado como uma faixa da página, com identificação pessoal e contexto separados por divisor;
