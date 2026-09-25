@@ -44,7 +44,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
       />
 
       {loading ? (
-        <div className="mt-4 space-y-2.5" aria-label="Carregando cuidados">
+        <div className="mt-4 space-y-1" aria-label="Carregando cuidados">
           {[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-muted" />)}
         </div>
       ) : pending.length === 0 ? (
@@ -54,7 +54,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
           <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">Hoje não há nenhum gesto pendente. Aproveite esse espaço ou adicione algo quando fizer sentido.</p>
         </div>
       ) : (
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 space-y-1">
           {pending.slice(0, 3).map((task) => (
             <TaskItem key={task.id} task={task} onToggle={completeTask} />
           ))}
