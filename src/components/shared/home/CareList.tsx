@@ -53,17 +53,17 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
       />
 
       {loading ? (
-        <div className="mt-5 space-y-3" aria-label="Carregando cuidados">
+        <div className="mt-4 space-y-2.5" aria-label="Carregando cuidados">
           {[0, 1, 2].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-muted" />)}
         </div>
       ) : pending.length === 0 ? (
-        <div className="mt-5 rounded-[1.4rem] bg-surface-subtle px-4 py-6 text-center shadow-inner">
+        <div className="mt-4 rounded-[1.4rem] bg-surface-subtle px-4 py-5 text-center shadow-inner">
           <AlumiaIcon icon={SparklesIcon} size="md" className="mx-auto text-tone-sun-fg" />
           <p className="mt-3 font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
           <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">Hoje não há nenhum gesto pendente. Aproveite esse espaço ou adicione algo quando fizer sentido.</p>
         </div>
       ) : (
-        <ul className="mt-5 space-y-3">
+        <ul className="mt-4 space-y-2.5">
           {pending.slice(0, 3).map((task) => (
             <li key={task.id} className="flex min-h-20 items-center gap-3 rounded-[1.25rem] bg-surface-subtle/75 p-3.5 transition-colors hover:bg-surface-subtle">
               <button type="button" onClick={() => completeTask(task.id)} aria-label={`Concluir ${task.title}`} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl hover:bg-success/60">

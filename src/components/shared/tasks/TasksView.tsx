@@ -94,7 +94,7 @@ export function TasksView() {
 
       {error && <div className="mt-4"><InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback></div>}
 
-      <div className="mt-5 grid grid-cols-2 border-b border-border" role="tablist" aria-label="Período das tarefas">
+      <div className="mt-4 grid grid-cols-2 border-b border-border" role="tablist" aria-label="Período das tarefas">
         {(["hoje", "em_breve"] as const).map((value) => (
           <button key={value} type="button" role="tab" aria-selected={tab === value} onClick={() => setTab(value)} className={`-mb-px min-h-12 border-b-2 px-4 text-sm font-semibold transition-colors ${tab === value ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"}`}>
             {value === "hoje" ? "Hoje" : "Em breve"}
@@ -103,30 +103,30 @@ export function TasksView() {
       </div>
 
       {loading ? (
-        <div className="mt-5 space-y-3" aria-label="Carregando tarefas">{[0, 1, 2].map((item) => <div key={item} className="h-20 animate-pulse rounded-2xl bg-muted" />)}</div>
+        <div className="mt-4 space-y-2.5" aria-label="Carregando tarefas">{[0, 1, 2].map((item) => <div key={item} className="h-20 animate-pulse rounded-2xl bg-muted" />)}</div>
       ) : tab === "hoje" ? (
-        <div className="mt-6 grid gap-x-4 gap-y-2 xl:grid-cols-2">{sections.map((section) => (
+        <div className="mt-4 grid gap-x-4 gap-y-2 xl:grid-cols-2">{sections.map((section) => (
           <section key={section.title} className={section.title === "Pode esperar" ? "xl:col-span-2" : undefined}>
-            <h3 className="mb-3 flex items-center gap-2.5 text-base font-semibold">
+            <h3 className="mb-2 flex items-center gap-2.5 text-base font-semibold">
               <AlumiaIcon icon={section.icon} size="md" className={section.tone} />
               {section.title}
             </h3>
             {section.tasks.length ? (
               <ul className="space-y-3">{section.tasks.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} />)}</ul>
             ) : (
-              <Surface variant="subtle" className="px-4 py-5 sm:px-5">
+              <Surface variant="subtle" className="px-4 py-4">
                 <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{section.empty}</p>
               </Surface>
             )}
           </section>
         ))}</div>
       ) : (
-        <section className="mt-6">
-          <h3 className="mb-3 flex items-center gap-2.5 text-base font-semibold">
+        <section className="mt-4">
+          <h3 className="mb-2 flex items-center gap-2.5 text-base font-semibold">
             <AlumiaIcon icon={Clock01Icon} size="md" className="text-tone-sky-fg" />
             Próximos cuidados
           </h3>
-          {upcoming.length ? <ul className="space-y-3">{upcoming.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} />)}</ul> : <Surface variant="subtle" className="px-5 py-8 text-center"><p className="font-display text-lg font-semibold">Nada marcado adiante.</p><p className="mt-1 text-sm text-muted-foreground">Quando você agendar algo, ele aparece aqui.</p></Surface>}
+          {upcoming.length ? <ul className="space-y-2.5">{upcoming.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} />)}</ul> : <Surface variant="subtle" className="px-4 py-5 text-center"><p className="font-display text-lg font-semibold">Nada marcado adiante.</p><p className="mt-1 text-sm text-muted-foreground">Quando você agendar algo, ele aparece aqui.</p></Surface>}
         </section>
       )}
 

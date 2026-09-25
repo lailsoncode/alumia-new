@@ -35,14 +35,14 @@ export function HomePage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-4">
         <Greeting />
         <InfoCard>{message}</InfoCard>
         {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={loadTasks} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)] lg:gap-6">
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
           <CareList tasks={tasks} loading={loading} onRefresh={loadTasks} />
-          <div className="space-y-5">
+          <div className="space-y-4">
             <HydrationCard />
             <ModulesGrid />
           </div>

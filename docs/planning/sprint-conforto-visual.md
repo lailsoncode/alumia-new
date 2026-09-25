@@ -13,7 +13,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 ## Entrega concentrada
 
 - paleta clara original com viés lavanda, cartões amplos, cantos generosos e sombras leves;
-- densidade equilibrada, com intervalos menores entre cabeçalhos, seções e ações;
+- densidade equilibrada em todo o aplicativo, com intervalos de 8–16 px entre elementos relacionados e 16–24 px entre blocos estruturais;
 - saudação com acento visual e avatar; a troca de tema permanece em Ajustes;
 - cabeçalho organizado como uma faixa da página, com identificação pessoal e contexto separados por divisor;
 - navegação inferior em cápsula flutuante no mobile e sidebar preservada no desktop;
@@ -44,11 +44,11 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 | `npm run lint` | 0 erros; 7 avisos legados de Fast Refresh |
 | `npm run build` | cliente e SSR aprovados |
 | 360 × 800 | sem overflow horizontal; navegação inferior ativa |
-| 390 × 844 | home, tarefas, hidratação e módulos inspecionados |
+| 390 × 844 | home, tarefas, hidratação, módulos, ajustes e autenticação inspecionados sem overflow horizontal |
 | 768 × 1024 | sem overflow horizontal; navegação inferior ativa |
 | 1024 × 768 | sem overflow horizontal; sidebar ativa |
-| 1440 × 900 | tarefas inspecionadas em duas colunas |
-| aproveitamento de tela | home móvel reduzida de 1.451 para 1.277 px e tarefas de 1.219 para 1.044 px de altura no estado vazio |
+| 1440 × 900 | hidratação e autenticação inspecionadas; conteúdo principal visível sem rolagem |
+| aproveitamento de tela | no estado observado em 390 px: home com 1.120 px, tarefas com 907 px, módulos com 1.075 px, hidratação com 1.355 px e ajustes com 1.306 px de altura total |
 | temas claro e escuro | inspecionados visualmente |
 | console da prévia | sem erros ou avisos |
 | contraste dos pares recorrentes | mínimo medido de 6,00:1 no claro e 6,46:1 no escuro |

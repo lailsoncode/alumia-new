@@ -59,16 +59,16 @@ export function ModulesList() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-5">
       <section aria-labelledby="active-modules-title">
         <div className="flex items-center gap-2.5">
           <AlumiaIcon icon={Grid2X2Icon} size="md" className="text-muted-foreground" />
           <h2 id="active-modules-title" className="font-display text-xl font-semibold tracking-tight sm:text-2xl">Módulos ativos</h2>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="mt-3 grid grid-cols-2 gap-3">
           {activeModules.map((module) => (
-            <article key={module.id} className={`flex min-h-56 flex-col rounded-[1.25rem] border p-3.5 text-center shadow-[var(--shadow-card)] sm:min-h-60 sm:p-5 ${module.cardClass}`}>
+            <article key={module.id} className={`flex min-h-48 flex-col rounded-[1.25rem] border p-3 text-center shadow-[var(--shadow-card)] sm:min-h-52 sm:p-4 ${module.cardClass}`}>
               <div className="flex min-h-12 items-center justify-center gap-2">
                 <AlumiaIcon icon={module.icon} size="md" className={module.iconClass} />
                 <h3 className="text-base font-semibold leading-tight min-[380px]:text-lg sm:text-xl">{module.name}</h3>
@@ -92,13 +92,13 @@ export function ModulesList() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="mt-3 grid gap-2.5 lg:grid-cols-2">
           {catalogModules.map((module) => {
             const status = module.active ? "Ativo" : "Em breve";
             const switchLabel = module.active ? `${module.name} está ativo` : `${module.name} estará disponível em breve`;
 
             return (
-              <article key={module.id} className={`flex min-h-20 items-center gap-3 rounded-[1.125rem] border bg-surface px-4 py-3 shadow-[var(--shadow-card)] ${module.rowClass}`}>
+              <article key={module.id} className={`flex min-h-16 items-center gap-3 rounded-[1.125rem] border bg-surface px-4 py-2.5 shadow-[var(--shadow-card)] ${module.rowClass}`}>
                 <AlumiaIcon icon={module.icon} size="md" className={`shrink-0 ${module.iconClass}`} />
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-base font-semibold sm:text-lg">{module.name}</h3>

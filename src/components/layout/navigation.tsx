@@ -42,7 +42,7 @@ export function BottomNavigation() {
 export function SidebarNavigation() {
   const { pathname } = useLocation();
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-sidebar-border bg-sidebar px-5 py-6 lg:flex lg:flex-col">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-sidebar-border bg-sidebar px-5 py-5 lg:flex lg:flex-col">
       <Link to="/" className="flex items-center gap-3 rounded-xl px-2 py-1 text-sidebar-foreground">
         <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <AlumiaIcon icon={SparklesIcon} size="md" />
@@ -53,7 +53,7 @@ export function SidebarNavigation() {
         </span>
       </Link>
 
-      <nav aria-label="Navegação principal" className="mt-10">
+      <nav aria-label="Navegação principal" className="mt-7">
         <ul className="space-y-1">
           {items.map((item) => {
             const active = isItemActive(pathname, item.matches);

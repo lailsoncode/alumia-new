@@ -88,8 +88,8 @@ export function CompleteProfilePage() {
         <h1 className="mt-2 text-3xl font-bold leading-tight text-foreground sm:text-4xl">Deixe a Alumia com a sua cara.</h1>
         <p className="mt-3 text-base leading-relaxed text-muted-foreground">Você pode editar estas informações quando quiser.</p>
 
-        <form onSubmit={handleSave} className="mt-6 space-y-4">
-          <div className="flex items-center gap-4 rounded-2xl border border-border bg-surface-subtle p-4">
+        <form onSubmit={handleSave} className="mt-5 space-y-3">
+          <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface-subtle p-3.5">
             <button
               type="button"
               aria-label="Escolher foto de perfil"
@@ -106,7 +106,7 @@ export function CompleteProfilePage() {
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             <FormField id="profile-firstname" label="Nome">
               <input id="profile-firstname" value={firstName} onChange={(event) => setFirstName(event.target.value)} autoComplete="given-name" className={fieldClass} />
             </FormField>
