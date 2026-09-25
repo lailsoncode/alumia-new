@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Moon01Icon, SparklesIcon, Sun01Icon } from "@hugeicons/core-free-icons";
+import { SparklesIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { useAuth } from "../../hooks/use-auth";
-import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "../../lib/theme";
+import { applyTheme, getStoredTheme } from "../../lib/theme";
 import { getUserProfile } from "../../services/authService";
 
 interface GreetingProps {
@@ -27,15 +27,12 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
   const [avatarUrl, setAvatarUrl] = useState(propAvatarUrl || "");
   const [greeting, setGreeting] = useState("Boa noite");
   const [profileLine, setProfileLine] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const hour = new Date().getHours();
     const storedTheme = getStoredTheme();
     setGreeting(getPeriodGreeting(hour));
-    setDarkMode(storedTheme === "dark");
     applyTheme(storedTheme);
-    return subscribeToThemeChanges((theme) => setDarkMode(theme === "dark"));
   }, []);
 
   useEffect(() => {
@@ -82,12 +79,6 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
     .join("")
     .toUpperCase();
 
-  const toggleTheme = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    applyTheme(next ? "dark" : "light");
-  };
-
   const personalLine = profileLine || subtitleByPeriod();
 
   return (
@@ -100,21 +91,16 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
           </h1>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">{personalLine}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <button type="button" onClick={toggleTheme} aria-label={darkMode ? "Usar tema claro" : "Usar tema escuro"} className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/35 bg-surface text-primary transition-colors hover:bg-surface-subtle">
-            <AlumiaIcon icon={darkMode ? Sun01Icon : Moon01Icon} size="sm" />
-          </button>
-          <div
-            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-primary/35 bg-card text-sm font-semibold text-foreground"
-            role={avatarUrl ? undefined : "img"}
-            aria-label={avatarUrl ? undefined : `Avatar de ${name}`}
-          >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={`Avatar de ${name}`} className="h-full w-full object-cover" />
-            ) : (
-              initials
-            )}
-          </div>
+        <div
+          className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/35 bg-card text-sm font-semibold text-foreground"
+          role={avatarUrl ? undefined : "img"}
+          aria-label={avatarUrl ? undefined : `Avatar de ${name}`}
+        >
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={`Avatar de ${name}`} className="h-full w-full object-cover" />
+          ) : (
+            initials
+          )}
         </div>
       </div>
       {role && (

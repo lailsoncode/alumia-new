@@ -14,7 +14,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 
 - paleta clara original com viés lavanda, cartões amplos, cantos generosos e sombras leves;
 - densidade equilibrada, com intervalos menores entre cabeçalhos, seções e ações;
-- saudação com acento visual, avatar e troca de tema sempre acessível;
+- saudação com acento visual e avatar; a troca de tema permanece em Ajustes;
 - cabeçalho organizado como uma faixa da página, com identificação pessoal e contexto separados por divisor;
 - navegação inferior em cápsula flutuante no mobile e sidebar preservada no desktop;
 - textos de cuidado mais humanos, com “gestos”, “no seu ritmo” e “sem cobrança”;

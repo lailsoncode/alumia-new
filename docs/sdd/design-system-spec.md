@@ -24,8 +24,8 @@ A camada de conforto B2C deve usar:
 - cartões amplos, cantos generosos e sombras discretas, apoiadas por bordas suaves;
 - respiro entre blocos para que a tela não pareça uma sequência de cobranças;
 - pequenos acentos em amarelo, ciano, menta, pêssego e lavanda para orientar seções;
-- saudação personalizada, acesso rápido ao tema e navegação inferior flutuante no mobile;
-- cabeçalho pessoal como faixa estrutural da página, sem aparência flutuante, reunindo saudação, contexto, tema e avatar;
+- saudação personalizada e navegação inferior flutuante no mobile;
+- cabeçalho pessoal como faixa estrutural da página, sem aparência flutuante, reunindo saudação, contexto e avatar;
 - orientação visível quando a organização de uma tela não for autoevidente;
 - estados vazios que preservem a estrutura da jornada e usem linguagem acolhedora.
 
