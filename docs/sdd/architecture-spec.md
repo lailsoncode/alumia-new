@@ -47,7 +47,7 @@ integrations não importa componentes
 | Formulários | React Hook Form + Zod |
 | Datas | date-fns |
 | Testes | Vitest, Testing Library e Playwright para smoke E2E |
-| PWA | vite-plugin-pwa depois da vertical web estável |
+| PWA | Workbox Build e OneSignal Web SDK v16 |
 | Mobile | Capacitor apenas após validação do MVP web |
 
 Versões exatas ficam travadas no lockfile criado no bootstrap. Dependências opcionais entram somente quando uma especificação aprovada exigir.
@@ -263,6 +263,15 @@ Ordem de deploy:
 
 Mudanças destrutivas usam expand/contract. Staging deve usar dados sintéticos e configuração equivalente à produção.
 
+### PWA e notificações web
+
+- o service worker da PWA é gerado pelo Workbox após o build do TanStack Start, publicado em `/sw.js`, controla `/` e mantém o shell e os artefatos estáticos disponíveis em cache;
+- o OneSignal usa o worker dedicado `/push/onesignal/OneSignalSDKWorker.js`, limitado ao escopo `/push/onesignal/`;
+- a separação de escopos evita colisão entre cache/offline e entrega de push;
+- o SDK não solicita permissão ao carregar a aplicação: o prompt nativo só pode surgir após ação explícita no switch de notificações;
+- a assinatura do navegador é associada ao `user.id` autenticado com `OneSignal.login` e desvinculada no logout;
+- somente o App ID público usa variável `VITE_*`; chaves REST e credenciais de envio permanecem em Edge Functions ou secrets do servidor.
+
 ## 11. Qualidade obrigatória
 
 Scripts mínimos:
@@ -291,4 +300,3 @@ check
 - `ADR-006`: uma aplicação com layouts separados;
 - `ADR-007`: migração seletiva do FlutterFlow;
 - `ADR-008`: autorização separada de entitlement.
-

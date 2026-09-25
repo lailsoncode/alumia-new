@@ -1,5 +1,9 @@
+import { useEffect } from "react";
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
+import { useAuth } from "@/hooks/use-auth";
+import { initializeOneSignal, isOneSignalConfigured, synchronizeOneSignalUser } from "@/services/oneSignalService";
+import { registerPwaServiceWorker } from "@/services/pwaService";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -42,7 +46,7 @@ export const Route = createRootRoute({
         content: "Cuide de você com leveza: tarefas, hidratação e mais.",
       },
       { property: "og:type", content: "website" },
-      { name: "theme-color", content: "oklch(0.985 0.008 280)" },
+      { name: "theme-color", content: "#f8f7fb" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -79,5 +83,19 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    void registerPwaServiceWorker().catch((error) => console.error("Erro ao registrar a PWA:", error));
+    if (isOneSignalConfigured()) {
+      void initializeOneSignal().catch((error) => console.error("Erro ao iniciar notificações:", error));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loading || !isOneSignalConfigured()) return;
+    void synchronizeOneSignalUser(user?.id ?? null).catch((error) => console.error("Erro ao sincronizar notificações:", error));
+  }, [loading, user?.id]);
+
   return <Outlet />;
 }

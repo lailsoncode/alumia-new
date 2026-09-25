@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { SectionHeader, Surface } from "@/components/ui/surface";
 import { useAuth } from "@/hooks/use-auth";
 import { getUserProfile, signOut } from "@/services/authService";
+import { disablePushNotifications, enablePushNotifications, getPushNotificationState, isOneSignalConfigured } from "@/services/oneSignalService";
 import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
 import type { ProfileData } from "@/types";
 
-function PreferenceSwitch({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: string }) {
+function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
   return (
-    <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange} className={`relative flex h-11 w-14 shrink-0 items-center rounded-full p-1 transition-colors ${checked ? "bg-primary" : "bg-muted"}`}>
+    <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange} disabled={disabled} className={`relative flex h-11 w-14 shrink-0 items-center rounded-full p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${checked ? "bg-primary" : "bg-muted"}`}>
       <span className={`h-6 w-6 rounded-full bg-surface shadow-sm transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`} />
     </button>
   );
@@ -25,6 +26,7 @@ export function SettingsPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState<"loading" | "ready" | "saving" | "denied" | "unsupported" | "unconfigured" | "error">("loading");
   const [language, setLanguage] = useState("pt-BR");
 
   useEffect(() => {
@@ -35,9 +37,29 @@ export function SettingsPage() {
     const nextDark = getStoredTheme() === "dark";
     setDarkMode(nextDark);
     applyTheme(nextDark ? "dark" : "light");
-    setNotifications(window.localStorage.getItem("notifications-enabled") === "true");
     setLanguage(window.localStorage.getItem("language") || "pt-BR");
     return subscribeToThemeChanges((theme) => setDarkMode(theme === "dark"));
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!isOneSignalConfigured()) {
+      setNotificationStatus("unconfigured");
+      return () => { active = false; };
+    }
+
+    getPushNotificationState()
+      .then((state) => {
+        if (!active) return;
+        setNotifications(state.enabled);
+        setNotificationStatus(state.supported ? "ready" : "unsupported");
+      })
+      .catch(() => {
+        if (active) setNotificationStatus("error");
+      });
+
+    return () => { active = false; };
   }, []);
 
   const toggleTheme = () => {
@@ -46,11 +68,30 @@ export function SettingsPage() {
     applyTheme(next ? "dark" : "light");
   };
 
-  const toggleNotifications = () => {
-    const next = !notifications;
-    setNotifications(next);
-    window.localStorage.setItem("notifications-enabled", String(next));
+  const toggleNotifications = async () => {
+    if (notificationStatus === "saving" || notificationStatus === "loading") return;
+
+    setNotificationStatus("saving");
+    try {
+      const state = notifications ? await disablePushNotifications() : await enablePushNotifications();
+      setNotifications(state.enabled);
+      setNotificationStatus(
+        !state.supported ? "unsupported" : !notifications && !state.permission ? "denied" : "ready",
+      );
+    } catch {
+      setNotificationStatus("error");
+    }
   };
+
+  const notificationDescription = {
+    loading: "Verificando a permissão deste dispositivo…",
+    saving: "Atualizando sua preferência…",
+    ready: "Ative somente se quiser receber lembretes.",
+    denied: "Permissão bloqueada no navegador. Libere-a nas configurações do site.",
+    unsupported: "Este navegador não oferece suporte a notificações.",
+    unconfigured: "As notificações estarão disponíveis em breve.",
+    error: "Não foi possível atualizar agora. Tente novamente.",
+  }[notificationStatus];
 
   const logout = async () => {
     await signOut();
@@ -83,9 +124,9 @@ export function SettingsPage() {
             <div className="flex min-h-16 items-center gap-3 px-4 py-2.5">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-tone-lavender-fg" />
-                <div className="min-w-0"><p className="text-sm font-semibold">Notificações</p><p className="mt-0.5 text-xs text-muted-foreground">Ative somente se quiser receber lembretes.</p></div>
+                <div className="min-w-0"><p className="text-sm font-semibold">Notificações</p><p className="mt-0.5 text-xs text-muted-foreground">{notificationDescription}</p></div>
               </div>
-              <PreferenceSwitch checked={notifications} onChange={toggleNotifications} label="Ativar notificações" />
+              <PreferenceSwitch checked={notifications} onChange={toggleNotifications} label="Ativar notificações" disabled={["loading", "saving", "unsupported", "unconfigured"].includes(notificationStatus)} />
             </div>
             <div className="flex min-h-16 items-center gap-3 px-4 py-2.5">
               <div className="flex min-w-0 flex-1 items-start gap-3">
