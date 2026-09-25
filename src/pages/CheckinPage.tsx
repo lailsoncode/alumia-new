@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { HistoryIcon, SentIcon, SmileIcon, SparklesIcon } from "@hugeicons/core-free-icons";
 import {
   CareSuggestionCard,
+  CheckinDetailDialog,
   CheckinHistoryList,
   EmotionPicker,
   MoodCalendar,
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { InlineFeedback, Surface } from "@/components/ui/surface";
 import { createCareCheckin, getCareCheckinHistory, getCheckinCatalogs } from "@/services/checkinService";
 import { createTask } from "@/services/tasksService";
+import { isSameLocalDay } from "@/lib/utils";
 import type { CareCheckinHistoryItem, CheckinEmotion, CheckinNeed, CreateCareCheckinResult } from "@/types";
 
 function newIdempotencyKey() {
@@ -37,6 +39,7 @@ export function CheckinPage() {
   const [result, setResult] = useState<CreateCareCheckinResult | null>(null);
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [taskFeedback, setTaskFeedback] = useState<{ message: string; tone: "success" | "danger" } | null>(null);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<CareCheckinHistoryItem | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -44,11 +47,20 @@ export function CheckinPage() {
     try {
       const [catalogs, recentHistory] = await Promise.all([
         getCheckinCatalogs(),
-        getCareCheckinHistory(0, 3),
+        getCareCheckinHistory(0, 20),
       ]);
       setEmotions(catalogs.emotions);
       setNeeds(catalogs.needs);
       setHistory(recentHistory);
+      const todayCheckin = recentHistory.find((item) => isSameLocalDay(item.occurredAt));
+      if (todayCheckin?.suggestion) {
+        setResult({
+          checkinId: todayCheckin.id,
+          occurredAt: todayCheckin.occurredAt,
+          moodCategory: todayCheckin.moodCategory,
+          suggestion: todayCheckin.suggestion,
+        });
+      }
     } catch {
       setLoadError("Não conseguimos preparar o check-in agora.");
     } finally {
@@ -119,7 +131,13 @@ export function CheckinPage() {
             onAddTask={() => setTaskSheetOpen(true)}
           />
           {taskFeedback && <InlineFeedback tone={taskFeedback.tone}>{taskFeedback.message}</InlineFeedback>}
-          <MoodCalendar items={history} />
+          <MoodCalendar items={history} onSelect={setSelectedHistoryItem} />
+          <CheckinDetailDialog
+            item={selectedHistoryItem}
+            onOpenChange={(open) => {
+              if (!open) setSelectedHistoryItem(null);
+            }}
+          />
           <AddTaskSheet
             key={result.checkinId}
             open={taskSheetOpen}

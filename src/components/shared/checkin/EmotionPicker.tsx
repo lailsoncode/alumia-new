@@ -50,7 +50,7 @@ export function EmotionPicker({ emotions, value, onChange, error }: EmotionPicke
                   <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{group.description}</p>
                 </div>
               </div>
-              <div className="mt-2.5 flex flex-wrap gap-2">
+              <div className="mt-2.5 flex flex-wrap justify-center gap-2">
                 {options.map((emotion) => {
                   const selected = value.includes(emotion.code);
                   const selectedInGroup = options.filter((option) => value.includes(option.code)).length;

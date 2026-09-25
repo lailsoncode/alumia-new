@@ -20,7 +20,24 @@ interface HistoryRow {
   mood_category: MoodCategory;
   emotions: HistoryEmotionRelation[] | null;
   need: { label: string } | { label: string }[] | null;
-  suggestion: { title: string; body: string; action_text: string } | { title: string; body: string; action_text: string }[] | null;
+  suggestion:
+    | {
+      suggestion_code: string;
+      suggestion_version: number;
+      title: string;
+      body: string;
+      action_text: string;
+      action_category: string;
+    }
+    | {
+      suggestion_code: string;
+      suggestion_version: number;
+      title: string;
+      body: string;
+      action_text: string;
+      action_category: string;
+    }[]
+    | null;
 }
 
 function firstRelation<T>(value: T | T[] | null): T | null {
@@ -105,7 +122,14 @@ export async function getCareCheckinHistory(page = 0, pageSize = 20): Promise<Ca
         emotion:checkin_emotions!care_checkin_emotions_emotion_code_fkey(label, emoji)
       ),
       need:checkin_needs!care_checkins_need_code_fkey(label),
-      suggestion:checkin_suggestion_snapshots(title, body, action_text)
+      suggestion:checkin_suggestion_snapshots(
+        suggestion_code,
+        suggestion_version,
+        title,
+        body,
+        action_text,
+        action_category
+      )
     `)
     .order("occurred_at", { ascending: false })
     .range(start, end);
@@ -129,7 +153,14 @@ export async function getCareCheckinHistory(page = 0, pageSize = 20): Promise<Ca
       }),
       need: row.need_code ? { code: row.need_code, label: need?.label ?? row.need_code } : null,
       suggestion: suggestion
-        ? { title: suggestion.title, body: suggestion.body, actionText: suggestion.action_text }
+        ? {
+          code: suggestion.suggestion_code,
+          version: suggestion.suggestion_version,
+          title: suggestion.title,
+          body: suggestion.body,
+          actionText: suggestion.action_text,
+          actionCategory: suggestion.action_category,
+        }
         : null,
     };
   });

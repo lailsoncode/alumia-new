@@ -2,7 +2,7 @@
 
 **ID:** `B2C`
 
-**Versão:** 0.4.0
+**Versão:** 0.5.0
 
 **Estado:** proposed
 
@@ -62,6 +62,8 @@ O check-in preserva o fluxo validado no protótipo: a pessoa pode escolher até 
 - `B2C-CHK-010`: apresentar após o envio um clima emocional ilustrado, uma mensagem acolhedora e um microgesto prático.
 - `B2C-CHK-011`: permitir transformar o microgesto em tarefa identificada com a cor do módulo de check-in.
 - `B2C-CHK-012`: apresentar o histórico como calendário visual e lista privada, sem expor pontuação.
+- `B2C-CHK-013`: manter o resultado do último check-in do dia ao retornar ao módulo e apresentá-lo como resumo na home.
+- `B2C-CHK-014`: permitir abrir os detalhes de cada registro pelos cards do calendário visual.
 
 ### Estados
 
@@ -81,6 +83,8 @@ idle → selecting → submitting → success
 - `B2C-CHK-AC-07`: exclusão remove o item da experiência e entra no fluxo de eliminação definido.
 - `B2C-CHK-AC-08`: o resultado mantém snapshot da mensagem e do microgesto vistos pela pessoa.
 - `B2C-CHK-AC-09`: o calendário mostra a ilustração e a data dos registros sem revelar score.
+- `B2C-CHK-AC-10`: ao retornar no mesmo dia, a pessoa vê o resultado salvo; em outro dia, encontra o formulário para um novo registro.
+- `B2C-CHK-AC-11`: o card da home e cada card do calendário abrem o resultado correspondente com data, clima e mensagem preservada.
 
 ## 5. Tarefas gentis
 

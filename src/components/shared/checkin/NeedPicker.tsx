@@ -20,7 +20,7 @@ export function NeedPicker({ needs, value, onChange, error }: NeedPickerProps) {
           <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">Escolha uma opção.</p>
         </div>
       </div>
-      <div className="mt-2.5 grid grid-cols-2 gap-2">
+      <div className="mx-auto mt-2.5 grid max-w-2xl grid-cols-2 gap-2">
         {needs.map((need) => {
           const selected = value === need.code;
           return (

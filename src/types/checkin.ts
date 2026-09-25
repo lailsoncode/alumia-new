@@ -51,5 +51,5 @@ export interface CareCheckinHistoryItem {
   moodCategory: MoodCategory;
   emotions: Array<Pick<CheckinEmotion, "code" | "label" | "emoji">>;
   need: Pick<CheckinNeed, "code" | "label"> | null;
-  suggestion: Pick<CareSuggestion, "title" | "body" | "actionText"> | null;
+  suggestion: CareSuggestion | null;
 }
