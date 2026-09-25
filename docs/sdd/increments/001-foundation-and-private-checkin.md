@@ -12,7 +12,7 @@ Ao final do incremento:
 2. confirma a sessão e recebe um workspace pessoal idempotente;
 3. aceita as versões atuais dos documentos obrigatórios;
 4. escolhe o módulo de check-in no onboarding;
-5. seleciona uma emoção e uma necessidade opcional;
+5. seleciona até três emoções agradáveis, até três difíceis e uma necessidade;
 6. envia o check-in;
 7. recebe uma sugestão editorial determinística;
 8. vê seu histórico paginado;
@@ -33,8 +33,7 @@ Ao final do incremento:
 
 - login com Google;
 - texto livre no check-in;
-- seleção de múltiplas emoções;
-- tarefas, mindfulness, hidratação e notificações;
+- mindfulness e notificações;
 - organizações e papéis B2B;
 - painel master;
 - migração de dados do Firebase;
@@ -63,8 +62,8 @@ Entrada:
 
 ```ts
 type CreateCareCheckinInput = {
-  emotionCode: string;
-  needCode?: string;
+  emotionCodes: string[];
+  needCode: string;
   idempotencyKey: string;
 };
 ```
@@ -75,11 +74,14 @@ Saída:
 type CreateCareCheckinResult = {
   checkinId: string;
   occurredAt: string;
+  moodCategory: "very_difficult" | "difficult" | "slightly_difficult" | "mixed" | "slightly_positive" | "positive" | "very_positive";
   suggestion: {
     code: string;
     version: number;
     title: string;
     body: string;
+    actionText: string;
+    actionCategory: string;
   };
 };
 ```
@@ -128,10 +130,12 @@ Constraints essenciais:
 - é idempotente;
 - retorna `workspace_id`.
 
-### `create_care_checkin(emotion_code, need_code, idempotency_key)`
+### `create_care_checkin(emotion_codes, need_code, idempotency_key)`
 
 - resolve workspace do usuário;
 - valida catálogos publicados;
+- valida ao menos uma emoção e o limite de três opções por grupo;
+- calcula internamente a faixa emocional sem expor score ao cliente;
 - escolhe regra editorial ativa com fallback publicado;
 - cria check-in e snapshot em uma transação;
 - retorna o contrato definido;
@@ -159,6 +163,8 @@ Componentes:
 - `NeedPicker`;
 - `CheckinForm`;
 - `CareSuggestionCard`;
+- `MoodSummaryCard`;
+- `MoodCalendar`;
 - `CheckinHistoryList`;
 - `AlumiaIcon`;
 - layouts público e B2C.
@@ -177,9 +183,10 @@ Estados obrigatórios:
 
 O seed deve usar conteúdo revisável e não afirmar validação clínica. Categorias mínimas:
 
-- emoções: calmo, feliz, motivado, ansioso, cansado, sobrecarregado;
+- emoções agradáveis: motivado, grato, calmo, esperançoso, feliz, animado, orgulhoso e aliviado;
+- emoções difíceis: ansioso, sobrecarregado, irritado, sozinho, estressado, triste, cansado e confuso;
 - necessidades: foco, calma, energia, apoio, somente registrar;
-- ao menos uma sugestão publicada por necessidade;
+- ao menos uma sugestão publicada por combinação entre necessidade e grupo de faixa emocional;
 - uma sugestão fallback publicada.
 
 Textos finais devem passar por revisão editorial antes do staging público. A menção a BRUMS ou PANAS não entra neste incremento.
@@ -285,4 +292,3 @@ O incremento só é concluído quando:
 - migrations sobem do zero em ambiente limpo;
 - staging reproduz o smoke completo;
 - não há bug P0 ou P1 aberto na jornada.
-

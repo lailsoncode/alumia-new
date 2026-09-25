@@ -50,6 +50,7 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
         time: taskData.time || null,
         priority: taskData.priority || null,
         reminder: taskData.reminder || null,
+        module_key: taskData.moduleKey ?? "tasks",
         done: false,
       },
     ])
@@ -77,6 +78,7 @@ export async function updateTask(taskId: string, updates: Partial<Task>): Promis
       time: updates.time,
       priority: updates.priority,
       reminder: updates.reminder,
+      module_key: updates.moduleKey ?? updates.module_key,
       done: updates.done,
     })
     .eq("id", taskId)

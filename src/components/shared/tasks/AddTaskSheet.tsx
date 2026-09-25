@@ -7,11 +7,18 @@ import { DatePickerSheet } from "./DatePickerSheet";
 import { PrioritySelector } from "./PrioritySelector";
 import { ReminderSelector } from "./ReminderSelector";
 
-interface AddTaskSheetProps { open: boolean; onClose: () => void; onSave?: (data: AddTaskData) => void | Promise<void>; }
+interface AddTaskSheetProps {
+  open: boolean;
+  onClose: () => void;
+  onSave?: (data: AddTaskData) => void | Promise<void>;
+  initialTitle?: string;
+  initialDescription?: string;
+  moduleKey?: AddTaskData["moduleKey"];
+}
 
-export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+export function AddTaskSheet({ open, onClose, onSave, initialTitle = "", initialDescription = "", moduleKey }: AddTaskSheetProps) {
+  const [title, setTitle] = useState(initialTitle);
+  const [description, setDescription] = useState(initialDescription);
   const [active, setActive] = useState<"prioridade" | "lembrete" | null>(null);
   const [priority, setPriority] = useState<TaskPriority>(null);
   const [reminder, setReminder] = useState<TaskReminder>(null);
@@ -39,7 +46,7 @@ export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
 
   const save = async () => {
     const dateValue = date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}` : undefined;
-    await onSave?.({ title: title.trim(), description: description.trim(), priority, reminder, date: dateValue, time: time || undefined });
+    await onSave?.({ title: title.trim(), description: description.trim(), priority, reminder, date: dateValue, time: time || undefined, moduleKey });
     setTitle(""); setDescription(""); setPriority(null); setReminder(null); setDate(null); setTime(null); setActive(null); onClose();
   };
 

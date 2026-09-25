@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AjustesRouteImport } from './routes/ajustes'
+import { Route as CheckInRouteImport } from './routes/check-in'
 import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
 import { Route as HidratacaoRouteImport } from './routes/hidratacao'
 import { Route as LoginRouteImport } from './routes/login'
@@ -18,6 +19,7 @@ import { Route as ModulosRouteImport } from './routes/modulos'
 import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as TarefasRouteImport } from './routes/tarefas'
+import { Route as CheckInHistoricoRouteImport } from './routes/check-in_.historico'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,6 +29,11 @@ const IndexRoute = IndexRouteImport.update({
 const AjustesRoute = AjustesRouteImport.update({
   id: '/ajustes',
   path: '/ajustes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckInRoute = CheckInRouteImport.update({
+  id: '/check-in',
+  path: '/check-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompletarPerfilRoute = CompletarPerfilRouteImport.update({
@@ -64,10 +71,16 @@ const TarefasRoute = TarefasRouteImport.update({
   path: '/tarefas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckInHistoricoRoute = CheckInHistoricoRouteImport.update({
+  id: '/check-in_/historico',
+  path: '/check-in/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
@@ -75,10 +88,12 @@ export interface FileRoutesByFullPath {
   '/nova-senha': typeof NovaSenhaRoute
   '/registro': typeof RegistroRoute
   '/tarefas': typeof TarefasRoute
+  '/check-in/historico': typeof CheckInHistoricoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
@@ -86,11 +101,13 @@ export interface FileRoutesByTo {
   '/nova-senha': typeof NovaSenhaRoute
   '/registro': typeof RegistroRoute
   '/tarefas': typeof TarefasRoute
+  '/check-in/historico': typeof CheckInHistoricoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
@@ -98,12 +115,14 @@ export interface FileRoutesById {
   '/nova-senha': typeof NovaSenhaRoute
   '/registro': typeof RegistroRoute
   '/tarefas': typeof TarefasRoute
+  '/check-in_/historico': typeof CheckInHistoricoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/ajustes'
+    | '/check-in'
     | '/completar-perfil'
     | '/hidratacao'
     | '/login'
@@ -111,10 +130,12 @@ export interface FileRouteTypes {
     | '/nova-senha'
     | '/registro'
     | '/tarefas'
+    | '/check-in/historico'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/ajustes'
+    | '/check-in'
     | '/completar-perfil'
     | '/hidratacao'
     | '/login'
@@ -122,10 +143,12 @@ export interface FileRouteTypes {
     | '/nova-senha'
     | '/registro'
     | '/tarefas'
+    | '/check-in/historico'
   id:
     | '__root__'
     | '/'
     | '/ajustes'
+    | '/check-in'
     | '/completar-perfil'
     | '/hidratacao'
     | '/login'
@@ -133,11 +156,13 @@ export interface FileRouteTypes {
     | '/nova-senha'
     | '/registro'
     | '/tarefas'
+    | '/check-in_/historico'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AjustesRoute: typeof AjustesRoute
+  CheckInRoute: typeof CheckInRoute
   CompletarPerfilRoute: typeof CompletarPerfilRoute
   HidratacaoRoute: typeof HidratacaoRoute
   LoginRoute: typeof LoginRoute
@@ -145,6 +170,7 @@ export interface RootRouteChildren {
   NovaSenhaRoute: typeof NovaSenhaRoute
   RegistroRoute: typeof RegistroRoute
   TarefasRoute: typeof TarefasRoute
+  CheckInHistoricoRoute: typeof CheckInHistoricoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -161,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/ajustes'
       fullPath: '/ajustes'
       preLoaderRoute: typeof AjustesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/check-in': {
+      id: '/check-in'
+      path: '/check-in'
+      fullPath: '/check-in'
+      preLoaderRoute: typeof CheckInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/completar-perfil': {
@@ -212,12 +245,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TarefasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/check-in_/historico': {
+      id: '/check-in_/historico'
+      path: '/check-in/historico'
+      fullPath: '/check-in/historico'
+      preLoaderRoute: typeof CheckInHistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AjustesRoute: AjustesRoute,
+  CheckInRoute: CheckInRoute,
   CompletarPerfilRoute: CompletarPerfilRoute,
   HidratacaoRoute: HidratacaoRoute,
   LoginRoute: LoginRoute,
@@ -225,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   NovaSenhaRoute: NovaSenhaRoute,
   RegistroRoute: RegistroRoute,
   TarefasRoute: TarefasRoute,
+  CheckInHistoricoRoute: CheckInHistoricoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

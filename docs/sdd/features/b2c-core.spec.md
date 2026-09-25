@@ -2,7 +2,7 @@
 
 **ID:** `B2C`
 
-**Versão:** 0.3.0
+**Versão:** 0.4.0
 
 **Estado:** proposed
 
@@ -46,19 +46,22 @@ Uma pessoa consegue configurar sua experiência, realizar gestos de cuidado e co
 
 ### Escopo MVP
 
-O primeiro incremento usa uma emoção principal, uma necessidade opcional e uma sugestão editorial. O modelo permite evoluir para seleção múltipla depois da revisão de conteúdo.
+O check-in preserva o fluxo validado no protótipo: a pessoa pode escolher até três emoções agradáveis e até três emoções difíceis, além de uma necessidade. A diferença entre as quantidades posiciona o registro em uma de sete faixas internas, usadas apenas para selecionar o clima visual e a sugestão editorial. Pontuação e classificação numérica não são mostradas à pessoa.
 
 ### Requisitos
 
 - `B2C-CHK-001`: listar apenas emoções e necessidades publicadas.
-- `B2C-CHK-002`: permitir selecionar uma emoção principal.
-- `B2C-CHK-003`: permitir selecionar uma necessidade ou “só queria registrar”.
+- `B2C-CHK-002`: permitir selecionar até três emoções agradáveis e até três emoções difíceis, exigindo ao menos uma emoção no total.
+- `B2C-CHK-003`: permitir selecionar uma necessidade, incluindo “só queria registrar”.
 - `B2C-CHK-004`: criar check-in em uma operação idempotente por envio.
 - `B2C-CHK-005`: selecionar sugestão por regra editorial determinística.
 - `B2C-CHK-006`: salvar snapshot da sugestão apresentada.
 - `B2C-CHK-007`: permitir consultar histórico paginado e excluir um registro.
 - `B2C-CHK-008`: não incluir texto livre no incremento 001.
 - `B2C-CHK-009`: não afirmar diagnóstico ou validação clínica.
+- `B2C-CHK-010`: apresentar após o envio um clima emocional ilustrado, uma mensagem acolhedora e um microgesto prático.
+- `B2C-CHK-011`: permitir transformar o microgesto em tarefa identificada com a cor do módulo de check-in.
+- `B2C-CHK-012`: apresentar o histórico como calendário visual e lista privada, sem expor pontuação.
 
 ### Estados
 
@@ -69,13 +72,15 @@ idle → selecting → submitting → success
 
 ### Critérios
 
-- `B2C-CHK-AC-01`: sem emoção, o formulário explica o campo necessário e não envia.
+- `B2C-CHK-AC-01`: sem emoção, o formulário explica o campo necessário e não envia; ao atingir três opções de um grupo, as demais ficam indisponíveis até uma seleção ser removida.
 - `B2C-CHK-AC-02`: com entrada válida, exatamente um check-in é criado para a chave idempotente.
-- `B2C-CHK-AC-03`: a resposta apresenta a sugestão e opção de voltar à home.
+- `B2C-CHK-AC-03`: a resposta apresenta clima ilustrado, sugestão prática e opção de refazer o check-in.
 - `B2C-CHK-AC-04`: repetir a requisição não duplica o registro.
 - `B2C-CHK-AC-05`: outro usuário, organização ou suporte não consegue selecionar o registro.
 - `B2C-CHK-AC-06`: analytics recebe apenas `checkin_completed`, duração e resultado técnico.
 - `B2C-CHK-AC-07`: exclusão remove o item da experiência e entra no fluxo de eliminação definido.
+- `B2C-CHK-AC-08`: o resultado mantém snapshot da mensagem e do microgesto vistos pela pessoa.
+- `B2C-CHK-AC-09`: o calendário mostra a ilustração e a data dos registros sem revelar score.
 
 ## 5. Tarefas gentis
 

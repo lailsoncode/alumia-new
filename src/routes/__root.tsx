@@ -15,6 +15,8 @@ const appShellHeaders = {
   "/": "Que bom ter você aqui. Vamos com calma, no seu ritmo.",
   "/tarefas": "Organize o seu dia, do seu jeito.",
   "/modulos": "Escolha o que faz sentido para você agora. Um passo de cada vez.",
+  "/check-in": "Vamos cuidar de como você está se sentindo?",
+  "/check-in/historico": "Seus sentimentos, acolhidos no seu tempo.",
   "/hidratacao": "Cada gole é um gesto de carinho com você.",
   "/ajustes": "Sua conta, suas preferências e sua privacidade.",
 } as const;
@@ -23,6 +25,8 @@ const protectedPaths = new Set([...Object.keys(appShellHeaders), "/completar-per
 
 const routeModules: Partial<Record<keyof typeof appShellHeaders, ModuleKey>> = {
   "/tarefas": "tasks",
+  "/check-in": "checkin",
+  "/check-in/historico": "checkin",
   "/hidratacao": "hydration",
 };
 

@@ -7,7 +7,7 @@ import { isItemActive } from "./navigation-utils";
 const items = [
   { to: "/", label: "Início", icon: Home01Icon, matches: ["/"] },
   { to: "/tarefas", label: "Tarefas", icon: CheckListIcon, matches: ["/tarefas"] },
-  { to: "/modulos", label: "Cuidados", icon: Grid2X2Icon, matches: ["/modulos", "/hidratacao"] },
+  { to: "/modulos", label: "Cuidados", icon: Grid2X2Icon, matches: ["/modulos", "/hidratacao", "/check-in"] },
   { to: "/ajustes", label: "Ajustes", icon: Settings01Icon, matches: ["/ajustes", "/completar-perfil"] },
 ] as const;
 

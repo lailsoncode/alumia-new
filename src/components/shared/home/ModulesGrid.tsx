@@ -7,6 +7,7 @@ import { MODULE_THEMES } from "@/lib/module-themes";
 
 const modules = [
   { ...MODULE_THEMES.tasks, to: "/tarefas" as const },
+  { ...MODULE_THEMES.checkin, to: "/check-in" as const },
   { ...MODULE_THEMES.hydration, to: "/hidratacao" as const },
 ];
 

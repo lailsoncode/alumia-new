@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CareList, HydrationCard, InfoCard, ModulesGrid } from "@/components/shared/home";
+import { CareList, EmotionalCheckinCard, HydrationCard, InfoCard, ModulesGrid } from "@/components/shared/home";
 import { InlineFeedback } from "@/components/ui/surface";
 import { getLocalDateString } from "@/lib/utils";
 import { getTasks } from "@/services/tasksService";
@@ -33,6 +33,7 @@ export function HomePage() {
 
   return (
     <div className="space-y-4">
+      <EmotionalCheckinCard />
       <InfoCard>{message}</InfoCard>
       {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={loadTasks} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 

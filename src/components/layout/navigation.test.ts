@@ -8,7 +8,8 @@ describe("isItemActive", () => {
   });
 
   it("agrupa hidratação dentro de Cuidados", () => {
-    expect(isItemActive("/hidratacao", ["/modulos", "/hidratacao"])).toBe(true);
-    expect(isItemActive("/ajustes", ["/modulos", "/hidratacao"])).toBe(false);
+    expect(isItemActive("/hidratacao", ["/modulos", "/hidratacao", "/check-in"])).toBe(true);
+    expect(isItemActive("/check-in/historico", ["/modulos", "/hidratacao", "/check-in"])).toBe(true);
+    expect(isItemActive("/ajustes", ["/modulos", "/hidratacao", "/check-in"])).toBe(false);
   });
 });

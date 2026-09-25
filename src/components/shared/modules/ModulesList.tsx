@@ -15,6 +15,11 @@ const activeModules = [
     to: "/tarefas" as const,
   },
   {
+    ...MODULE_THEMES.checkin,
+    description: "Reconheça e acolha o que você sente",
+    to: "/check-in" as const,
+  },
+  {
     ...MODULE_THEMES.hydration,
     description: "Pausas para hidratação e cuidado",
     to: "/hidratacao" as const,
@@ -24,8 +29,8 @@ const activeModules = [
 const catalogModules = [
   { ...MODULE_THEMES.tasks, active: true },
   { ...MODULE_THEMES.hydration, active: true },
+  { ...MODULE_THEMES.checkin, active: true },
   { ...MODULE_THEMES.alumia_ai, active: false },
-  { ...MODULE_THEMES.checkin, active: false },
   { ...MODULE_THEMES.mindfulness, active: false },
   { ...MODULE_THEMES.student, active: false },
 ];

@@ -16,11 +16,12 @@ describe("ModulesList", () => {
 
     expect(screen.getByRole("button", { name: "Acessar tarefas" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Acessar hidratação" })).toBeEnabled();
-    expect(screen.queryByRole("button", { name: /check-in emocional/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Acessar check-in emocional" })).toBeEnabled();
     expect(screen.queryByRole("button", { name: /mindfulness/i })).not.toBeInTheDocument();
-    expect(screen.getAllByText("Em breve")).toHaveLength(4);
+    expect(screen.getAllByText("Em breve")).toHaveLength(3);
     expect(screen.getByRole("switch", { name: "Tarefas está ativo" })).toBeChecked();
     expect(screen.getByRole("switch", { name: "Tarefas está ativo" })).toBeDisabled();
+    expect(screen.getByRole("switch", { name: "Check-in emocional está ativo" })).toBeChecked();
     expect(screen.getByRole("switch", { name: "Alum.IA estará disponível em breve" })).not.toBeChecked();
     expect(screen.getByRole("switch", { name: "Alum.IA estará disponível em breve" })).toBeDisabled();
   });
