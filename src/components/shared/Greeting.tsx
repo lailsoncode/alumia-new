@@ -31,8 +31,10 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
 
   useEffect(() => {
     const hour = new Date().getHours();
+    const storedTheme = getStoredTheme();
     setGreeting(getPeriodGreeting(hour));
-    setDarkMode(getStoredTheme() === "dark");
+    setDarkMode(storedTheme === "dark");
+    applyTheme(storedTheme);
     return subscribeToThemeChanges((theme) => setDarkMode(theme === "dark"));
   }, []);
 
@@ -86,31 +88,41 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
     applyTheme(next ? "dark" : "light");
   };
 
+  const personalLine = profileLine || subtitleByPeriod();
+
   return (
-    <header className="flex items-start justify-between gap-4 py-1">
-      <div className="min-w-0 flex-1">
-        <h1 className="flex flex-wrap items-center gap-x-2 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          <span>{greeting}, <strong className="font-bold">{name}</strong></span>
-          <AlumiaIcon icon={SparklesIcon} size="sm" className="text-tone-sun-fg" />
-        </h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">{role || profileLine || subtitleByPeriod()}</p>
-      </div>
-      <div className="flex shrink-0 items-center gap-2">
-        <button type="button" onClick={toggleTheme} aria-label={darkMode ? "Usar tema claro" : "Usar tema escuro"} className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface text-muted-foreground shadow-[var(--shadow-card)] transition-colors hover:bg-surface-subtle hover:text-foreground">
-          <AlumiaIcon icon={darkMode ? Sun01Icon : Moon01Icon} size="sm" />
-        </button>
-        <div
-          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card text-sm font-semibold text-foreground shadow-sm"
-          role={avatarUrl ? undefined : "img"}
-          aria-label={avatarUrl ? undefined : `Avatar de ${name}`}
-        >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt={`Avatar de ${name}`} className="h-full w-full object-cover" />
-          ) : (
-            initials
-          )}
+    <header className="-mx-4 -mt-5 border-b border-border bg-surface px-4 pt-4 sm:-mx-6 sm:-mt-6 sm:px-6 lg:-mx-8 lg:-mt-8 lg:px-8">
+      <div className="flex items-center justify-between gap-3 pb-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="flex flex-wrap items-center gap-x-2 font-display text-xl font-semibold tracking-tight text-foreground min-[380px]:text-2xl sm:text-3xl">
+            <span>{greeting}, <strong className="font-bold">{name}</strong></span>
+            <AlumiaIcon icon={SparklesIcon} size="sm" className="hidden text-tone-sun-fg min-[360px]:inline-flex" />
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">{personalLine}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <button type="button" onClick={toggleTheme} aria-label={darkMode ? "Usar tema claro" : "Usar tema escuro"} className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/35 bg-surface text-primary transition-colors hover:bg-surface-subtle">
+            <AlumiaIcon icon={darkMode ? Sun01Icon : Moon01Icon} size="sm" />
+          </button>
+          <div
+            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-primary/35 bg-card text-sm font-semibold text-foreground"
+            role={avatarUrl ? undefined : "img"}
+            aria-label={avatarUrl ? undefined : `Avatar de ${name}`}
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={`Avatar de ${name}`} className="h-full w-full object-cover" />
+            ) : (
+              initials
+            )}
+          </div>
         </div>
       </div>
+      {role && (
+        <div className="flex min-h-14 items-center gap-2 border-t border-border py-3 text-sm font-medium text-foreground sm:text-base">
+          <span>{role}</span>
+          <AlumiaIcon icon={SparklesIcon} size="xs" className="shrink-0 text-tone-sun-fg" />
+        </div>
+      )}
     </header>
   );
 }
