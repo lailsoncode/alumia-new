@@ -1,0 +1,23 @@
+{
+  "name": "Alumia",
+  "short_name": "Alumia",
+  "description": "Seu espaço de cuidado diário.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f7fb",
+  "theme_color": "#529f8f",
+  "icons": [
+    {
+      "src": "/icons/alumia-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/alumia-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
