@@ -145,22 +145,19 @@ export function HydrationPage() {
           </InlineFeedback>
         )}
 
-        <Surface className="module-surface grid grid-cols-[5.75rem_minmax(0,1fr)] gap-3 p-3.5 shadow-none min-[380px]:grid-cols-[7rem_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4 sm:p-4">
+        <Surface className="module-surface grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2.5 p-2.5 shadow-none min-[380px]:grid-cols-[5rem_minmax(0,1fr)] sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-3 sm:p-3">
           <img
             src={hydrationImage}
             alt="Personagem da Alumia bebendo água"
-            className="h-24 w-full self-stretch rounded-2xl object-cover min-[380px]:h-28 sm:h-32"
+            className="h-24 w-full rounded-xl object-cover sm:h-28"
           />
-          <div className="min-w-0 self-center">
-            <div className="flex items-start gap-2">
+          <div className="min-w-0">
+            <div className="flex items-start gap-1.5">
               <AlumiaIcon icon={GlassWaterIcon} size="sm" className="module-text mt-0.5 shrink-0" />
-              <h2 className="text-base font-semibold leading-snug sm:text-lg">Descubra seu ritmo de hidratação</h2>
+              <h2 className="text-sm font-semibold leading-snug sm:text-base">Descubra seu ritmo de hidratação</h2>
             </div>
-            <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">
-              Beber água pode ser um gesto de carinho, sem pressão ou cobrança.
-            </p>
-            <p className="mt-1.5 hidden text-sm leading-relaxed text-foreground/80 min-[430px]:block">
-              A Alumia acompanha o ritmo que fizer sentido para o seu corpo e para o seu dia.
+            <p className="mt-1 text-xs leading-relaxed text-foreground/80 sm:text-sm">
+              Cada gole pode ser um gesto de cuidado, no ritmo que fizer sentido para você.
             </p>
           </div>
         </Surface>
