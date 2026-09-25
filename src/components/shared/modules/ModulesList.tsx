@@ -73,13 +73,13 @@ export function ModulesList() {
             const switchLabel = module.active ? `${module.label} está ativo` : `${module.label} estará disponível em breve`;
 
             return (
-              <article key={module.key} className={`module-surface flex min-h-16 items-center gap-3 rounded-[1.125rem] border px-4 py-2.5 shadow-[var(--shadow-card)] ${module.themeClass}`}>
+              <article key={module.key} className={`module-whisper flex min-h-16 items-center gap-3 rounded-[1.125rem] border px-4 py-2.5 shadow-[var(--shadow-card)] ${module.themeClass}`}>
                 <AlumiaIcon icon={module.icon} size="md" className="module-text shrink-0" />
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-base font-semibold sm:text-lg">{module.label}</h3>
                   <p className="mt-0.5 text-xs font-medium text-muted-foreground">{status}</p>
                 </div>
-                <Switch checked={module.active} disabled aria-label={switchLabel} className="disabled:cursor-default disabled:opacity-100" />
+                <Switch checked={module.active} disabled aria-label={switchLabel} className="disabled:cursor-default disabled:opacity-100 data-[state=unchecked]:bg-muted" />
               </article>
             );
           })}

@@ -252,7 +252,7 @@
     --border: var(--module-border);
     --input: color-mix(in oklab, var(--module-accent) 48%, transparent);
     --ring: var(--module-accent);
-    --surface-subtle: color-mix(in oklab, var(--module-soft) 48%, var(--surface));
+    --surface-subtle: color-mix(in oklab, var(--module-soft) 26%, var(--surface));
     --sidebar-accent: var(--module-soft);
     --sidebar-accent-foreground: var(--module-strong);
     --sidebar-border: var(--module-border);
@@ -318,7 +318,11 @@
   .dark .module-theme-student { --module-accent: oklch(0.76 0.085 270); }
 
   .module-surface {
-    background: color-mix(in oklab, var(--module-soft) 68%, var(--surface));
+    background: color-mix(in oklab, var(--module-soft) 42%, var(--surface));
+    border-color: var(--module-border);
+  }
+  .module-whisper {
+    background: color-mix(in oklab, var(--module-soft) 20%, var(--surface));
     border-color: var(--module-border);
   }
   .module-border { border-color: var(--module-border); }

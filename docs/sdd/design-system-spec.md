@@ -87,6 +87,8 @@ A implementação expõe esses valores por variáveis semânticas locais, como `
 - `DS-MOD-006`: cores semânticas de erro, alerta, sucesso, prioridade e acessibilidade não são substituídas pela cor do módulo.
 - `DS-MOD-007`: cor nunca é o único sinal da origem; ícone e nome acessível acompanham o tema quando a origem for relevante.
 - `DS-MOD-008`: módulos futuros podem ter tokens reservados sem serem apresentados como disponíveis.
+- `DS-MOD-009`: superfícies grandes usam apenas um véu pastel do módulo; superfícies repetidas, como tarefas e linhas do catálogo, usam um tingimento quase branco. A cor mais concentrada fica restrita a elementos pequenos de orientação e ação.
+- `DS-MOD-010`: no catálogo, módulos inativos mantêm borda, ícone e tingimento suave de identidade, mas o toggle desligado permanece neutro para não sugerir ativação.
 
 ## 4. Hugeicons
 

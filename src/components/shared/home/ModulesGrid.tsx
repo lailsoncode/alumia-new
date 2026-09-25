@@ -20,7 +20,7 @@ export function ModulesGrid() {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {modules.map((module) => (
-          <button key={module.key} type="button" onClick={() => navigate({ to: module.to })} className={`module-surface flex min-h-12 min-w-0 items-center gap-1.5 rounded-[0.875rem] border px-2 text-left text-sm font-medium text-foreground transition-colors hover:-translate-y-px ${module.themeClass}`}>
+          <button key={module.key} type="button" onClick={() => navigate({ to: module.to })} className={`module-whisper flex min-h-12 min-w-0 items-center gap-1.5 rounded-[0.875rem] border px-2 text-left text-sm font-medium text-foreground transition-colors hover:-translate-y-px ${module.themeClass}`}>
             <AlumiaIcon icon={module.icon} size="sm" className="module-text shrink-0" />
             <span className="truncate">{module.label}</span>
           </button>

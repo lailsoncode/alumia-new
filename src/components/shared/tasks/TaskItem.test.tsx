@@ -12,7 +12,7 @@ describe("TaskItem", () => {
 
     const item = screen.getByRole("listitem");
     expect(item).toHaveAttribute("data-module", "hydration");
-    expect(item).toHaveClass("module-theme-hydration", "module-border", "bg-surface");
+    expect(item).toHaveClass("module-theme-hydration", "module-whisper");
     expect(item).not.toHaveClass("module-surface");
     expect(screen.getByText("Hidratação")).toBeInTheDocument();
   });
