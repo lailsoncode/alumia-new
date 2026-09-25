@@ -1,5 +1,3 @@
-import { SparklesIcon } from "@hugeicons/core-free-icons";
-import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { useAuth } from "@/hooks/use-auth";
 
 interface GreetingProps {
@@ -35,11 +33,10 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
 
   return (
     <header className="-mx-4 -mt-4 border-b border-border bg-surface px-4 pt-3 sm:-mx-5 sm:-mt-5 sm:px-5 lg:-mx-6 lg:-mt-6 lg:px-6">
-      <div className="flex items-center justify-between gap-3 pb-3">
+      <div className="flex items-center justify-between gap-3 pb-1.5">
         <div className="min-w-0 flex-1">
-          <h1 className="flex flex-wrap items-center gap-x-2 font-display text-xl font-semibold tracking-tight text-foreground min-[380px]:text-2xl sm:text-3xl">
+          <h1 className="font-display text-xl font-semibold tracking-tight text-foreground min-[380px]:text-2xl sm:text-3xl">
             <span>{greeting}, <strong className="font-bold">{name}</strong></span>
-            <AlumiaIcon icon={SparklesIcon} size="sm" className="hidden text-tone-sun-fg min-[360px]:inline-flex" />
           </h1>
         </div>
         <div
@@ -55,9 +52,8 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
         </div>
       </div>
       {role && (
-        <div className="flex min-h-12 items-center gap-2 pb-2.5 text-sm font-medium text-foreground sm:text-base">
+        <div className="pb-3 text-sm font-medium leading-relaxed text-foreground sm:text-base">
           <span>{role}</span>
-          <AlumiaIcon icon={SparklesIcon} size="xs" className="shrink-0 text-tone-sun-fg" />
         </div>
       )}
     </header>
