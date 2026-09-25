@@ -77,17 +77,17 @@ export function TasksView() {
 
   return (
     <section>
-      <Surface className="module-surface overflow-hidden rounded-[1.25rem] p-3 sm:p-4">
-        <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-3 min-[380px]:grid-cols-[6.5rem_minmax(0,1fr)] sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
-          <img src={tasksImage} alt="Personagem da Alumia organizando ideias com calma" className="h-full min-h-40 w-full rounded-[0.875rem] object-cover" />
-          <div className="py-0.5">
-            <h2 className="flex items-start gap-2 font-display text-base font-semibold leading-snug text-foreground sm:text-lg">
-              <AlumiaIcon icon={BulbIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
+      <Surface className="module-surface overflow-hidden rounded-[1.25rem] p-2.5 sm:p-3">
+        <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2.5 min-[380px]:grid-cols-[5rem_minmax(0,1fr)] sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-3">
+          <img src={tasksImage} alt="Personagem da Alumia organizando ideias com calma" className="h-24 w-full rounded-xl object-cover sm:h-28" />
+          <div>
+            <h2 className="flex items-start gap-1.5 font-display text-sm font-semibold leading-snug text-foreground sm:text-base">
+              <AlumiaIcon icon={BulbIcon} size="sm" className="mt-0.5 shrink-0 text-tone-sun-fg" />
               Como a Alumia organiza seus gestos?
             </h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Primeiro, o que você marcou como importante. Depois, o que tem data ou horário. E, por fim, o que pode esperar. Sempre no seu ritmo. Sem pressão, sem cobrança.
-          </p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+              Primeiro, o que é importante. Depois, o que tem data ou horário. Por fim, o que pode esperar — tudo no seu ritmo, sem cobrança.
+            </p>
           </div>
         </div>
       </Surface>
