@@ -26,6 +26,7 @@ A camada de conforto B2C deve usar:
 - pequenos acentos em amarelo, ciano, menta, pêssego e lavanda para orientar seções;
 - saudação personalizada e navegação inferior flutuante no mobile;
 - cabeçalho pessoal como faixa estrutural da página, sem aparência flutuante, reunindo saudação, contexto da tela e avatar; a biografia ou frase livre do usuário aparece apenas no perfil;
+- saudação e contexto aparecem no mesmo bloco, sem divisória interna; na Home, o contexto é uma mensagem fixa de acolhimento, sem cobrança ou linguagem de produtividade;
 - orientação visível quando a organização de uma tela não for autoevidente;
 - estados vazios que preservem a estrutura da jornada e usem linguagem acolhedora.
 - ícones decorativos dos blocos B2C apresentados diretamente, sem círculos ou quadrados coloridos ao redor;

@@ -55,7 +55,7 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
         </div>
       </div>
       {role && (
-        <div className="flex min-h-12 items-center gap-2 border-t border-border py-2.5 text-sm font-medium text-foreground sm:text-base">
+        <div className="flex min-h-12 items-center gap-2 pb-2.5 text-sm font-medium text-foreground sm:text-base">
           <span>{role}</span>
           <AlumiaIcon icon={SparklesIcon} size="xs" className="shrink-0 text-tone-sun-fg" />
         </div>

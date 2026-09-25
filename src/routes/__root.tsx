@@ -12,7 +12,7 @@ import { registerPwaServiceWorker } from "@/services/pwaService";
 import appCss from "../styles.css?url";
 
 const appShellHeaders = {
-  "/": undefined,
+  "/": "Que bom ter você aqui. Vamos com calma, no seu ritmo.",
   "/tarefas": "Organize o seu dia, do seu jeito.",
   "/modulos": "Escolha o que faz sentido para você agora. Um passo de cada vez.",
   "/hidratacao": "Cada gole é um gesto de carinho com você.",
