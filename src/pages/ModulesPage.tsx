@@ -6,7 +6,7 @@ export function ModulesPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <Greeting role="Escolha só o que fizer sentido para você agora." />
+        <Greeting role="Escolha o que faz sentido para você agora. Um passo de cada vez." />
         <ModulesList />
       </div>
     </AppShell>

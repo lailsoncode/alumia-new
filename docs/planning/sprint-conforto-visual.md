@@ -23,6 +23,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 - estados vazios próprios para cada grupo, sem transformar ausência de tarefas em erro;
 - hierarquia e acentos cromáticos consistentes em home, tarefas, hidratação, módulos e ajustes;
 - módulos ativos da home reunidos em um único bloco compacto com ação de edição;
+- página de módulos recuperada com cartões ativos em duas colunas e catálogo compacto de estados;
 - hidratação apresentada como acompanhamento pessoal, sem alegação clínica;
 - módulos futuros continuam identificados como “Em breve” e não ganham ações falsas.
 

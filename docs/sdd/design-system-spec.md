@@ -29,6 +29,7 @@ A camada de conforto B2C deve usar:
 - orientação visível quando a organização de uma tela não for autoevidente;
 - estados vazios que preservem a estrutura da jornada e usem linguagem acolhedora.
 - módulos ativos da home agrupados em uma única superfície, com opções compactas em duas colunas, edição no rodapé e raios contidos de 20 px no bloco e 14 px nas opções.
+- página de módulos organizada em grade colorida para os módulos funcionais e catálogo em linhas para comunicar estados “Ativo” e “Em breve”; somente módulos funcionais oferecem a ação “Acessar”.
 
 Essas escolhas não autorizam dados simulados, módulos incompletos apresentados como ativos ou perda de contraste para obter uma aparência mais suave.
 

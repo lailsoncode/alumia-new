@@ -14,16 +14,20 @@ describe("ModulesList", () => {
   it("oferece somente os módulos funcionais como ações", () => {
     render(<ModulesList />);
 
-    expect(screen.getByRole("button", { name: "Abrir tarefas" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Abrir hidratação" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Acessar tarefas" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Acessar hidratação" })).toBeEnabled();
     expect(screen.queryByRole("button", { name: /check-in emocional/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /mindfulness/i })).not.toBeInTheDocument();
-    expect(screen.getAllByText("Em breve")).toHaveLength(3);
+    expect(screen.getAllByText("Em breve")).toHaveLength(4);
+    expect(screen.getByRole("switch", { name: "Tarefas está ativo" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Tarefas está ativo" })).toBeDisabled();
+    expect(screen.getByRole("switch", { name: "Alum.IA estará disponível em breve" })).not.toBeChecked();
+    expect(screen.getByRole("switch", { name: "Alum.IA estará disponível em breve" })).toBeDisabled();
   });
 
   it("navega para um módulo ativo", () => {
     render(<ModulesList />);
-    fireEvent.click(screen.getByRole("button", { name: "Abrir tarefas" }));
+    fireEvent.click(screen.getByRole("button", { name: "Acessar tarefas" }));
     expect(navigate).toHaveBeenCalledWith({ to: "/tarefas" });
   });
 });
