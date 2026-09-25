@@ -12,14 +12,14 @@ const modules = [
 export function ModulesGrid() {
   const navigate = useNavigate();
   return (
-    <Surface className="p-4 sm:p-5">
+    <Surface className="rounded-[1.25rem] p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-tone-lavender text-tone-lavender-fg"><AlumiaIcon icon={Settings01Icon} size="sm" /></span>
         <h2 className="text-lg font-semibold">Seus módulos ativos</h2>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {modules.map((module) => (
-          <button key={module.title} type="button" onClick={() => navigate({ to: module.to })} className="flex min-h-12 min-w-0 items-center gap-1.5 rounded-2xl border border-border bg-surface-subtle px-2 text-left text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-muted">
+          <button key={module.title} type="button" onClick={() => navigate({ to: module.to })} className="flex min-h-12 min-w-0 items-center gap-1.5 rounded-[0.875rem] border border-border bg-surface-subtle px-2 text-left text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-muted">
             <AlumiaIcon icon={module.icon} size="sm" className="shrink-0" />
             <span className="truncate">{module.title}</span>
           </button>
