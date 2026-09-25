@@ -16,7 +16,7 @@ function getPeriodGreeting(hour: number) {
 
 /**
  * Componente de saudação contextual.
- * Exibe o nome do usuário, a saudação baseada no período do dia, e um avatar.
+ * Exibe o nome do usuário, a saudação baseada no período do dia, o contexto da tela e um avatar.
  */
 export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: GreetingProps) {
   const { user, profile } = useAuth();
@@ -24,13 +24,6 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
   const name = propName || profile?.firstName || user?.email?.split("@")[0] || "você";
   const profileAvatar = profile?.avatarUrl && !profile.avatarUrl.startsWith("blob:") ? profile.avatarUrl : "";
   const avatarUrl = propAvatarUrl && !propAvatarUrl.startsWith("blob:") ? propAvatarUrl : profileAvatar;
-  const profileLine = profile?.bio?.split(/[.!?]/)[0]?.trim().slice(0, 64) || "";
-
-  const subtitleByPeriod = () => {
-    if (greeting === "Bom dia") return "Que o seu dia seja incrível!";
-    if (greeting === "Boa tarde") return "Hoje o sol nasceu só para você brilhar!";
-    return "Descanse bem, amanhã é um novo dia!";
-  };
 
   const initials = (name || "V")
     .split(" ")
@@ -40,8 +33,6 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
     .join("")
     .toUpperCase();
 
-  const personalLine = profileLine || subtitleByPeriod();
-
   return (
     <header className="-mx-4 -mt-4 border-b border-border bg-surface px-4 pt-3 sm:-mx-5 sm:-mt-5 sm:px-5 lg:-mx-6 lg:-mt-6 lg:px-6">
       <div className="flex items-center justify-between gap-3 pb-3">
@@ -50,7 +41,6 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
             <span>{greeting}, <strong className="font-bold">{name}</strong></span>
             <AlumiaIcon icon={SparklesIcon} size="sm" className="hidden text-tone-sun-fg min-[360px]:inline-flex" />
           </h1>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">{personalLine}</p>
         </div>
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/35 bg-card text-sm font-semibold text-foreground"
