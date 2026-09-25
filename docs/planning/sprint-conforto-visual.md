@@ -22,6 +22,7 @@ Recuperar a sensação acolhedora percebida na versão anterior da Alumia sem de
 - grupos “Importa hoje”, “Marcado para hoje” e “Pode esperar” mantidos mesmo quando vazios;
 - estados vazios próprios para cada grupo, sem transformar ausência de tarefas em erro;
 - hierarquia e acentos cromáticos consistentes em home, tarefas, hidratação, módulos e ajustes;
+- módulos ativos da home reunidos em um único bloco compacto com ação de edição;
 - hidratação apresentada como acompanhamento pessoal, sem alegação clínica;
 - módulos futuros continuam identificados como “Em breve” e não ganham ações falsas.
 

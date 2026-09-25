@@ -1,31 +1,33 @@
 import { useNavigate } from "@tanstack/react-router";
-import { CheckListIcon, GlassWaterIcon, Grid2X2Icon } from "@hugeicons/core-free-icons";
+import { CheckListIcon, GlassWaterIcon, Settings01Icon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 
 const modules = [
-  { title: "Tarefas", description: "Organize o que importa", icon: CheckListIcon, to: "/tarefas" as const, tone: "bg-tone-lavender text-tone-lavender-fg" },
-  { title: "Hidratação", description: "Registre cada pausa", icon: GlassWaterIcon, to: "/hidratacao" as const, tone: "bg-tone-sky text-tone-sky-fg" },
+  { title: "Tarefas", icon: CheckListIcon, to: "/tarefas" as const },
+  { title: "Hidratação", icon: GlassWaterIcon, to: "/hidratacao" as const },
 ];
 
 export function ModulesGrid() {
   const navigate = useNavigate();
   return (
-    <section>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-tone-lavender text-tone-lavender-fg"><AlumiaIcon icon={Grid2X2Icon} size="sm" /></span><h2 className="text-lg font-semibold">Seus espaços de cuidado</h2></div>
-        <button type="button" onClick={() => navigate({ to: "/modulos" })} className="min-h-10 text-sm font-semibold text-primary underline-offset-4 hover:underline">Gerenciar</button>
+    <Surface className="p-4 sm:p-5">
+      <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-tone-lavender text-tone-lavender-fg"><AlumiaIcon icon={Settings01Icon} size="sm" /></span>
+        <h2 className="text-lg font-semibold">Seus módulos ativos</h2>
       </div>
-      <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+      <div className="mt-4 grid grid-cols-2 gap-3">
         {modules.map((module) => (
-          <Surface key={module.title} as="article" variant="interactive">
-            <button type="button" onClick={() => navigate({ to: module.to })} className="flex min-h-20 w-full items-center gap-3 p-4 text-left">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${module.tone}`}><AlumiaIcon icon={module.icon} size="md" /></span>
-              <span><span className="block text-sm font-semibold text-foreground">{module.title}</span><span className="mt-0.5 block text-xs text-muted-foreground">{module.description}</span></span>
-            </button>
-          </Surface>
+          <button key={module.title} type="button" onClick={() => navigate({ to: module.to })} className="flex min-h-12 min-w-0 items-center gap-1.5 rounded-2xl border border-border bg-surface-subtle px-2 text-left text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-muted">
+            <AlumiaIcon icon={module.icon} size="sm" className="shrink-0" />
+            <span className="truncate">{module.title}</span>
+          </button>
         ))}
       </div>
-    </section>
+      <div className="mt-4 flex justify-end">
+        <Button className="min-h-11" variant="outline" size="sm" onClick={() => navigate({ to: "/modulos" })}>Editar meus módulos</Button>
+      </div>
+    </Surface>
   );
 }

@@ -28,6 +28,7 @@ A camada de conforto B2C deve usar:
 - cabeçalho pessoal como faixa estrutural da página, sem aparência flutuante, reunindo saudação, contexto e avatar;
 - orientação visível quando a organização de uma tela não for autoevidente;
 - estados vazios que preservem a estrutura da jornada e usem linguagem acolhedora.
+- módulos ativos da home agrupados em uma única superfície, com opções compactas em duas colunas e edição no rodapé.
 
 Essas escolhas não autorizam dados simulados, módulos incompletos apresentados como ativos ou perda de contraste para obter uma aparência mais suave.
 
