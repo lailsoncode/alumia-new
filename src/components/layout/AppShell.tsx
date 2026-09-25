@@ -1,20 +1,25 @@
 import type { ReactNode } from "react";
 import { BottomNavigation, SidebarNavigation } from "./navigation";
+import { Greeting } from "@/components/shared/Greeting";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
   children: ReactNode;
   className?: string;
   contentClassName?: string;
+  headerRole?: string;
 }
 
-export function AppShell({ children, className, contentClassName }: AppShellProps) {
+export function AppShell({ children, className, contentClassName, headerRole }: AppShellProps) {
   return (
     <div className={cn("min-h-screen bg-background", className)}>
       <SidebarNavigation />
       <div className="lg:pl-64">
         <main className={cn("mx-auto w-full max-w-7xl px-4 pb-28 pt-4 sm:px-5 sm:pt-5 lg:px-6 lg:pb-8 lg:pt-6", contentClassName)}>
-          {children}
+          <div className="space-y-4">
+            <Greeting role={headerRole} />
+            {children}
+          </div>
         </main>
       </div>
       <BottomNavigation />

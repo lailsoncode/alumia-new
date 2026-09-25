@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { AccessibilityIcon, BellIcon, ChevronRightIcon, GlobeIcon, LockIcon, Logout01Icon, Moon01Icon, Settings01Icon, Sun01Icon, UserIcon } from "@hugeicons/core-free-icons";
-import { AppShell } from "@/components/layout";
-import { Greeting } from "@/components/shared/Greeting";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { SectionHeader, Surface } from "@/components/ui/surface";
 import { useAuth } from "@/hooks/use-auth";
-import { getUserProfile, signOut } from "@/services/authService";
+import { signOut } from "@/services/authService";
 import { disablePushNotifications, enablePushNotifications, getPushNotificationState, isOneSignalConfigured } from "@/services/oneSignalService";
 import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
-import type { ProfileData } from "@/types";
 
 function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
   return (
@@ -22,16 +19,13 @@ function PreferenceSwitch({ checked, onChange, label, disabled = false }: { chec
 
 export function SettingsPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const { user, profile } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  const [notificationStatus, setNotificationStatus] = useState<"loading" | "ready" | "saving" | "denied" | "unsupported" | "unconfigured" | "error">("loading");
+  const [notificationStatus, setNotificationStatus] = useState<"loading" | "ready" | "saving" | "denied" | "unsupported" | "unconfigured" | "error">(
+    isOneSignalConfigured() ? "loading" : "unconfigured",
+  );
   const [language, setLanguage] = useState("pt-BR");
-
-  useEffect(() => {
-    if (user) getUserProfile(user.id).then(setProfile).catch((error) => console.error("Erro ao obter perfil:", error));
-  }, [user]);
 
   useEffect(() => {
     const nextDark = getStoredTheme() === "dark";
@@ -101,10 +95,7 @@ export function SettingsPage() {
   const name = profile?.firstName ? `${profile.firstName} ${profile.lastName}`.trim() : user?.email?.split("@")[0] || "Seu perfil";
 
   return (
-    <AppShell>
-      <div className="space-y-5">
-        <Greeting role="Sua conta, suas preferências e sua privacidade." />
-
+    <div className="space-y-5">
         <section>
           <SectionHeader icon={UserIcon} iconClassName="text-tone-mint-fg" title="Perfil"/>
           <Surface className="mt-3 p-4">
@@ -163,7 +154,6 @@ export function SettingsPage() {
             <button type="button" onClick={logout} className="flex min-h-16 w-full items-center gap-3 px-4 text-left text-destructive transition-colors hover:bg-destructive/10 sm:px-5"><AlumiaIcon icon={Logout01Icon} size="sm" /><span className="flex-1 text-sm font-semibold">Sair da conta</span><AlumiaIcon icon={ChevronRightIcon} size="sm" /></button>
           </Surface>
         </section>
-      </div>
-    </AppShell>
+    </div>
   );
 }

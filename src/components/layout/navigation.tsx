@@ -22,6 +22,7 @@ export function BottomNavigation() {
             <li key={item.to} className="min-w-0">
               <Link
                 to={item.to}
+                preload="render"
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-[1.25rem] px-1 text-xs font-semibold transition-colors",
@@ -61,6 +62,7 @@ export function SidebarNavigation() {
               <li key={item.to}>
                 <Link
                   to={item.to}
+                  preload="render"
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "flex min-h-12 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors",

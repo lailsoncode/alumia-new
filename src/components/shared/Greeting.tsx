@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
 import { SparklesIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
-import { useAuth } from "../../hooks/use-auth";
-import { applyTheme, getStoredTheme } from "../../lib/theme";
-import { getUserProfile } from "../../services/authService";
+import { useAuth } from "@/hooks/use-auth";
 
 interface GreetingProps {
   name?: string;
@@ -22,48 +19,12 @@ function getPeriodGreeting(hour: number) {
  * Exibe o nome do usuário, a saudação baseada no período do dia, e um avatar.
  */
 export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: GreetingProps) {
-  const { user } = useAuth();
-  const [name, setName] = useState(propName || "você");
-  const [avatarUrl, setAvatarUrl] = useState(propAvatarUrl || "");
-  const [greeting, setGreeting] = useState("Boa noite");
-  const [profileLine, setProfileLine] = useState("");
-
-  useEffect(() => {
-    const hour = new Date().getHours();
-    const storedTheme = getStoredTheme();
-    setGreeting(getPeriodGreeting(hour));
-    applyTheme(storedTheme);
-  }, []);
-
-  useEffect(() => {
-    if (propName) setName(propName);
-    if (propAvatarUrl && !propAvatarUrl.startsWith("blob:")) {
-      setAvatarUrl(propAvatarUrl);
-    }
-
-    if (user && !propName) {
-      getUserProfile(user.id)
-        .then((profile) => {
-          if (profile) {
-            setName(profile.firstName || user.email?.split("@")[0] || "você");
-            setProfileLine(profile.bio?.split(/[.!?]/)[0]?.trim().slice(0, 64) || "");
-            if (profile.avatarUrl && !propAvatarUrl) {
-              if (!profile.avatarUrl.startsWith("blob:")) {
-                setAvatarUrl(profile.avatarUrl);
-              }
-            }
-          } else {
-            setName(user.email?.split("@")[0] || "você");
-          }
-        })
-        .catch((err) => {
-          console.error("Erro ao carregar perfil no Greeting:", err);
-          setName(user.email?.split("@")[0] || "você");
-        });
-    } else if (!user && !propName) {
-      setName("você");
-    }
-  }, [user, propName, propAvatarUrl]);
+  const { user, profile } = useAuth();
+  const greeting = getPeriodGreeting(new Date().getHours());
+  const name = propName || profile?.firstName || user?.email?.split("@")[0] || "você";
+  const profileAvatar = profile?.avatarUrl && !profile.avatarUrl.startsWith("blob:") ? profile.avatarUrl : "";
+  const avatarUrl = propAvatarUrl && !propAvatarUrl.startsWith("blob:") ? propAvatarUrl : profileAvatar;
+  const profileLine = profile?.bio?.split(/[.!?]/)[0]?.trim().slice(0, 64) || "";
 
   const subtitleByPeriod = () => {
     if (greeting === "Bom dia") return "Que o seu dia seja incrível!";

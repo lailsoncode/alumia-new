@@ -152,6 +152,8 @@ Regras:
 - React Query guarda estado do servidor;
 - URL guarda aba, busca, filtros e paginação compartilhável;
 - contexts guardam sessão, tema e contexto atual;
+- `AuthProvider` mantém uma única assinatura da sessão Supabase e uma cópia compartilhada do perfil durante toda a navegação;
+- o layout autenticado, o cabeçalho e a navegação permanecem montados ao trocar entre as rotas principais;
 - `useState` guarda somente estado efêmero da interface;
 - banco guarda estado de negócio durável;
 - não será instalada outra store global sem ADR.

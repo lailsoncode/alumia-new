@@ -1,10 +1,24 @@
 import { useEffect } from "react";
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation } from "@tanstack/react-router";
 
+import { AppShell } from "@/components/layout";
 import { useAuth } from "@/hooks/use-auth";
+import { RequireAuth } from "@/lib/RequireAuth";
+import { applyTheme, getStoredTheme } from "@/lib/theme";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { initializeOneSignal, isOneSignalConfigured, synchronizeOneSignalUser } from "@/services/oneSignalService";
 import { registerPwaServiceWorker } from "@/services/pwaService";
 import appCss from "../styles.css?url";
+
+const appShellHeaders = {
+  "/": undefined,
+  "/tarefas": "Organize o seu dia, do seu jeito.",
+  "/modulos": "Escolha o que faz sentido para você agora. Um passo de cada vez.",
+  "/hidratacao": "Cada gole é um gesto de carinho com você.",
+  "/ajustes": "Sua conta, suas preferências e sua privacidade.",
+} as const;
+
+const protectedPaths = new Set([...Object.keys(appShellHeaders), "/completar-perfil"]);
 
 function NotFoundComponent() {
   return (
@@ -82,10 +96,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function RootComponent() {
+function RuntimeIntegrations() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
+    applyTheme(getStoredTheme());
     void registerPwaServiceWorker().catch((error) => console.error("Erro ao registrar a PWA:", error));
     if (isOneSignalConfigured()) {
       void initializeOneSignal().catch((error) => console.error("Erro ao iniciar notificações:", error));
@@ -97,5 +112,29 @@ function RootComponent() {
     void synchronizeOneSignalUser(user?.id ?? null).catch((error) => console.error("Erro ao sincronizar notificações:", error));
   }, [loading, user?.id]);
 
-  return <Outlet />;
+  return null;
+}
+
+function ApplicationContent() {
+  const { pathname } = useLocation();
+  const isProtected = protectedPaths.has(pathname);
+  const usesAppShell = Object.hasOwn(appShellHeaders, pathname);
+  const content = usesAppShell ? (
+    <AppShell headerRole={appShellHeaders[pathname as keyof typeof appShellHeaders]}>
+      <Outlet />
+    </AppShell>
+  ) : (
+    <Outlet />
+  );
+
+  return isProtected ? <RequireAuth>{content}</RequireAuth> : content;
+}
+
+function RootComponent() {
+  return (
+    <AuthProvider>
+      <RuntimeIntegrations />
+      <ApplicationContent />
+    </AuthProvider>
+  );
 }

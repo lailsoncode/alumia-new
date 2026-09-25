@@ -9,8 +9,6 @@ import {
   Settings01Icon,
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
-import { AppShell } from "@/components/layout";
-import { Greeting } from "@/components/shared/Greeting";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { InlineFeedback, SectionHeader, Surface } from "@/components/ui/surface";
@@ -136,10 +134,8 @@ export function HydrationPage() {
   const maxHistory = Math.max(goal, ...history.map((item) => item.total), 1);
 
   return (
-    <AppShell>
+    <>
       <div className="space-y-4">
-        <Greeting role="Cada gole é um gesto de carinho com você." />
-
         {error && (
           <InlineFeedback tone="danger">
             {error}{" "}
@@ -336,6 +332,6 @@ export function HydrationPage() {
           </section>
         </>
       )}
-    </AppShell>
+    </>
   );
 }

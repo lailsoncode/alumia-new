@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { InlineFeedback } from "@/components/ui/surface";
 import { useAuth } from "@/hooks/use-auth";
-import { getUserProfile, updateUserProfile } from "@/services/authService";
+import { updateUserProfile } from "@/services/authService";
 import registerHero from "@/assets/newaccount.webp";
 
 const fieldClass = "min-h-12 w-full rounded-xl border border-input bg-surface px-4 py-3 text-base text-foreground shadow-sm transition-colors placeholder:text-muted-foreground/75 hover:border-primary/35 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30";
 
 export function CompleteProfilePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
@@ -25,18 +25,13 @@ export function CompleteProfilePage() {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-    getUserProfile(user.id)
-      .then((profile) => {
-        if (!profile) return;
-        setFirstName(profile.firstName || "");
-        setLastName(profile.lastName || "");
-        setBio(profile.bio || "");
-        setGoals(profile.goals || "");
-        if (profile.avatarUrl && !profile.avatarUrl.startsWith("blob:")) setAvatarPreview(profile.avatarUrl);
-      })
-      .catch((error) => console.error("Erro ao carregar perfil:", error));
-  }, [user]);
+    if (!profile) return;
+    setFirstName(profile.firstName || "");
+    setLastName(profile.lastName || "");
+    setBio(profile.bio || "");
+    setGoals(profile.goals || "");
+    if (profile.avatarUrl && !profile.avatarUrl.startsWith("blob:")) setAvatarPreview(profile.avatarUrl);
+  }, [profile]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -73,6 +68,7 @@ export function CompleteProfilePage() {
     setSaveError(null);
     try {
       await updateUserProfile(user.id, { firstName, lastName, bio, goals, avatarUrl: avatarPreview || "" });
+      await refreshProfile();
       navigate({ to: "/" });
     } catch (caught: unknown) {
       setSaveError(caught instanceof Error ? caught.message : "Não foi possível salvar seu perfil.");

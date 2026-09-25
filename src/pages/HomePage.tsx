@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/layout";
-import { Greeting } from "@/components/shared/Greeting";
 import { CareList, HydrationCard, InfoCard, ModulesGrid } from "@/components/shared/home";
 import { InlineFeedback } from "@/components/ui/surface";
 import { getLocalDateString } from "@/lib/utils";
@@ -34,20 +32,17 @@ export function HomePage() {
         : `Há ${pendingToday.length} cuidados esperando por você hoje. Um gesto de cada vez.`;
 
   return (
-    <AppShell>
-      <div className="space-y-4">
-        <Greeting />
-        <InfoCard>{message}</InfoCard>
-        {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={loadTasks} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
+    <div className="space-y-4">
+      <InfoCard>{message}</InfoCard>
+      {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={loadTasks} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
 
-        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
-          <CareList tasks={tasks} loading={loading} onRefresh={loadTasks} />
-          <div className="space-y-4">
-            <HydrationCard />
-            <ModulesGrid />
-          </div>
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
+        <CareList tasks={tasks} loading={loading} onRefresh={loadTasks} />
+        <div className="space-y-4">
+          <HydrationCard />
+          <ModulesGrid />
         </div>
       </div>
-    </AppShell>
+    </div>
   );
 }

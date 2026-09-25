@@ -48,7 +48,7 @@ export interface PushNotificationState {
 let sdkPromise: Promise<OneSignalSdk> | null = null;
 
 export function isOneSignalConfigured() {
-  return Boolean(ONE_SIGNAL_APP_ID && ONE_SIGNAL_APP_ID !== "YOUR_ONESIGNAL_APP_ID");
+  return Boolean(ONE_SIGNAL_APP_ID && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(ONE_SIGNAL_APP_ID));
 }
 
 function loadOneSignalSdk() {
