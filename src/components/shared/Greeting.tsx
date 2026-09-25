@@ -33,14 +33,15 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
 
   return (
     <header className="-mx-4 -mt-4 border-b border-border bg-surface px-4 pt-3 sm:-mx-5 sm:-mt-5 sm:px-5 lg:-mx-6 lg:-mt-6 lg:px-6">
-      <div className="flex items-center justify-between gap-3 pb-1.5">
+      <div className="flex items-center justify-between gap-3 pb-3">
         <div className="min-w-0 flex-1">
           <h1 className="font-display text-xl font-semibold tracking-tight text-foreground min-[380px]:text-2xl sm:text-3xl">
             <span>{greeting}, <strong className="font-bold">{name}</strong></span>
           </h1>
+          {role && <p className="mt-0.5 text-sm font-medium leading-relaxed text-foreground sm:text-base">{role}</p>}
         </div>
         <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/35 bg-card text-sm font-semibold text-foreground"
+          className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/35 bg-card text-lg font-semibold text-foreground"
           role={avatarUrl ? undefined : "img"}
           aria-label={avatarUrl ? undefined : `Avatar de ${name}`}
         >
@@ -51,11 +52,6 @@ export function Greeting({ name: propName, role, avatarUrl: propAvatarUrl }: Gre
           )}
         </div>
       </div>
-      {role && (
-        <div className="pb-3 text-sm font-medium leading-relaxed text-foreground sm:text-base">
-          <span>{role}</span>
-        </div>
-      )}
     </header>
   );
 }
