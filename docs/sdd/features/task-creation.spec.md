@@ -2,7 +2,7 @@
 
 **ID:** `B2C-TSK`
 
-**Versão:** `0.1.3`
+**Versão:** `0.2.0`
 
 **Estado:** `proposed`
 
@@ -21,7 +21,7 @@ Incluído:
 - seleção de um ou mais dias na recorrência semanal;
 - notificação padrão para tarefas com data e horário, quando o canal estiver autorizado;
 - alarme opcional com antecedência configurável;
-- identificação visual de tarefa originada no módulo Estudante;
+- identificação visual do módulo que originou ou contextualiza a tarefa;
 - conclusão, reagendamento e desativação da recorrência.
 
 Fora deste incremento:
@@ -54,7 +54,7 @@ Fora deste incremento:
 - `B2C-TSK-010`: permitir um alarme opcional na hora ou 5, 15 ou 30 minutos antes da tarefa; nenhum lembrete ou alarme pode existir sem data.
 - `B2C-TSK-011`: tratar alarme como alerta de maior atenção, distinto da notificação padrão, e oferecê-lo somente quando o cliente conseguir executar o comportamento informado.
 - `B2C-TSK-012`: respeitar horário de silêncio, permissão do sistema e revogação do canal sem alterar o estado da tarefa.
-- `B2C-TSK-013`: marcar visualmente uma tarefa com origem `student` usando o ícone de graduação; a origem vem do módulo e não é uma prioridade.
+- `B2C-TSK-013`: persistir o `moduleKey` da tarefa e usar o tema e o ícone correspondentes em qualquer lista; Estudante usa o ícone de graduação e Hidratação usa sua identidade ciano.
 - `B2C-TSK-014`: registrar analytics técnicos sem título, descrição, data exata ou conteúdo pessoal.
 
 ## 5. Estados e transições
@@ -79,7 +79,8 @@ aviso planejado → enviado | cancelado | falhou
 ### `tasks`
 
 - `workspace_id`, título, descrição opcional, importância, estado e timestamps;
-- `source`: `manual`, `student` ou outra origem versionada no futuro;
+- `source`: `manual`, `module_action`, `automation` ou outra origem versionada no futuro;
+- `module_key`: `tasks` por padrão ou a chave do módulo que criou ou contextualiza a tarefa;
 - `scheduled_local_date` e `scheduled_local_time` para tarefa simples;
 - `timezone` quando o agendamento depender da intenção local;
 - `alarm_offset_minutes` nullable, limitado a `0`, `5`, `15` ou `30`.
@@ -126,7 +127,8 @@ type CreateTaskInput = {
   time?: string;
   recurrence?: TaskRecurrenceInput;
   alarmOffsetMinutes?: 0 | 5 | 15 | 30;
-  source?: "manual" | "student";
+  source?: "manual" | "module_action" | "automation";
+  moduleKey?: "tasks" | "hydration" | "checkin" | "mindfulness" | "student" | "alumia_ai";
   idempotencyKey: string;
 };
 ```
@@ -148,7 +150,7 @@ O compositor é uma bottom sheet sobre a tela atual:
 1. nome da tarefa com foco inicial e ação de entrada por voz quando suportada;
 2. descrição opcional;
 3. ações compactas “Quando?”, “Prioridade” e “Alarme”;
-4. marcador com ícone de graduação quando a origem for `student`;
+4. marcador com ícone e tema do módulo quando a origem contextual precisar ser exibida;
 5. cancelar e salvar.
 
 “Quando?” abre uma etapa sobreposta com:
@@ -168,7 +170,7 @@ As ações principais, as opções de prioridade e as opções de alarme permane
 
 Ao acionar “Alarme” sem data, a interface conduz primeiro à etapa “Quando?”. As opções do alarme só aparecem depois da escolha da data e solicitam horário antes da aplicação. O formulário nunca salva um lembrete órfão de agendamento.
 
-O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo recebe `source = student` automaticamente e exibe o ícone; o controle não funciona como alternância decorativa no compositor geral.
+O tema da tarefa é contextual. Uma tarefa manual criada no gerenciador recebe `moduleKey = tasks`; uma tarefa criada dentro de Hidratação recebe `moduleKey = hydration`; uma tarefa criada dentro de Estudante recebe `moduleKey = student` e exibe o ícone de graduação. O módulo não é inferido pelo título e seu marcador não funciona como alternância decorativa no compositor geral.
 
 ## 9. Critérios de aceitação
 
@@ -183,7 +185,7 @@ O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo receb
 - `B2C-TSK-AC-09`: cliente sem suporte a alarme informa a limitação antes da seleção e mantém a notificação padrão disponível.
 - `B2C-TSK-AC-10`: cancelar o compositor e reabrir apresenta um novo rascunho vazio.
 - `B2C-TSK-AC-11`: falha ao salvar mantém o conteúdo preenchido e permite tentar novamente.
-- `B2C-TSK-AC-12`: tarefa criada pelo módulo Estudante persiste `source = student` e apresenta o ícone de graduação.
+- `B2C-TSK-AC-12`: tarefa criada por Hidratação persiste `moduleKey = hydration` e mantém o tema ciano na Home e em Tarefas; tarefa de Estudante mantém sua identidade e ícone de graduação.
 - `B2C-TSK-AC-13`: outro usuário, organização, suporte ou platform admin não consegue ler o conteúdo da tarefa.
 - `B2C-TSK-AC-14`: ao tentar configurar lembrete sem data, a pessoa é conduzida ao agendamento; a API rejeita lembrete sem data e alarme relativo sem horário.
 - `B2C-TSK-AC-15`: em viewport de 360 px, ações, prioridades e alarmes não quebram em uma segunda linha nem causam rolagem horizontal na página.
@@ -193,14 +195,14 @@ O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo receb
 - domínio: cálculo diário, múltiplos dias semanais, fuso e próxima ocorrência;
 - banco: constraints, unicidade, RLS e retry idempotente;
 - jobs e Edge Functions: janela de materialização, cancelamento e entregas;
-- componentes: rascunho, seletores, teclado, erro, loading e origem Estudante;
+- componentes: rascunho, seletores, teclado, erro, loading e temas por `moduleKey`;
 - E2E: criar simples, criar recorrente, concluir uma ocorrência e desativar a série.
 
 ## 11. Telemetria
 
 Permitido:
 
-- `task_created` com presença de agenda, recorrência e origem em códigos fechados;
+- `task_created` com presença de agenda, recorrência, origem e `moduleKey` em códigos fechados;
 - `task_occurrence_completed`;
 - `task_recurrence_disabled`;
 - `task_alert_delivery_result` com tipo e resultado técnico.
@@ -210,7 +212,7 @@ Proibido: título, descrição, data exata, horário exato, texto de erro do pro
 ## 12. Migração e rollback
 
 - a migration é aditiva e não reescreve a migration inicial já aplicada;
-- tarefas atuais entram como `source = manual`, sem recorrência e sem alarme;
+- tarefas atuais entram como `source = manual` e `module_key = tasks`, sem recorrência e sem alarme;
 - lembretes antigos são convertidos para `alarm_offset_minutes` apenas quando existe data e horário válidos;
 - a entrega de alertas fica protegida por feature flag e pode ser desligada sem impedir criação e conclusão de tarefas;
 - rollback desativa geração e entrega, preservando tarefas e histórico.

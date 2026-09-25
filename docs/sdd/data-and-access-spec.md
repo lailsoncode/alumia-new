@@ -2,7 +2,7 @@
 
 **ID:** `DATA-SEC`
 
-**Versão:** 0.2.1
+**Versão:** 0.3.0
 
 **Estado:** proposed
 
@@ -125,7 +125,7 @@ Guarda o snapshot mostrado:
 
 ### Tarefas
 
-- `tasks`: workspace, title, optional description, importance, status, source, agenda local opcional, alarme opcional e timestamps;
+- `tasks`: workspace, title, optional description, importance, status, source, `module_key`, agenda local opcional, alarme opcional e timestamps;
 - `task_recurrence_rules`: task, frequência `daily` ou `weekly`, intervalo, dias ISO selecionados, horário local, fuso, início, estado ativo e data de desativação nullable;
 - `task_occurrences`: task, regra, data civil, instante planejado quando aplicável, status e completed_at;
 - `task_events`: task, event type, actor e timestamp.
@@ -135,7 +135,7 @@ Estados: `active`, `completed`, `archived`. “Atrasada” não é um estado per
 
 Regras semanais possuem ao menos um dia e não repetem o mesmo dia. Não existe data programada de término; a série termina por ação explícita. Ocorrências são calculadas ou materializadas em janela limitada e possuem unicidade por regra e agenda, impedindo uma recorrência sem término de virar quantidade ilimitada de linhas.
 
-`source = student` identifica uma tarefa criada pelo módulo Estudante e não amplia acesso. Notificação padrão é uma entrega comum no horário de uma tarefa com instante definido. Alarme é uma entrega opcional de maior atenção, com antecedência de `0`, `5`, `15` ou `30` minutos e suporte dependente da capacidade do cliente.
+`source` registra como a tarefa foi criada; `module_key` define sua identidade funcional e visual. Uma tarefa manual geral usa `module_key = tasks`; uma ação de Hidratação usa `hydration`; uma ação de Estudante usa `student`. O módulo não é inferido pelo título e não amplia acesso. Notificação padrão é uma entrega comum no horário de uma tarefa com instante definido. Alarme é uma entrega opcional de maior atenção, com antecedência de `0`, `5`, `15` ou `30` minutos e suporte dependente da capacidade do cliente.
 
 Um lembrete ou alarme nunca é persistido sem data. Alarmes definidos na hora ou por antecedência em minutos exigem também horário e fuso, formando um instante válido. Essa dependência é validada no domínio e protegida por constraint ou operação transacional no servidor.
 

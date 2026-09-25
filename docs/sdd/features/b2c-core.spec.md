@@ -2,7 +2,7 @@
 
 **ID:** `B2C`
 
-**Versão:** 0.2.2
+**Versão:** 0.3.0
 
 **Estado:** proposed
 
@@ -81,7 +81,7 @@ idle → selecting → submitting → success
 
 ### Requisitos
 
-Os requisitos normativos `B2C-TSK-001` a `B2C-TSK-014` estão em [`task-creation.spec.md`](task-creation.spec.md). Eles cobrem criação e organização, recorrência diária ou semanal com múltiplos dias, séries sem término predefinido, materialização limitada, notificação padrão, alarme opcional, origem Estudante e telemetria privada.
+Os requisitos normativos `B2C-TSK-001` a `B2C-TSK-014` estão em [`task-creation.spec.md`](task-creation.spec.md). Eles cobrem criação e organização, recorrência diária ou semanal com múltiplos dias, séries sem término predefinido, materialização limitada, notificação padrão, alarme opcional, identidade visual por módulo e telemetria privada.
 
 A origem `student` fica reservada enquanto o módulo Estudante estiver fora do primeiro MVP.
 
