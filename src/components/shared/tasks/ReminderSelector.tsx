@@ -17,14 +17,14 @@ const reminderOptions: { label: string; value: TaskReminder }[] = [
  */
 export function ReminderSelector({ selectedReminder, onChangeReminder }: ReminderSelectorProps) {
   return (
-    <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Momento do lembrete">
+    <div className="mt-3 grid grid-cols-4 gap-1" role="group" aria-label="Momento do lembrete">
       {reminderOptions.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChangeReminder(selectedReminder === opt.value ? null : opt.value)}
           aria-pressed={selectedReminder === opt.value}
-          className={`min-h-11 rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
+          className={`min-w-0 rounded-xl border px-1 py-2 text-sm font-medium transition-colors ${
             selectedReminder === opt.value
               ? "border-primary bg-primary/10 text-primary"
               : "border-border bg-background text-foreground hover:bg-muted"

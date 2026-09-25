@@ -18,7 +18,24 @@ export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
   const [date, setDate] = useState<Date | null>(null);
   const [time, setTime] = useState<string | null>(null);
   const [dateOpen, setDateOpen] = useState(false);
+  const [openReminderAfterDate, setOpenReminderAfterDate] = useState(false);
   if (!open) return null;
+
+  const dateLabel = date
+    ? `${date.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}${time ? `, ${time}` : ""}`
+    : "Quando?";
+  const priorityLabel = priority ? priority[0].toUpperCase() + priority.slice(1) : "Prioridade";
+  const reminderLabel = reminder === "na_hora" ? "Na hora" : reminder?.replace("min", " min") || "Lembrete";
+
+  const openReminder = () => {
+    if (!date || !time) {
+      setActive(null);
+      setOpenReminderAfterDate(true);
+      setDateOpen(true);
+      return;
+    }
+    setActive(active === "lembrete" ? null : "lembrete");
+  };
 
   const save = async () => {
     const dateValue = date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}` : undefined;
@@ -41,10 +58,10 @@ export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
           <div><label htmlFor="task-description" className="text-sm font-semibold">Descrição <span className="font-normal text-muted-foreground">(opcional)</span></label><textarea id="task-description" value={description} onChange={(event) => setDescription(event.target.value)} rows={2} className="mt-2 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30" /></div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => setDateOpen(true)}><AlumiaIcon icon={CalendarAdd01Icon} size="xs" />{date ? `${date.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}${time ? `, ${time}` : ""}` : "Data e horário"}</Button>
-          <Button variant="outline" size="sm" onClick={() => setActive(active === "prioridade" ? null : "prioridade")}><AlumiaIcon icon={FlagIcon} size="xs" />{priority ? `Prioridade ${priority}` : "Prioridade"}</Button>
-          <Button variant="outline" size="sm" onClick={() => setActive(active === "lembrete" ? null : "lembrete")}><AlumiaIcon icon={AlarmClockIcon} size="xs" />{reminder ? "Lembrete definido" : "Lembrete"}</Button>
+        <div className="mt-4 grid grid-cols-3 gap-1.5">
+          <Button variant="outline" size="sm" className="min-w-0 gap-1 px-2 sm:gap-2 sm:px-3.5" onClick={() => { setOpenReminderAfterDate(false); setDateOpen(true); }} aria-label={date ? `Agendamento: ${dateLabel}` : "Definir data e horário"}><AlumiaIcon icon={CalendarAdd01Icon} size="xs" /><span className="min-w-0 truncate">{dateLabel}</span></Button>
+          <Button variant="outline" size="sm" className="min-w-0 gap-1 px-2 sm:gap-2 sm:px-3.5" onClick={() => setActive(active === "prioridade" ? null : "prioridade")} aria-label={priority ? `Prioridade ${priority}` : "Definir prioridade"}><AlumiaIcon icon={FlagIcon} size="xs" /><span className="min-w-0 truncate">{priorityLabel}</span></Button>
+          <Button variant="outline" size="sm" className="min-w-0 gap-1 px-2 sm:gap-2 sm:px-3.5" onClick={openReminder} aria-label={reminder ? `Lembrete ${reminderLabel}` : "Definir lembrete"}><AlumiaIcon icon={AlarmClockIcon} size="xs" /><span className="min-w-0 truncate">{reminderLabel}</span></Button>
         </div>
         {active === "prioridade" && <PrioritySelector selectedPriority={priority} onChangePriority={setPriority} />}
         {active === "lembrete" && <ReminderSelector selectedReminder={reminder} onChangeReminder={setReminder} />}
@@ -54,7 +71,19 @@ export function AddTaskSheet({ open, onClose, onSave }: AddTaskSheetProps) {
           <Button type="button" onClick={save} disabled={!title.trim()}>Salvar tarefa<AlumiaIcon icon={ArrowRight01Icon} size="xs" /></Button>
         </div>
       </section>
-      <DatePickerSheet open={dateOpen} onClose={() => setDateOpen(false)} onSave={(selectedDate, selectedTime) => { setDate(selectedDate); setTime(selectedTime); }} initialDate={date} initialTime={time} />
+      <DatePickerSheet
+        open={dateOpen}
+        onClose={() => { setDateOpen(false); setOpenReminderAfterDate(false); }}
+        onSave={(selectedDate, selectedTime) => {
+          setDate(selectedDate);
+          setTime(selectedTime);
+          if (openReminderAfterDate && selectedDate && selectedTime) setActive("lembrete");
+          setOpenReminderAfterDate(false);
+        }}
+        initialDate={date}
+        initialTime={time}
+        requireTime={openReminderAfterDate || Boolean(reminder)}
+      />
     </>
   );
 }

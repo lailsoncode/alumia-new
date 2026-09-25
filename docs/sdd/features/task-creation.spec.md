@@ -2,7 +2,7 @@
 
 **ID:** `B2C-TSK`
 
-**Versão:** `0.1.1`
+**Versão:** `0.1.2`
 
 **Estado:** `proposed`
 
@@ -162,6 +162,8 @@ O compositor é uma bottom sheet sobre a tela atual:
 
 O compositor deve permanecer acima do teclado, preservar o rascunho ao abrir seletores, impedir envio duplicado e mostrar erro sem fechar quando a persistência falhar.
 
+As ações principais, as opções de prioridade e as opções de alarme permanecem lado a lado, em uma única linha, a partir de 360 px. Rótulos usam a forma curta e podem truncar visualmente, preservando o nome acessível completo.
+
 Ao acionar “Alarme” sem data, a interface conduz primeiro à etapa “Quando?”. As opções do alarme só aparecem depois da escolha da data e solicitam horário antes da aplicação. O formulário nunca salva um lembrete órfão de agendamento.
 
 O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo recebe `source = student` automaticamente e exibe o ícone; o controle não funciona como alternância decorativa no compositor geral.
@@ -182,6 +184,7 @@ O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo receb
 - `B2C-TSK-AC-12`: tarefa criada pelo módulo Estudante persiste `source = student` e apresenta o ícone de graduação.
 - `B2C-TSK-AC-13`: outro usuário, organização, suporte ou platform admin não consegue ler o conteúdo da tarefa.
 - `B2C-TSK-AC-14`: ao tentar configurar lembrete sem data, a pessoa é conduzida ao agendamento; a API rejeita lembrete sem data e alarme relativo sem horário.
+- `B2C-TSK-AC-15`: em viewport de 360 px, ações, prioridades e alarmes não quebram em uma segunda linha nem causam rolagem horizontal na página.
 
 ## 10. Testes
 

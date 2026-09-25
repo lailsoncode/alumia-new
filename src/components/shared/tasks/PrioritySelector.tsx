@@ -16,14 +16,14 @@ const priorityOptions: { label: string; value: TaskPriority }[] = [
  */
 export function PrioritySelector({ selectedPriority, onChangePriority }: PrioritySelectorProps) {
   return (
-    <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Prioridade da tarefa">
+    <div className="mt-3 grid grid-cols-3 gap-1.5" role="group" aria-label="Prioridade da tarefa">
       {priorityOptions.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChangePriority(selectedPriority === opt.value ? null : opt.value)}
           aria-pressed={selectedPriority === opt.value}
-          className={`min-h-11 rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
+          className={`min-w-0 rounded-xl border px-2 py-2 text-sm font-medium transition-colors ${
             selectedPriority === opt.value
               ? "border-primary bg-primary/10 text-primary"
               : "border-border bg-background text-foreground hover:bg-muted"
