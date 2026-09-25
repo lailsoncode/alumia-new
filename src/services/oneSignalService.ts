@@ -20,6 +20,7 @@ interface OneSignalSdk {
   Notifications: {
     isPushSupported: () => boolean;
     permission: boolean;
+    requestPermission: () => Promise<boolean>;
   };
   User: {
     externalId: string | null;
@@ -145,6 +146,11 @@ export async function getPushNotificationState(): Promise<PushNotificationState>
 export async function enablePushNotifications() {
   const oneSignal = await loadOneSignalSdk();
   if (!oneSignal.Notifications.isPushSupported()) return readPushState(oneSignal);
+
+  if (!oneSignal.Notifications.permission) {
+    const permissionGranted = await oneSignal.Notifications.requestPermission();
+    if (!permissionGranted) return readPushState(oneSignal);
+  }
 
   await oneSignal.User.PushSubscription.optIn();
   return readPushState(oneSignal);
