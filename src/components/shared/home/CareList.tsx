@@ -35,7 +35,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
   };
 
   return (
-    <Surface className="p-4 sm:p-5">
+    <Surface className="module-theme-tasks p-4 sm:p-5">
       <SectionHeader
         title="Gestos para hoje"
         icon={SparklesIcon}

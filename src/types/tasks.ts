@@ -1,3 +1,5 @@
+import type { ModuleKey } from "@/lib/module-themes";
+
 /**
  * @file tasks.ts
  * @description Definições de tipos e interfaces para o módulo de tarefas do Alumia.
@@ -26,6 +28,8 @@ export interface Task {
   hasFlag?: boolean;
   priority?: TaskPriority;
   reminder?: TaskReminder;
+  moduleKey?: ModuleKey;
+  module_key?: ModuleKey;
   /** Deixa o item com fundo destacado (lavanda) */
   highlighted?: boolean;
   done?: boolean;
@@ -41,4 +45,5 @@ export interface AddTaskData {
   reminder: TaskReminder;
   date?: string;
   time?: string;
+  moduleKey?: ModuleKey;
 }

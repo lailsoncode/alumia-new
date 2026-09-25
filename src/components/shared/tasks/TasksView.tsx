@@ -77,7 +77,7 @@ export function TasksView() {
 
   return (
     <section>
-      <Surface className="overflow-hidden rounded-[1.25rem] border-tone-sky-fg/25 bg-tone-sky/70 p-3 sm:p-4">
+      <Surface className="module-surface overflow-hidden rounded-[1.25rem] p-3 sm:p-4">
         <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-3 min-[380px]:grid-cols-[6.5rem_minmax(0,1fr)] sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
           <img src={tasksImage} alt="Personagem da Alumia organizando ideias com calma" className="h-full min-h-40 w-full rounded-[0.875rem] object-cover" />
           <div className="py-0.5">
@@ -123,7 +123,7 @@ export function TasksView() {
       ) : (
         <section className="mt-4">
           <h3 className="mb-2 flex items-center gap-2.5 text-base font-semibold">
-            <AlumiaIcon icon={Clock01Icon} size="md" className="text-tone-sky-fg" />
+            <AlumiaIcon icon={Clock01Icon} size="md" className="module-text" />
             Próximos cuidados
           </h3>
           {upcoming.length ? <ul className="space-y-1">{upcoming.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} />)}</ul> : <Surface variant="subtle" className="px-4 py-5 text-center"><p className="font-display text-lg font-semibold">Nada marcado adiante.</p><p className="mt-1 text-sm text-muted-foreground">Quando você agendar algo, ele aparece aqui.</p></Surface>}

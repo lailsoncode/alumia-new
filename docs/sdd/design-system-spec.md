@@ -81,7 +81,7 @@ A implementação expõe esses valores por variáveis semânticas locais, como `
 
 - `DS-MOD-001`: ao entrar em um módulo, bordas, botões, ícones, seleção, foco, progresso, gráficos e superfícies de destaque herdam seu tema.
 - `DS-MOD-002`: o shell comum continua reconhecível; o estado ativo da navegação pode herdar o módulo atual.
-- `DS-MOD-003`: conteúdo exibido fora de seu módulo mantém a identidade da origem. Uma tarefa de hidratação continua ciana na Home e na lista geral de tarefas.
+- `DS-MOD-003`: conteúdo exibido fora de seu módulo mantém a identidade da origem. Uma tarefa de hidratação mantém borda, controles, ícone e marcador cianos na Home e na lista geral, sobre fundo claro neutro.
 - `DS-MOD-004`: a identidade vem de `moduleKey` persistido ou fornecido pelo contexto. Texto como “beber água” não é analisado para escolher cor.
 - `DS-MOD-005`: tarefa criada manualmente no gerenciador geral usa `moduleKey = tasks`.
 - `DS-MOD-006`: cores semânticas de erro, alerta, sucesso, prioridade e acessibilidade não são substituídas pela cor do módulo.

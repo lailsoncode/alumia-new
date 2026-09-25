@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout";
 import { useAuth } from "@/hooks/use-auth";
 import { RequireAuth } from "@/lib/RequireAuth";
 import { applyTheme, getStoredTheme } from "@/lib/theme";
+import type { ModuleKey } from "@/lib/module-themes";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { initializeOneSignal, isOneSignalConfigured, synchronizeOneSignalUser } from "@/services/oneSignalService";
 import { registerPwaServiceWorker } from "@/services/pwaService";
@@ -19,6 +20,11 @@ const appShellHeaders = {
 } as const;
 
 const protectedPaths = new Set([...Object.keys(appShellHeaders), "/completar-perfil"]);
+
+const routeModules: Partial<Record<keyof typeof appShellHeaders, ModuleKey>> = {
+  "/tarefas": "tasks",
+  "/hidratacao": "hydration",
+};
 
 function NotFoundComponent() {
   return (
@@ -120,7 +126,10 @@ function ApplicationContent() {
   const isProtected = protectedPaths.has(pathname);
   const usesAppShell = Object.hasOwn(appShellHeaders, pathname);
   const content = usesAppShell ? (
-    <AppShell headerRole={appShellHeaders[pathname as keyof typeof appShellHeaders]}>
+    <AppShell
+      headerRole={appShellHeaders[pathname as keyof typeof appShellHeaders]}
+      moduleKey={routeModules[pathname as keyof typeof appShellHeaders]}
+    >
       <Outlet />
     </AppShell>
   ) : (

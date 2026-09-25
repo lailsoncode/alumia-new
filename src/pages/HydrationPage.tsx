@@ -145,7 +145,7 @@ export function HydrationPage() {
           </InlineFeedback>
         )}
 
-        <Surface className="grid grid-cols-[5.75rem_minmax(0,1fr)] gap-3 border-tone-sky-fg/25 bg-tone-sky p-3.5 shadow-none min-[380px]:grid-cols-[7rem_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4 sm:p-4">
+        <Surface className="module-surface grid grid-cols-[5.75rem_minmax(0,1fr)] gap-3 p-3.5 shadow-none min-[380px]:grid-cols-[7rem_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4 sm:p-4">
           <img
             src={hydrationImage}
             alt="Personagem da Alumia bebendo água"
@@ -153,7 +153,7 @@ export function HydrationPage() {
           />
           <div className="min-w-0 self-center">
             <div className="flex items-start gap-2">
-              <AlumiaIcon icon={GlassWaterIcon} size="sm" className="mt-0.5 shrink-0 text-tone-sky-fg" />
+              <AlumiaIcon icon={GlassWaterIcon} size="sm" className="module-text mt-0.5 shrink-0" />
               <h2 className="text-base font-semibold leading-snug sm:text-lg">Descubra seu ritmo de hidratação</h2>
             </div>
             <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">
@@ -168,7 +168,7 @@ export function HydrationPage() {
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(18rem,0.72fr)_minmax(0,1.28fr)]">
           <Surface className="p-4 sm:p-5">
             <div className="flex items-start gap-3">
-              <AlumiaIcon icon={Settings01Icon} size="md" className="mt-0.5 shrink-0 text-tone-sky-fg" />
+              <AlumiaIcon icon={Settings01Icon} size="md" className="module-text mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-muted-foreground">Sua referência diária</p>
                 <h2 className="mt-0.5 text-2xl font-bold">
@@ -179,7 +179,7 @@ export function HydrationPage() {
                 Ajustar
               </Button>
             </div>
-            <div className="mt-3 flex items-start gap-2 rounded-2xl bg-tone-sky px-3.5 py-3 text-sm leading-relaxed text-tone-sky-fg">
+            <div className="module-surface mt-3 flex items-start gap-2 rounded-2xl border px-3.5 py-3 text-sm leading-relaxed text-[var(--module-strong)]">
               <AlumiaIcon icon={SparklesIcon} size="xs" className="mt-0.5 shrink-0" />
               <p>O número é uma referência configurável. O cuidado vem primeiro.</p>
             </div>
@@ -187,7 +187,7 @@ export function HydrationPage() {
 
           <Surface className="p-4 sm:p-5">
             <div className="flex items-start gap-3">
-              <AlumiaIcon icon={GlassWaterIcon} size="md" className="mt-0.5 shrink-0 text-tone-sky-fg" />
+              <AlumiaIcon icon={GlassWaterIcon} size="md" className="module-text mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-muted-foreground">Seu ritmo hoje</p>
                 <h2 className="mt-0.5 text-xl font-semibold sm:text-2xl">
@@ -258,7 +258,7 @@ export function HydrationPage() {
           <Surface className="p-4 sm:p-5 lg:col-span-2">
             <SectionHeader
               icon={Calendar01Icon}
-              iconClassName="text-tone-sky-fg"
+              iconClassName="module-text"
               title="Seu consumo nos últimos 7 dias"
               description="Um panorama simples do seu ritmo, sem cobrança."
             />

@@ -33,10 +33,10 @@ export function HydrationCard() {
   };
 
   return (
-    <Surface className="p-4 sm:p-5">
+    <Surface className="module-theme-hydration p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <AlumiaIcon icon={GlassWaterIcon} size="md" className="mt-0.5 shrink-0 text-tone-sky-fg" />
+          <AlumiaIcon icon={GlassWaterIcon} size="md" className="module-text mt-0.5 shrink-0" />
           <div>
             <h2 className="text-lg font-semibold">Um gesto de hidratação</h2>
             <p className="text-sm text-muted-foreground">{loading ? "Preparando seu registro…" : intake === 0 ? "Seu primeiro copo pode chegar quando quiser." : `${intake} ml de cuidado registrados hoje.`}</p>

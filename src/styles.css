@@ -45,6 +45,10 @@
   --color-tone-lavender-fg: var(--tone-lavender-fg);
   --color-tone-sky: var(--tone-sky);
   --color-tone-sky-fg: var(--tone-sky-fg);
+  --color-tone-aqua: var(--tone-aqua);
+  --color-tone-aqua-fg: var(--tone-aqua-fg);
+  --color-tone-indigo: var(--tone-indigo);
+  --color-tone-indigo-fg: var(--tone-indigo-fg);
   --color-tone-mint: var(--tone-mint);
   --color-tone-mint-fg: var(--tone-mint-fg);
   --color-tone-peach: var(--tone-peach);
@@ -105,6 +109,10 @@
   --tone-lavender-fg: oklch(0.36 0.09 294);
   --tone-sky: oklch(0.91 0.05 230);
   --tone-sky-fg: oklch(0.35 0.08 235);
+  --tone-aqua: oklch(0.92 0.045 205);
+  --tone-aqua-fg: oklch(0.34 0.08 212);
+  --tone-indigo: oklch(0.91 0.05 270);
+  --tone-indigo-fg: oklch(0.35 0.085 270);
   --tone-mint: oklch(0.9 0.06 171);
   --tone-mint-fg: oklch(0.33 0.085 177);
   --tone-peach: oklch(0.92 0.055 58);
@@ -165,6 +173,10 @@
   --tone-lavender-fg: oklch(0.91 0.04 295);
   --tone-sky: oklch(0.32 0.055 230);
   --tone-sky-fg: oklch(0.91 0.035 230);
+  --tone-aqua: oklch(0.31 0.05 205);
+  --tone-aqua-fg: oklch(0.91 0.035 205);
+  --tone-indigo: oklch(0.32 0.055 270);
+  --tone-indigo-fg: oklch(0.91 0.035 270);
   --tone-mint: oklch(0.31 0.06 171);
   --tone-mint-fg: oklch(0.9 0.04 171);
   --tone-peach: oklch(0.34 0.06 58);
@@ -225,10 +237,93 @@
   }
   .tone-lavender { background: var(--tone-lavender); color: var(--tone-lavender-fg); }
   .tone-sky { background: var(--tone-sky); color: var(--tone-sky-fg); }
+  .tone-aqua { background: var(--tone-aqua); color: var(--tone-aqua-fg); }
+  .tone-indigo { background: var(--tone-indigo); color: var(--tone-indigo-fg); }
   .tone-mint { background: var(--tone-mint); color: var(--tone-mint-fg); }
   .tone-peach { background: var(--tone-peach); color: var(--tone-peach-fg); }
   .tone-rose { background: var(--tone-rose); color: var(--tone-rose-fg); }
   .tone-sun { background: var(--tone-sun); color: var(--tone-sun-fg); }
+
+  :where(.module-theme-alumia-ai, .module-theme-tasks, .module-theme-checkin, .module-theme-mindfulness, .module-theme-hydration, .module-theme-student) {
+    --primary: var(--module-accent);
+    --primary-foreground: var(--module-on-accent);
+    --accent: var(--module-soft);
+    --accent-foreground: var(--module-strong);
+    --border: var(--module-border);
+    --input: color-mix(in oklab, var(--module-accent) 48%, transparent);
+    --ring: var(--module-accent);
+    --surface-subtle: color-mix(in oklab, var(--module-soft) 48%, var(--surface));
+    --sidebar-accent: var(--module-soft);
+    --sidebar-accent-foreground: var(--module-strong);
+    --sidebar-border: var(--module-border);
+    --sidebar-ring: var(--module-accent);
+  }
+
+  .module-theme-alumia-ai {
+    --module-soft: var(--tone-mint);
+    --module-accent: oklch(0.61 0.115 174);
+    --module-strong: var(--tone-mint-fg);
+    --module-on-accent: oklch(0.99 0.008 175);
+    --module-border: color-mix(in oklab, var(--module-accent) 38%, transparent);
+  }
+  .module-theme-tasks {
+    --module-soft: var(--tone-sky);
+    --module-accent: oklch(0.62 0.11 232);
+    --module-strong: var(--tone-sky-fg);
+    --module-on-accent: oklch(0.99 0.008 232);
+    --module-border: color-mix(in oklab, var(--module-accent) 38%, transparent);
+  }
+  .module-theme-checkin {
+    --module-soft: var(--tone-lavender);
+    --module-accent: oklch(0.65 0.105 300);
+    --module-strong: var(--tone-lavender-fg);
+    --module-on-accent: oklch(0.99 0.008 300);
+    --module-border: color-mix(in oklab, var(--module-accent) 38%, transparent);
+  }
+  .module-theme-mindfulness {
+    --module-soft: var(--tone-mint);
+    --module-accent: oklch(0.61 0.1 160);
+    --module-strong: var(--tone-mint-fg);
+    --module-on-accent: oklch(0.99 0.008 160);
+    --module-border: color-mix(in oklab, var(--module-accent) 38%, transparent);
+  }
+  .module-theme-hydration {
+    --module-soft: var(--tone-aqua);
+    --module-accent: oklch(0.65 0.1 208);
+    --module-strong: var(--tone-aqua-fg);
+    --module-on-accent: oklch(0.99 0.008 208);
+    --module-border: color-mix(in oklab, var(--module-accent) 40%, transparent);
+  }
+  .module-theme-student {
+    --module-soft: var(--tone-indigo);
+    --module-accent: oklch(0.61 0.105 270);
+    --module-strong: var(--tone-indigo-fg);
+    --module-on-accent: oklch(0.99 0.008 270);
+    --module-border: color-mix(in oklab, var(--module-accent) 38%, transparent);
+  }
+
+  .dark .module-theme-alumia-ai,
+  .dark .module-theme-tasks,
+  .dark .module-theme-checkin,
+  .dark .module-theme-mindfulness,
+  .dark .module-theme-hydration,
+  .dark .module-theme-student {
+    --module-on-accent: oklch(0.19 0.025 260);
+  }
+  .dark .module-theme-alumia-ai { --module-accent: oklch(0.75 0.09 174); }
+  .dark .module-theme-tasks { --module-accent: oklch(0.75 0.08 232); }
+  .dark .module-theme-checkin { --module-accent: oklch(0.76 0.085 300); }
+  .dark .module-theme-mindfulness { --module-accent: oklch(0.75 0.085 160); }
+  .dark .module-theme-hydration { --module-accent: oklch(0.76 0.08 208); }
+  .dark .module-theme-student { --module-accent: oklch(0.76 0.085 270); }
+
+  .module-surface {
+    background: color-mix(in oklab, var(--module-soft) 68%, var(--surface));
+    border-color: var(--module-border);
+  }
+  .module-border { border-color: var(--module-border); }
+  .module-text { color: var(--module-strong); }
+  .module-divider { background: var(--module-border); }
 }
 
 @media (prefers-reduced-motion: reduce) {
