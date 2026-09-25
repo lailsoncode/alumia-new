@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { CheckListIcon, Grid2X2Icon, Home01Icon, Settings01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
+import { CheckListIcon, Grid2X2Icon, Home01Icon, Settings01Icon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { cn } from "@/lib/utils";
 import { isItemActive } from "./navigation-utils";
@@ -45,9 +45,12 @@ export function SidebarNavigation() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-sidebar-border bg-sidebar px-5 py-5 lg:flex lg:flex-col">
       <Link to="/" className="flex items-center gap-3 rounded-xl px-2 py-1 text-sidebar-foreground">
-        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-          <AlumiaIcon icon={SparklesIcon} size="md" />
-        </span>
+        <img
+          src="/icons/alumia-icon-192.png"
+          alt=""
+          aria-hidden="true"
+          className="h-11 w-11 shrink-0 rounded-xl object-cover shadow-sm"
+        />
         <span>
           <span className="block font-display text-xl font-bold">Alumia</span>
           <span className="block text-xs text-muted-foreground">Cuidado no seu ritmo</span>
