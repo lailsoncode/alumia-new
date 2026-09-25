@@ -40,9 +40,7 @@ export function SectionHeader({ title, description, action, className, icon, ico
     <div className={cn("flex items-start justify-between gap-4", className)}>
       <div className="flex min-w-0 items-start gap-3">
         {icon && (
-          <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-tone-sky text-tone-sky-fg", iconClassName)}>
-            <AlumiaIcon icon={icon} size="sm" />
-          </span>
+          <AlumiaIcon icon={icon} size="md" className={cn("mt-0.5 shrink-0 text-tone-sky-fg", iconClassName)} />
         )}
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-foreground">{title}</h2>

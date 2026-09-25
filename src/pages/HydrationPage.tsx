@@ -94,8 +94,8 @@ export function HydrationPage() {
           <div className="space-y-5">
             <Surface className="p-4 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tone-sky text-tone-sky-fg"><AlumiaIcon icon={GlassWaterIcon} size="lg" /></span>
+                <div className="flex items-start gap-3">
+                  <AlumiaIcon icon={GlassWaterIcon} size="lg" className="mt-0.5 shrink-0 text-tone-sky-fg" />
                   <div><p className="text-sm font-semibold text-muted-foreground">Seu ritmo hoje</p><h2 className="text-2xl font-bold">{loading ? "…" : `${intake} ml de cuidado`}</h2></div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setGoalOpen(true)}><AlumiaIcon icon={Settings01Icon} size="xs" />Referência: {goal} ml</Button>
@@ -116,7 +116,7 @@ export function HydrationPage() {
             </Surface>
 
             <Surface className="p-4 sm:p-6">
-              <SectionHeader icon={Calendar01Icon} iconClassName="bg-tone-mint text-tone-mint-fg" title="Últimos 7 dias" description="Um panorama simples do seu ritmo, sem cobrança." />
+              <SectionHeader icon={Calendar01Icon} iconClassName="text-tone-mint-fg" title="Últimos 7 dias" description="Um panorama simples do seu ritmo, sem cobrança." />
               <div className="mt-5 space-y-3">
                 {loading ? [0, 1, 2, 3].map((item) => <div key={item} className="h-5 animate-pulse rounded-full bg-muted" />) : history.map((item) => (
                   <div key={item.dayName} className="grid grid-cols-[3.75rem_4rem_1fr] items-center gap-3 text-sm"><span className="font-semibold">{item.dayName}</span><span className="text-right text-xs text-muted-foreground">{item.total} ml</span><div className="h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary/75" style={{ width: `${Math.min(100, item.total / maxHistory * 100)}%` }} /></div></div>

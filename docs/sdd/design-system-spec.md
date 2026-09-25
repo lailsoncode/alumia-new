@@ -28,8 +28,8 @@ A camada de conforto B2C deve usar:
 - cabeçalho pessoal como faixa estrutural da página, sem aparência flutuante, reunindo saudação, contexto e avatar;
 - orientação visível quando a organização de uma tela não for autoevidente;
 - estados vazios que preservem a estrutura da jornada e usem linguagem acolhedora.
-- ícones decorativos dos blocos da home apresentados diretamente, sem círculos ou quadrados coloridos ao redor;
-- títulos dos blocos alinhados visualmente com seus ícones na primeira linha, independentemente da presença de descrição;
+- ícones decorativos dos blocos B2C apresentados diretamente, sem círculos ou quadrados coloridos ao redor;
+- títulos dos blocos B2C alinhados visualmente com seus ícones na primeira linha, independentemente da presença de descrição;
 - módulos ativos da home agrupados em uma única superfície, com opções compactas em duas colunas, edição no rodapé e raios contidos de 20 px no bloco e 14 px nas opções.
 - página de módulos organizada em grade colorida para os módulos funcionais e catálogo em linhas para comunicar estados “Ativo” e “Em breve”; somente módulos funcionais oferecem a ação “Acessar”.
 
