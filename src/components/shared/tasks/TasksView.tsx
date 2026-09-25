@@ -105,7 +105,7 @@ export function TasksView() {
       {loading ? (
         <div className="mt-5 space-y-3" aria-label="Carregando tarefas">{[0, 1, 2].map((item) => <div key={item} className="h-20 animate-pulse rounded-2xl bg-muted" />)}</div>
       ) : tab === "hoje" ? (
-        <div className="mt-6 grid gap-4 xl:grid-cols-2">{sections.map((section) => (
+        <div className="mt-6 grid gap-x-4 gap-y-2 xl:grid-cols-2">{sections.map((section) => (
           <section key={section.title} className={section.title === "Pode esperar" ? "xl:col-span-2" : undefined}>
             <h3 className="mb-3 flex items-center gap-2.5 text-base font-semibold">
               <AlumiaIcon icon={section.icon} size="md" className={section.tone} />
