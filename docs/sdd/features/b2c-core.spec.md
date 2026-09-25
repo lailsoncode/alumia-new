@@ -2,7 +2,7 @@
 
 **ID:** `B2C`
 
-**Versão:** 0.2.0
+**Versão:** 0.2.1
 
 **Estado:** proposed
 
@@ -87,7 +87,7 @@ A origem `student` fica reservada enquanto o módulo Estudante estiver fora do p
 
 ### Critérios
 
-Os critérios `B2C-TSK-AC-01` a `B2C-TSK-AC-13` estão na especificação detalhada. Eles verificam, entre outros casos, terça e quinta como duas ocorrências semanais, ausência de duplicidade, mudança de fuso, série ativa até desativação, avisos e isolamento dos dados.
+Os critérios `B2C-TSK-AC-01` a `B2C-TSK-AC-14` estão na especificação detalhada. Eles verificam, entre outros casos, terça e quinta como duas ocorrências semanais, ausência de duplicidade, mudança de fuso, série ativa até desativação, lembrete sempre vinculado a uma data, avisos e isolamento dos dados.
 
 ## 6. Mindfulness
 

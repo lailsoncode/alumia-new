@@ -1,6 +1,6 @@
 # Alumia — Spec-Driven Development
 
-**Versão do pacote:** 0.2.0
+**Versão do pacote:** 0.2.1
 
 **Data:** 25 de setembro de 2026
 

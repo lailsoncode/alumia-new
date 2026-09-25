@@ -2,7 +2,7 @@
 
 **ID:** `B2C-TSK`
 
-**Versão:** `0.1.0`
+**Versão:** `0.1.1`
 
 **Estado:** `proposed`
 
@@ -51,7 +51,7 @@ Fora deste incremento:
 - `B2C-TSK-007`: projetar ou materializar ocorrências em janela limitada, sem gravar uma série futura infinita.
 - `B2C-TSK-008`: impedir ocorrências duplicadas mesmo quando geração, retry ou job forem executados mais de uma vez.
 - `B2C-TSK-009`: criar uma notificação padrão no horário da tarefa quando houver data, horário, permissão do sistema e preferência do módulo ativa.
-- `B2C-TSK-010`: permitir um alarme opcional na hora ou 5, 15 ou 30 minutos antes da tarefa.
+- `B2C-TSK-010`: permitir um alarme opcional na hora ou 5, 15 ou 30 minutos antes da tarefa; nenhum lembrete ou alarme pode existir sem data.
 - `B2C-TSK-011`: tratar alarme como alerta de maior atenção, distinto da notificação padrão, e oferecê-lo somente quando o cliente conseguir executar o comportamento informado.
 - `B2C-TSK-012`: respeitar horário de silêncio, permissão do sistema e revogação do canal sem alterar o estado da tarefa.
 - `B2C-TSK-013`: marcar visualmente uma tarefa com origem `student` usando o ícone de graduação; a origem vem do módulo e não é uma prioridade.
@@ -135,7 +135,8 @@ Regras:
 
 - recorrência exige data inicial;
 - recorrência semanal exige `weekdays.length >= 1`;
-- alarme exige data e horário;
+- lembrete ou alarme exige data;
+- alarme definido “na hora” ou em minutos exige também um horário, pois depende de um instante preciso;
 - tarefa com data e sem horário aparece no dia escolhido, mas não possui instante para disparo individual;
 - a geração usa uma janela operacional configurável ou cria somente a próxima ocorrência;
 - retry com a mesma chave ou para a mesma ocorrência retorna o resultado existente.
@@ -161,6 +162,8 @@ O compositor é uma bottom sheet sobre a tela atual:
 
 O compositor deve permanecer acima do teclado, preservar o rascunho ao abrir seletores, impedir envio duplicado e mostrar erro sem fechar quando a persistência falhar.
 
+Ao acionar “Alarme” sem data, a interface conduz primeiro à etapa “Quando?”. As opções do alarme só aparecem depois da escolha da data e solicitam horário antes da aplicação. O formulário nunca salva um lembrete órfão de agendamento.
+
 O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo recebe `source = student` automaticamente e exibe o ícone; o controle não funciona como alternância decorativa no compositor geral.
 
 ## 9. Critérios de aceitação
@@ -178,6 +181,7 @@ O marcador Estudante é contextual. Uma tarefa criada dentro desse módulo receb
 - `B2C-TSK-AC-11`: falha ao salvar mantém o conteúdo preenchido e permite tentar novamente.
 - `B2C-TSK-AC-12`: tarefa criada pelo módulo Estudante persiste `source = student` e apresenta o ícone de graduação.
 - `B2C-TSK-AC-13`: outro usuário, organização, suporte ou platform admin não consegue ler o conteúdo da tarefa.
+- `B2C-TSK-AC-14`: ao tentar configurar lembrete sem data, a pessoa é conduzida ao agendamento; a API rejeita lembrete sem data e alarme relativo sem horário.
 
 ## 10. Testes
 

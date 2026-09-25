@@ -2,7 +2,7 @@
 
 **ID:** `DATA-SEC`
 
-**Versão:** 0.2.0
+**Versão:** 0.2.1
 
 **Estado:** proposed
 
@@ -136,6 +136,8 @@ Estados: `active`, `completed`, `archived`. “Atrasada” não é um estado per
 Regras semanais possuem ao menos um dia e não repetem o mesmo dia. Não existe data programada de término; a série termina por ação explícita. Ocorrências são calculadas ou materializadas em janela limitada e possuem unicidade por regra e agenda, impedindo uma recorrência sem término de virar quantidade ilimitada de linhas.
 
 `source = student` identifica uma tarefa criada pelo módulo Estudante e não amplia acesso. Notificação padrão é uma entrega comum no horário de uma tarefa com instante definido. Alarme é uma entrega opcional de maior atenção, com antecedência de `0`, `5`, `15` ou `30` minutos e suporte dependente da capacidade do cliente.
+
+Um lembrete ou alarme nunca é persistido sem data. Alarmes definidos na hora ou por antecedência em minutos exigem também horário e fuso, formando um instante válido. Essa dependência é validada no domínio e protegida por constraint ou operação transacional no servidor.
 
 ### Mindfulness
 
