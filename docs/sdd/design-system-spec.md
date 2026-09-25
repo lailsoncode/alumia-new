@@ -23,7 +23,7 @@ A camada de conforto B2C deve usar:
 - fundo muito claro com o viés lavanda da paleta original, superfícies claras e separação suave;
 - cartões amplos, cantos generosos e sombras discretas, apoiadas por bordas suaves;
 - respiro entre blocos para que a tela não pareça uma sequência de cobranças;
-- pequenos acentos em amarelo, ciano, menta, pêssego e lavanda para orientar seções;
+- pequenos acentos em amarelo, ciano, menta e pêssego para orientar seções gerais; o lilás fica reservado ao check-in emocional;
 - saudação personalizada e navegação inferior flutuante no mobile;
 - cabeçalho pessoal como faixa estrutural da página, sem aparência flutuante, reunindo saudação, contexto da tela e avatar; a biografia ou frase livre do usuário aparece apenas no perfil;
 - saudação e contexto aparecem próximos no mesmo bloco, sem divisória interna ou ícones decorativos ao fim das frases; na Home, o contexto é uma mensagem fixa de acolhimento, sem cobrança ou linguagem de produtividade;
@@ -78,6 +78,8 @@ Cada entrada do registro de módulos fornece ao menos:
 - `strong`, para texto ou ênfase com contraste;
 - `onAccent`, para conteúdo sobre o acento;
 - equivalentes válidos nos temas claro e escuro.
+
+O lilás não é usado como destaque genérico em cards, ícones ou chamadas do shell. Fora do módulo de check-in, a interface usa superfícies neutras, cores semânticas ou o azul-ciano da identidade geral da Alumia. O verde permanece restrito a estados semânticos de sucesso e o menta à identidade do módulo de mindfulness.
 
 A implementação expõe esses valores por variáveis semânticas locais, como `--module-soft`, `--module-accent`, `--module-strong`, `--module-border` e `--module-on-accent`. Páginas e componentes consomem o tema pelo `moduleKey`; não escolhem classes de cor isoladamente.
 

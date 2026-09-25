@@ -15,7 +15,7 @@ export function ModulesGrid() {
   return (
     <Surface className="rounded-[1.25rem] p-4 sm:p-5">
       <div className="flex items-center gap-3">
-        <AlumiaIcon icon={Settings01Icon} size="md" className="text-tone-lavender-fg" />
+        <AlumiaIcon icon={Settings01Icon} size="md" className="text-primary" />
         <h2 className="text-lg font-semibold">Seus módulos ativos</h2>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">

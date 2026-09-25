@@ -97,10 +97,10 @@ export function SettingsPage() {
   return (
     <div className="space-y-5">
         <section>
-          <SectionHeader icon={UserIcon} iconClassName="text-tone-mint-fg" title="Perfil"/>
+          <SectionHeader icon={UserIcon} iconClassName="text-primary" title="Perfil"/>
           <Surface className="mt-3 p-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-tone-mint text-lg font-bold text-tone-mint-fg">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary/10 text-lg font-bold text-primary">
                 {profile?.avatarUrl ? <img src={profile.avatarUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : name.slice(0, 1).toUpperCase()}
               </span>
               <div className="min-w-0 flex-1"><h2 className="truncate text-lg font-semibold">{name}</h2><p className="truncate text-xs text-muted-foreground">{user?.email}</p>{profile?.goals && <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-foreground">{profile.goals}</p>}</div>
@@ -110,11 +110,11 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <SectionHeader icon={Settings01Icon} iconClassName="text-tone-lavender-fg" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
+          <SectionHeader icon={Settings01Icon} iconClassName="text-primary" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
           <Surface className="mt-3 divide-y divide-border overflow-hidden">
             <div className="flex min-h-16 items-center gap-3 px-4 py-2.5">
               <div className="flex min-w-0 flex-1 items-start gap-3">
-                <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-tone-lavender-fg" />
+                <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-primary" />
                 <div className="min-w-0"><p className="text-sm font-semibold">Notificações</p><p className="mt-0.5 text-xs text-muted-foreground">{notificationDescription}</p></div>
               </div>
               <PreferenceSwitch checked={notifications} onChange={toggleNotifications} label="Ativar notificações" disabled={["loading", "saving", "unsupported", "unconfigured"].includes(notificationStatus)} />
@@ -142,7 +142,7 @@ export function SettingsPage() {
             <Surface variant="subtle" className="mt-2.5 flex items-start gap-3 p-4"><AlumiaIcon icon={AccessibilityIcon} size="md" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Preferências do dispositivo</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">A Alumia respeita redução de movimento, zoom e configurações de contraste do seu dispositivo.</p></div></Surface>
           </div>
           <div>
-            <SectionHeader icon={LockIcon} iconClassName="text-tone-mint-fg" title="Privacidade e segurança" />
+            <SectionHeader icon={LockIcon} iconClassName="text-primary" title="Privacidade e segurança" />
             <Surface variant="subtle" className="mt-2.5 flex items-start gap-3 p-4"><AlumiaIcon icon={LockIcon} size="md" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Seu cuidado é privado</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Tarefas, hidratação e informações pessoais pertencem à sua conta.</p></div></Surface>
           </div>
         </section>

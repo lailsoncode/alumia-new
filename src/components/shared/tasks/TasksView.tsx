@@ -69,7 +69,7 @@ export function TasksView() {
     {
       title: "Pode esperar",
       icon: AlertCircleIcon,
-      tone: "text-tone-mint-fg",
+      tone: "text-tone-peach-fg",
       tasks: backlog,
       empty: "Nada esperando sem data. Que bom ter esse espaço.",
     },

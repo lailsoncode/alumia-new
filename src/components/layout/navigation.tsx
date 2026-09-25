@@ -81,9 +81,9 @@ export function SidebarNavigation() {
         </ul>
       </nav>
 
-      <div className="mt-auto rounded-[1.5rem] bg-tone-lavender p-4 text-tone-lavender-fg shadow-[var(--shadow-card)]">
+      <div className="mt-auto rounded-[1.5rem] border border-primary/20 bg-primary/10 p-4 text-foreground shadow-[var(--shadow-card)]">
         <p className="font-display text-sm font-semibold">Seu espaço continua aqui.</p>
-        <p className="mt-1 text-xs leading-relaxed opacity-80">Volte quando fizer sentido para você.</p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Volte quando fizer sentido para você.</p>
       </div>
     </aside>
   );
