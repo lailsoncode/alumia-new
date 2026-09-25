@@ -16,7 +16,7 @@ const priorityOptions: { label: string; value: TaskPriority }[] = [
  */
 export function PrioritySelector({ selectedPriority, onChangePriority }: PrioritySelectorProps) {
   return (
-    <div className="mt-3 grid grid-cols-3 gap-1.5" role="group" aria-label="Prioridade da tarefa">
+    <div className="mt-2 grid grid-cols-3 gap-1.5" role="group" aria-label="Prioridade da tarefa">
       {priorityOptions.map((opt) => (
         <button
           key={opt.value}

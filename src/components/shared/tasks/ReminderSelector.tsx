@@ -17,7 +17,7 @@ const reminderOptions: { label: string; value: TaskReminder }[] = [
  */
 export function ReminderSelector({ selectedReminder, onChangeReminder }: ReminderSelectorProps) {
   return (
-    <div className="mt-3 grid grid-cols-4 gap-1" role="group" aria-label="Momento do lembrete">
+    <div className="mt-2 grid grid-cols-4 gap-1" role="group" aria-label="Momento do lembrete">
       {reminderOptions.map((opt) => (
         <button
           key={opt.value}

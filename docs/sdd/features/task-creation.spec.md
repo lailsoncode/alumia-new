@@ -2,7 +2,7 @@
 
 **ID:** `B2C-TSK`
 
-**Versão:** `0.1.2`
+**Versão:** `0.1.3`
 
 **Estado:** `proposed`
 
@@ -161,6 +161,8 @@ O compositor é uma bottom sheet sobre a tela atual:
 - ação para aplicar e voltar ao compositor.
 
 O compositor deve permanecer acima do teclado, preservar o rascunho ao abrir seletores, impedir envio duplicado e mostrar erro sem fechar quando a persistência falhar.
+
+O modal usa espaçamento vertical compacto e não apresenta texto auxiliar introdutório entre o título e os campos. Título, descrição, ações e rodapé permanecem próximos, preservando controles com pelo menos 44 px de altura.
 
 As ações principais, as opções de prioridade e as opções de alarme permanecem lado a lado, em uma única linha, a partir de 360 px. Rótulos usam a forma curta e podem truncar visualmente, preservando o nome acessível completo.
 
