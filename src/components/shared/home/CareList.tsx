@@ -48,7 +48,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
         title="Gestos para hoje"
         description="O que merece atenção primeiro, sempre no seu ritmo."
         icon={SparklesIcon}
-        iconClassName="bg-tone-sun text-tone-sun-fg"
+        iconClassName="mt-0.5 h-auto w-auto rounded-none bg-transparent text-tone-sun-fg"
         action={<Button variant="outline" size="sm" className="min-h-11 w-11 px-0 sm:w-auto sm:px-3" onClick={() => setSheetOpen(true)} aria-label="Adicionar tarefa"><AlumiaIcon icon={AddCircleIcon} size="xs" /><span className="hidden sm:inline">Adicionar</span></Button>}
       />
 
@@ -58,7 +58,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
         </div>
       ) : pending.length === 0 ? (
         <div className="mt-5 rounded-[1.4rem] bg-surface-subtle px-4 py-6 text-center shadow-inner">
-          <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-surface text-tone-sun-fg"><AlumiaIcon icon={SparklesIcon} size="sm" /></span>
+          <AlumiaIcon icon={SparklesIcon} size="md" className="mx-auto text-tone-sun-fg" />
           <p className="mt-3 font-display text-base font-semibold text-foreground">Tudo tranquilo por aqui.</p>
           <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">Hoje não há nenhum gesto pendente. Aproveite esse espaço ou adicione algo quando fizer sentido.</p>
         </div>

@@ -5,9 +5,7 @@ import { AlumiaIcon } from "@/components/ui/alumia-icon";
 export function InfoCard({ children }: { children: ReactNode }) {
   return (
     <section className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-tone-lavender px-4 py-3.5 text-tone-lavender-fg shadow-[var(--shadow-card)] sm:px-5">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface/65">
-        <AlumiaIcon icon={SparklesIcon} size="sm" />
-      </span>
+      <AlumiaIcon icon={SparklesIcon} size="md" className="shrink-0" />
       <p className="text-sm font-medium leading-relaxed sm:text-base">{children}</p>
     </section>
   );
