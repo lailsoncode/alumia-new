@@ -13,7 +13,7 @@ O desenvolvimento alterna verticais completas. Cada incremento deve atravessar b
 | Incremento | Entrega | Dependência | Gate |
 |---|---|---|---|
 | `INC-001` | Fundação, Auth, workspace e check-in privado | nenhuma | RLS pessoal e smoke B2C |
-| `INC-002` | Tarefas gentis | INC-001 | recorrência, fuso e histórico testados |
+| `INC-002` | Tarefas gentis | INC-001 | recorrência, fuso, avisos e histórico testados |
 | `INC-003` | Platform admin mínimo, organizações e benefícios | INC-001 | provisionamento e revogação idempotentes |
 | `INC-004` | Estrutura B2B e configuração de ciclo | INC-003 | isolamento entre tenants e estados do ciclo |
 | `INC-005` | Mindfulness, hidratação e preferências | INC-001 | acessibilidade e dados pessoais privados |
@@ -110,4 +110,3 @@ O segundo PR inicia as migrations de identidade e workspace. O terceiro entrega 
 ## 7. Critério para começar o próximo incremento
 
 Um incremento seguinte pode ser detalhado enquanto o atual está em implementação, mas não pode depender de contrato ainda não verificado. Mudanças de schema compartilhado devem ser resolvidas antes de paralelizar.
-

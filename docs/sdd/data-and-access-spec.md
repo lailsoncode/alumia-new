@@ -1,7 +1,9 @@
 # Especificação de dados e controle de acesso
 
-**ID:** `DATA-SEC`  
-**Versão:** 0.1.0  
+**ID:** `DATA-SEC`
+
+**Versão:** 0.2.0
+
 **Estado:** proposed
 
 ## 1. Regras estruturais
@@ -123,12 +125,17 @@ Guarda o snapshot mostrado:
 
 ### Tarefas
 
-- `tasks`: workspace, title, optional description, importance, scheduled_at, due_date, status, source e timestamps;
-- `task_recurrence_rules`: task, frequency, interval, weekdays, local_time, timezone, starts_on, ends_on;
-- `task_occurrences`: task, planned_for, status e completed_at;
+- `tasks`: workspace, title, optional description, importance, status, source, agenda local opcional, alarme opcional e timestamps;
+- `task_recurrence_rules`: task, frequência `daily` ou `weekly`, intervalo, dias ISO selecionados, horário local, fuso, início, estado ativo e data de desativação nullable;
+- `task_occurrences`: task, regra, data civil, instante planejado quando aplicável, status e completed_at;
 - `task_events`: task, event type, actor e timestamp.
+- `task_alert_deliveries`: ocorrência, tipo `standard_notification` ou `alarm`, instante planejado, canal, estado, chave idempotente e identificador opaco do provedor.
 
 Estados: `active`, `completed`, `archived`. “Atrasada” não é um estado persistido; é uma condição de apresentação que não usa linguagem punitiva.
+
+Regras semanais possuem ao menos um dia e não repetem o mesmo dia. Não existe data programada de término; a série termina por ação explícita. Ocorrências são calculadas ou materializadas em janela limitada e possuem unicidade por regra e agenda, impedindo uma recorrência sem término de virar quantidade ilimitada de linhas.
+
+`source = student` identifica uma tarefa criada pelo módulo Estudante e não amplia acesso. Notificação padrão é uma entrega comum no horário de uma tarefa com instante definido. Alarme é uma entrega opcional de maior atenção, com antecedência de `0`, `5`, `15` ou `30` minutos e suporte dependente da capacidade do cliente.
 
 ### Mindfulness
 

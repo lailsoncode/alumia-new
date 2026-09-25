@@ -23,6 +23,7 @@ Esta pasta reúne a documentação de produto, arquitetura, pesquisa e planejame
 | [Dados e acesso](sdd/data-and-access-spec.md) | Modelo, permissões, RLS e privacidade |
 | [Design system](sdd/design-system-spec.md) | UI, acessibilidade e uso de Hugeicons |
 | [B2C](sdd/features/b2c-core.spec.md) | Experiência pessoal de autocuidado |
+| [Tarefas](sdd/features/task-creation.spec.md) | Criação, recorrência semanal, notificações, alarmes e origem Estudante |
 | [B2B e NR-1](sdd/features/b2b-nr1.spec.md) | Alumia Empresas e gestão de riscos psicossociais |
 | [Painel master](sdd/features/platform-admin.spec.md) | Operação central da plataforma |
 | [Plano de entregas](sdd/delivery-plan.md) | Incrementos, dependências e gates |

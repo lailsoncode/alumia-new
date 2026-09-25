@@ -304,11 +304,11 @@ Respostas brutas ficam em uma área de acesso restrito. Dashboards consultam vie
 ### Tarefas
 
 - `tasks`: título, descrição opcional, estado, data/hora e origem;
-- `task_recurrence_rules`: frequência, dias e fuso;
+- `task_recurrence_rules`: frequência diária ou semanal, dias selecionados, início, fuso e desativação explícita;
 - `task_occurrences`: ocorrências materializadas quando necessário;
 - `task_events`: conclusão, reagendamento e arquivamento para auditoria do comportamento da feature.
 
-A regra de recorrência fica em `src/lib/domain/tasks` e é replicada ou protegida no servidor. Tarefas vencidas não recebem estado de “falha”.
+A recorrência semanal aceita um ou mais dias; a quantidade de vezes por semana é derivada dessa seleção. A série não possui término predefinido e permanece ativa até ser desativada. A regra fica em `src/lib/domain/tasks` e é replicada ou protegida no servidor. A interface projeta as datas futuras, enquanto o banco materializa apenas a próxima ocorrência ou uma janela limitada, sempre com unicidade. Tarefas vencidas não recebem estado de “falha”.
 
 ### Mindfulness
 
@@ -372,12 +372,14 @@ No B2B, o contrato e a configuração de cada implantação devem definir papéi
 
 Notificações entram depois que os módulos funcionarem sem elas. O fluxo será:
 
-1. o usuário ativa explicitamente um tipo de lembrete;
-2. o aplicativo registra preferência, fuso e horário de silêncio;
-3. um job seleciona apenas os lembretes elegíveis;
-4. uma Edge Function envia a mensagem por provedor de push;
-5. a entrega é registrada de modo idempotente;
-6. ignorar a notificação não altera pontuação nem cria consequência negativa.
+1. o usuário autoriza o canal de notificações no sistema e pode desativá-lo nas preferências;
+2. toda tarefa com data e horário recebe uma notificação padrão enquanto o canal do módulo estiver ativo;
+3. a pessoa pode configurar separadamente um alarme na hora ou 5, 15 ou 30 minutos antes, quando o cliente suportar esse comportamento;
+4. o aplicativo registra preferência, fuso e horário de silêncio;
+5. um job seleciona apenas avisos elegíveis;
+6. uma Edge Function envia notificações pelo provedor de push e o adaptador compatível agenda alarmes;
+7. cada entrega é registrada de modo idempotente;
+8. ignorar uma notificação ou alarme não altera pontuação nem cria consequência negativa.
 
 Mensagens ficam em catálogo editorial versionado. Personalização por estado emocional não entra no MVP para evitar exposição de dado sensível no push e interpretações inadequadas.
 

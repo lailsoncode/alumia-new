@@ -24,6 +24,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 | Protótipo FlutterFlow | onboarding, home, modelo de tarefas, check-in, mindfulness e hidratação como referências |
 | Auditoria do protótipo | reescrever stack; adiar comunidade, IA, estudante e insígnias; corrigir acessibilidade e roteamento |
 | Comparação entre as versões B2C | fundo frio visível, superfícies suaves, maior respiro, orientação persistente, linguagem humana e navegação flutuante |
+| Modal de tarefas do protótipo e validação do produto | recorrência semanal por múltiplos dias, série sem término predefinido, ocorrências sob demanda, notificação padrão, alarme opcional e origem Estudante |
 | Pitch deck | ofertas Freemium, PRO e Empresas como hipóteses comerciais |
 | Blueprint MeAgende.Me | React/Vite/Supabase, multi-tenancy, RLS, platform admin e verticais completas |
 | Materiais NR-1 | foco em condições de trabalho, métodos múltiplos, participação, inventário, ações e eficácia |

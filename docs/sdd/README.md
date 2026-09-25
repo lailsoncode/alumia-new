@@ -1,7 +1,9 @@
 # Alumia — Spec-Driven Development
 
-**Versão do pacote:** 0.1.0  
-**Data:** 21 de setembro de 2026  
+**Versão do pacote:** 0.2.0
+
+**Data:** 25 de setembro de 2026
+
 **Status:** proposto para revisão e início da implementação
 
 Este diretório é a fonte de verdade para desenvolver a nova Alumia. As especificações traduzem o plano do produto, o blueprint SaaS, os materiais do Google Drive, o pitch e a auditoria do FlutterFlow em contratos verificáveis.
@@ -43,6 +45,7 @@ Regras do processo:
 | [`data-and-access-spec.md`](data-and-access-spec.md) | Dados, estados, permissões e RLS | proposed |
 | [`design-system-spec.md`](design-system-spec.md) | Interface, Hugeicons e acessibilidade | proposed |
 | [`features/b2c-core.spec.md`](features/b2c-core.spec.md) | Experiência pessoal B2C | proposed |
+| [`features/task-creation.spec.md`](features/task-creation.spec.md) | Criação, recorrência, avisos e origem das tarefas | proposed |
 | [`features/b2b-nr1.spec.md`](features/b2b-nr1.spec.md) | Alumia Empresas e fluxo NR-1 | proposed |
 | [`features/platform-admin.spec.md`](features/platform-admin.spec.md) | Painel master da Alumia | proposed |
 | [`increments/001-foundation-and-private-checkin.md`](increments/001-foundation-and-private-checkin.md) | Primeiro incremento pronto para implementação | ready |

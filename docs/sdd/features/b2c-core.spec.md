@@ -1,7 +1,9 @@
 # Feature specification — Alumia B2C
 
-**ID:** `B2C`  
-**Versão:** 0.1.0  
+**ID:** `B2C`
+
+**Versão:** 0.2.0
+
 **Estado:** proposed
 
 ## 1. Resultado esperado
@@ -79,19 +81,13 @@ idle → selecting → submitting → success
 
 ### Requisitos
 
-- `B2C-TSK-001`: criar tarefa com título, importância e agendamento opcionais.
-- `B2C-TSK-002`: organizar em “importa hoje”, “com horário” e “pode esperar”.
-- `B2C-TSK-003`: concluir, reagendar e arquivar.
-- `B2C-TSK-004`: suportar recorrência com fuso.
-- `B2C-TSK-005`: registrar eventos relevantes sem conteúdo em analytics.
+Os requisitos normativos `B2C-TSK-001` a `B2C-TSK-014` estão em [`task-creation.spec.md`](task-creation.spec.md). Eles cobrem criação e organização, recorrência diária ou semanal com múltiplos dias, séries sem término predefinido, materialização limitada, notificação padrão, alarme opcional, origem Estudante e telemetria privada.
+
+A origem `student` fica reservada enquanto o módulo Estudante estiver fora do primeiro MVP.
 
 ### Critérios
 
-- `B2C-TSK-AC-01`: tarefa sem data pode permanecer em “pode esperar”.
-- `B2C-TSK-AC-02`: tarefa não concluída não recebe estado de falha.
-- `B2C-TSK-AC-03`: recorrência cria a próxima ocorrência sem duplicidade.
-- `B2C-TSK-AC-04`: mudança de fuso mantém a intenção local documentada.
-- `B2C-TSK-AC-05`: histórico carrega de forma paginada.
+Os critérios `B2C-TSK-AC-01` a `B2C-TSK-AC-13` estão na especificação detalhada. Eles verificam, entre outros casos, terça e quinta como duas ocorrências semanais, ausência de duplicidade, mudança de fuso, série ativa até desativação, avisos e isolamento dos dados.
 
 ## 6. Mindfulness
 
@@ -150,4 +146,3 @@ Proibido enviar emoção, necessidade, título, nota, quantidade de água indivi
 - RLS pessoal;
 - design system;
 - consentimentos e política de privacidade.
-
