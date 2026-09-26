@@ -1,5 +1,68 @@
+import { App } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "../lib/supabaseClient";
 import type { LoginData, RegisterData, ProfileData } from "../types";
+
+const NATIVE_AUTH_CALLBACK = "alumia://auth/callback";
+
+function getAuthCallbackParams(url: string) {
+  const parsedUrl = new URL(url);
+  const params = new URLSearchParams(parsedUrl.search);
+  const hashParams = new URLSearchParams(parsedUrl.hash.replace(/^#/, ""));
+  hashParams.forEach((value, key) => {
+    if (!params.has(key)) params.set(key, value);
+  });
+  return params;
+}
+
+export async function completeNativeAuth(url: string) {
+  if (!url.startsWith("alumia://auth/")) return false;
+
+  const params = getAuthCallbackParams(url);
+  const errorDescription = params.get("error_description") || params.get("error");
+  if (errorDescription) throw new Error(errorDescription);
+
+  const code = params.get("code");
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) throw error;
+  } else {
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+    if (!accessToken || !refreshToken) throw new Error("O retorno do login não contém uma sessão válida.");
+
+    const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+    if (error) throw error;
+  }
+
+  await Browser.close().catch(() => undefined);
+  return true;
+}
+
+export async function initializeNativeAuth() {
+  if (!Capacitor.isNativePlatform()) return () => undefined;
+
+  const handleUrl = (url: string) => {
+    void completeNativeAuth(url).catch((error) => console.error("Erro ao concluir autenticação nativa:", error));
+  };
+
+  const urlListener = await App.addListener("appUrlOpen", ({ url }) => handleUrl(url));
+  const stateListener = await App.addListener("appStateChange", ({ isActive }) => {
+    if (isActive) supabase.auth.startAutoRefresh();
+    else supabase.auth.stopAutoRefresh();
+  });
+
+  const launchUrl = await App.getLaunchUrl();
+  if (launchUrl?.url) handleUrl(launchUrl.url);
+  supabase.auth.startAutoRefresh();
+
+  return () => {
+    void urlListener.remove();
+    void stateListener.remove();
+    supabase.auth.stopAutoRefresh();
+  };
+}
 
 /**
  * @file authService.ts
@@ -39,6 +102,20 @@ export async function signUpWithEmail({
  * Redireciona o usuário para a página de consentimento do Google.
  */
 export async function signInWithGoogle() {
+  if (Capacitor.isNativePlatform()) {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: NATIVE_AUTH_CALLBACK,
+        skipBrowserRedirect: true,
+      },
+    });
+    if (error) throw error;
+    if (!data.url) throw new Error("Não foi possível iniciar o login com Google.");
+    await Browser.open({ url: data.url, presentationStyle: "popover" });
+    return;
+  }
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {

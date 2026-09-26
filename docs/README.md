@@ -1,5 +1,7 @@
 # Documentação da Alumia
 
+- [Builds nativos Android e iOS](./native-builds.md)
+
 Esta pasta reúne a documentação de produto, arquitetura, pesquisa e planejamento da Alumia. O pacote de **Spec-Driven Development (SDD)** é a fonte normativa para o desenvolvimento novo.
 
 ## Comece por aqui

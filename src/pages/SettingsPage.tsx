@@ -7,6 +7,8 @@ import { SectionHeader, Surface } from "@/components/ui/surface";
 import { useAuth } from "@/hooks/use-auth";
 import { signOut } from "@/services/authService";
 import { disablePushNotifications, enablePushNotifications, getPushNotificationState, isOneSignalConfigured } from "@/services/oneSignalService";
+import { getTasks } from "@/services/tasksService";
+import { synchronizeTaskReminders } from "@/services/taskReminderService";
 import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
 
 function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
@@ -69,6 +71,11 @@ export function SettingsPage() {
     try {
       const state = notifications ? await disablePushNotifications() : await enablePushNotifications();
       setNotifications(state.enabled);
+      if (!notifications && state.enabled) {
+        await getTasks()
+          .then(synchronizeTaskReminders)
+          .catch((error) => console.error("Não foi possível sincronizar os lembretes locais:", error));
+      }
       setNotificationStatus(
         !state.supported ? "unsupported" : !notifications && !state.permission ? "denied" : "ready",
       );

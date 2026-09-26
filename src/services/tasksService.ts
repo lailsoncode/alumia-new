@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabaseClient";
 import type { Task, AddTaskData } from "../types";
+import { cancelTaskReminder, scheduleTaskReminder } from "./taskReminderService";
 
 /**
  * @file tasksService.ts
@@ -58,6 +59,9 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
     .single();
 
   if (error) throw error;
+  await scheduleTaskReminder(data, Boolean(taskData.reminder)).catch((scheduleError) => {
+    console.error("Não foi possível agendar o lembrete local:", scheduleError);
+  });
   return data;
 }
 
@@ -87,6 +91,9 @@ export async function updateTask(taskId: string, updates: Partial<Task>): Promis
     .single();
 
   if (error) throw error;
+  await scheduleTaskReminder(data).catch((scheduleError) => {
+    console.error("Não foi possível atualizar o lembrete local:", scheduleError);
+  });
   return data;
 }
 
@@ -99,4 +106,7 @@ export async function updateTask(taskId: string, updates: Partial<Task>): Promis
 export async function deleteTask(taskId: string): Promise<void> {
   const { error } = await supabase.from("tasks").delete().eq("id", taskId);
   if (error) throw error;
+  await cancelTaskReminder(taskId).catch((scheduleError) => {
+    console.error("Não foi possível remover o lembrete local:", scheduleError);
+  });
 }

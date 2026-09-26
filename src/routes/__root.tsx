@@ -7,8 +7,11 @@ import { RequireAuth } from "@/lib/RequireAuth";
 import { applyTheme, getStoredTheme } from "@/lib/theme";
 import type { ModuleKey } from "@/lib/module-themes";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { initializeNativeAuth } from "@/services/authService";
 import { initializeOneSignal, isOneSignalConfigured, synchronizeOneSignalUser } from "@/services/oneSignalService";
 import { registerPwaServiceWorker } from "@/services/pwaService";
+import { getTasks } from "@/services/tasksService";
+import { initializeTaskReminderNavigation, synchronizeTaskReminders } from "@/services/taskReminderService";
 import appCss from "../styles.css?url";
 
 const appShellHeaders = {
@@ -110,17 +113,42 @@ function RuntimeIntegrations() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
+    let cleanupNativeAuth: (() => void) | undefined;
+    let cleanupReminderNavigation: (() => void) | undefined;
+    let active = true;
+
     applyTheme(getStoredTheme());
     void registerPwaServiceWorker().catch((error) => console.error("Erro ao registrar a PWA:", error));
+    void initializeNativeAuth().then((cleanup) => {
+      if (active) cleanupNativeAuth = cleanup;
+      else cleanup();
+    }).catch((error) => console.error("Erro ao iniciar autenticação nativa:", error));
+    void initializeTaskReminderNavigation().then((cleanup) => {
+      if (active) cleanupReminderNavigation = cleanup;
+      else cleanup();
+    }).catch((error) => console.error("Erro ao iniciar lembretes locais:", error));
     if (isOneSignalConfigured()) {
       void initializeOneSignal().catch((error) => console.error("Erro ao iniciar notificações:", error));
     }
+
+    return () => {
+      active = false;
+      cleanupNativeAuth?.();
+      cleanupReminderNavigation?.();
+    };
   }, []);
 
   useEffect(() => {
     if (loading || !isOneSignalConfigured()) return;
     void synchronizeOneSignalUser(user?.id ?? null).catch((error) => console.error("Erro ao sincronizar notificações:", error));
   }, [loading, user?.id]);
+
+  useEffect(() => {
+    if (loading || !user) return;
+    void getTasks()
+      .then(synchronizeTaskReminders)
+      .catch((error) => console.error("Erro ao sincronizar lembretes locais:", error));
+  }, [loading, user]);
 
   return null;
 }
