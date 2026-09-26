@@ -14,7 +14,7 @@ const items = [
 export function BottomNavigation() {
   const { pathname } = useLocation();
   return (
-    <nav aria-label="Navegação principal" className="alumia-floating fixed inset-x-4 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-lg rounded-[1.75rem] p-1.5 lg:hidden">
+    <nav aria-label="Navegação principal" className="alumia-floating fixed inset-x-4 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-lg rounded-[1.5rem] p-1 lg:hidden">
       <ul className="grid grid-cols-4 gap-1">
         {items.map((item) => {
           const active = isItemActive(pathname, item.matches);
@@ -25,7 +25,7 @@ export function BottomNavigation() {
                 preload="render"
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-[1.25rem] px-1 text-xs font-semibold transition-colors",
+                  "flex min-h-13 min-w-0 flex-col items-center justify-center gap-0.5 rounded-[1.125rem] px-1 text-xs font-semibold transition-colors",
                   active ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >

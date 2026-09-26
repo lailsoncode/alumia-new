@@ -33,25 +33,25 @@ export function HydrationCard() {
   };
 
   return (
-    <Surface className="module-theme-hydration p-4 sm:p-5">
+    <Surface className="module-theme-hydration p-3 sm:p-4">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-2.5">
           <AlumiaIcon icon={GlassWaterIcon} size="md" className="module-text mt-0.5 shrink-0" />
           <div>
-            <h2 className="text-lg font-semibold">Um gesto de hidratação</h2>
-            <p className="text-sm text-muted-foreground">{loading ? "Preparando seu registro…" : intake === 0 ? "Seu primeiro copo pode chegar quando quiser." : `${intake} ml de cuidado registrados hoje.`}</p>
+            <h2 className="text-base font-semibold sm:text-lg">Um gesto de hidratação</h2>
+            <p className="text-xs text-muted-foreground sm:text-sm">{loading ? "Preparando seu registro…" : intake === 0 ? "Seu primeiro copo pode chegar quando quiser." : `${intake} ml de cuidado registrados hoje.`}</p>
           </div>
         </div>
         {intake > 0 && <Button variant="ghost" size="icon" aria-label="Desfazer último registro" onClick={undo}><AlumiaIcon icon={ArrowReloadHorizontalIcon} size="sm" /></Button>}
       </div>
-      <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-muted">
+      <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-muted">
         <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={GOAL} aria-valuenow={intake} />
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2.5">
+      <div className="mt-2.5 grid grid-cols-2 gap-2">
         <Button variant="outline" size="sm" onClick={() => add(200)} disabled={loading}><AlumiaIcon icon={CupSodaIcon} size="xs" />Copo 200 ml</Button>
         <Button variant="outline" size="sm" onClick={() => add(500)} disabled={loading}><AlumiaIcon icon={GlassWaterIcon} size="xs" />Garrafa 500 ml</Button>
       </div>
-      <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => navigate({ to: "/hidratacao" })}>Ver meu ritmo</Button>
+      <Button variant="ghost" size="sm" className="mt-1 w-full" onClick={() => navigate({ to: "/hidratacao" })}>Ver meu ritmo</Button>
     </Surface>
   );
 }

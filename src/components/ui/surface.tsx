@@ -14,7 +14,7 @@ export function Surface({ as: Comp = "section", variant = "default", className, 
   return (
     <Comp
       className={cn(
-        "rounded-[1.5rem] border border-border",
+        "rounded-[1.125rem] border border-border/80",
         variant === "default" && "bg-surface shadow-[var(--shadow-card)]",
         variant === "subtle" && "bg-surface-subtle shadow-[var(--shadow-card)]",
         variant === "interactive" && "bg-surface shadow-[var(--shadow-card)] transition-[background-color,border-color,transform] hover:-translate-y-0.5 hover:border-primary/30 hover:bg-surface-subtle",
@@ -37,14 +37,14 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, description, action, className, icon, iconClassName }: SectionHeaderProps) {
   return (
-    <div className={cn("flex items-start justify-between gap-4", className)}>
-      <div className="flex min-w-0 items-start gap-3">
+    <div className={cn("flex items-start justify-between gap-3", className)}>
+      <div className="flex min-w-0 items-start gap-2.5">
         {icon && (
           <AlumiaIcon icon={icon} size="md" className={cn("mt-0.5 shrink-0 text-tone-sky-fg", iconClassName)} />
         )}
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-          {description && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p>}
+          <h2 className="text-base font-semibold text-foreground sm:text-lg">{title}</h2>
+          {description && <p className="mt-0.5 text-sm leading-snug text-muted-foreground">{description}</p>}
         </div>
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -66,7 +66,7 @@ export function InlineFeedback({ children, tone = "info", id }: InlineFeedbackPr
     danger: "border-destructive/25 bg-destructive/10 text-destructive",
   };
   return (
-    <p id={id} role="status" aria-live="polite" className={cn("rounded-2xl border px-4 py-3.5 text-sm leading-relaxed shadow-[var(--shadow-card)]", tones[tone])}>
+    <p id={id} role="status" aria-live="polite" className={cn("rounded-xl border px-3 py-2.5 text-sm leading-relaxed shadow-[var(--shadow-card)]", tones[tone])}>
       {children}
     </p>
   );

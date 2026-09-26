@@ -63,7 +63,7 @@ export function CheckinHistoryPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
+    <div className="mx-auto max-w-3xl space-y-3">
       <div className="flex items-start gap-3">
         <Button asChild variant="ghost" size="icon" className="shrink-0">
           <Link to="/check-in" aria-label="Voltar ao check-in">

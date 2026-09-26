@@ -34,7 +34,7 @@ export function EmotionPicker({ emotions, value, onChange, error }: EmotionPicke
   return (
     <fieldset aria-describedby={error ? "emotion-error" : undefined}>
       <legend className="sr-only">Como você está se sentindo?</legend>
-      <div className="space-y-5">
+      <div className="space-y-3.5">
         {groups.map((group) => {
           const options = emotions.filter((emotion) => emotion.valence === group.valence);
           if (options.length === 0) return null;
@@ -50,7 +50,7 @@ export function EmotionPicker({ emotions, value, onChange, error }: EmotionPicke
                   <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{group.description}</p>
                 </div>
               </div>
-              <div className="mt-2.5 flex flex-wrap justify-center gap-2">
+              <div className="mt-2 flex flex-wrap justify-center gap-1.5">
                 {options.map((emotion) => {
                   const selected = value.includes(emotion.code);
                   const selectedInGroup = options.filter((option) => value.includes(option.code)).length;
@@ -65,7 +65,7 @@ export function EmotionPicker({ emotions, value, onChange, error }: EmotionPicke
                         selected ? value.filter((code) => code !== emotion.code) : [...value, emotion.code],
                       )}
                       className={cn(
-                        "min-h-10 rounded-xl border px-3 py-2 text-sm font-medium transition-[background-color,border-color,color,transform] sm:text-base",
+                        "min-h-10 rounded-lg border px-2.5 py-1.5 text-sm font-medium transition-[background-color,border-color,color,transform] sm:text-base",
                         limitReached && "cursor-not-allowed opacity-45",
                         selected
                           ? "module-surface border-[var(--module-accent)] text-[var(--module-strong)] shadow-sm"

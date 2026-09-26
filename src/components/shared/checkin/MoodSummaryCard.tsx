@@ -7,19 +7,19 @@ import type { CreateCareCheckinResult } from "@/types";
 export function MoodSummaryCard({ result }: { result: CreateCareCheckinResult }) {
   const mood = MOOD_PRESENTATIONS[result.moodCategory];
   return (
-    <Surface className="module-surface grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3 p-3 shadow-none sm:grid-cols-[7rem_minmax(0,1fr)] sm:p-4">
+    <Surface className="module-surface grid grid-cols-[4.75rem_minmax(0,1fr)] items-center gap-2.5 p-2.5 shadow-none sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:p-3">
       <img
         src={mood.image}
         alt={`Ilustração que representa ${mood.label.toLowerCase()}`}
-        className="aspect-square w-full rounded-xl object-cover"
+        className="aspect-square w-full rounded-lg object-cover"
       />
       <div className="min-w-0">
         <div className="flex items-start gap-2">
           <AlumiaIcon icon={SunCloud01Icon} size="md" className="module-text mt-0.5" />
-          <h2 className="text-lg font-semibold leading-snug sm:text-2xl">{mood.label}</h2>
+          <h2 className="text-lg font-semibold leading-snug sm:text-xl">{mood.label}</h2>
         </div>
-        <p className="mt-1 text-sm font-medium leading-relaxed sm:text-base">{result.suggestion.title}</p>
-        <p className="mt-0.5 text-xs leading-relaxed text-foreground/75 sm:text-sm">{result.suggestion.body}</p>
+        <p className="mt-0.5 text-sm font-medium leading-snug sm:text-base">{result.suggestion.title}</p>
+        <p className="mt-0.5 text-xs leading-snug text-foreground/75 sm:text-sm">{result.suggestion.body}</p>
       </div>
     </Surface>
   );

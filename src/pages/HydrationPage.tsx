@@ -135,7 +135,7 @@ export function HydrationPage() {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {error && (
           <InlineFeedback tone="danger">
             {error}{" "}
@@ -145,11 +145,11 @@ export function HydrationPage() {
           </InlineFeedback>
         )}
 
-        <Surface className="module-surface grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2.5 p-2.5 shadow-none min-[380px]:grid-cols-[5rem_minmax(0,1fr)] sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-3 sm:p-3">
+        <Surface className="module-surface grid grid-cols-[4.25rem_minmax(0,1fr)] items-center gap-2.5 p-2 shadow-none min-[380px]:grid-cols-[4.75rem_minmax(0,1fr)] sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:p-2.5">
           <img
             src={hydrationImage}
             alt="Personagem da Alumia bebendo água"
-            className="h-24 w-full rounded-xl object-cover sm:h-28"
+            className="h-20 w-full rounded-lg object-cover sm:h-24"
           />
           <div className="min-w-0">
             <div className="flex items-start gap-1.5">
@@ -162,8 +162,8 @@ export function HydrationPage() {
           </div>
         </Surface>
 
-        <div className="grid items-start gap-4 lg:grid-cols-[minmax(18rem,0.72fr)_minmax(0,1.28fr)]">
-          <Surface className="p-4 sm:p-5">
+        <div className="grid items-start gap-3 lg:grid-cols-[minmax(18rem,0.72fr)_minmax(0,1.28fr)]">
+          <Surface className="p-3 sm:p-4">
             <div className="flex items-start gap-3">
               <AlumiaIcon icon={Settings01Icon} size="md" className="module-text mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
@@ -176,13 +176,13 @@ export function HydrationPage() {
                 Ajustar
               </Button>
             </div>
-            <div className="module-surface mt-3 flex items-start gap-2 rounded-2xl border px-3.5 py-3 text-sm leading-relaxed text-[var(--module-strong)]">
+            <div className="module-surface mt-2.5 flex items-start gap-2 rounded-xl border px-3 py-2 text-sm leading-snug text-[var(--module-strong)]">
               <AlumiaIcon icon={SparklesIcon} size="xs" className="mt-0.5 shrink-0" />
               <p>O número é uma referência configurável. O cuidado vem primeiro.</p>
             </div>
           </Surface>
 
-          <Surface className="p-4 sm:p-5">
+          <Surface className="p-3 sm:p-4">
             <div className="flex items-start gap-3">
               <AlumiaIcon icon={GlassWaterIcon} size="md" className="module-text mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
@@ -193,7 +193,7 @@ export function HydrationPage() {
               </div>
             </div>
 
-            <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted">
+            <div className="mt-2.5 h-2.5 overflow-hidden rounded-full bg-muted">
               <div
                 className="h-full rounded-full bg-primary transition-[width]"
                 style={{ width: `${progress}%` }}
@@ -208,7 +208,7 @@ export function HydrationPage() {
               {Math.round(progress)}% da referência que você escolheu.
             </p>
 
-            <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="mt-2.5 grid grid-cols-3 gap-2">
               <Button aria-label="Registrar copo de 200 ml" variant="outline" size="sm" className="min-w-0 px-2" onClick={() => addWater(200)} disabled={loading}>
                 <AlumiaIcon icon={CupSodaIcon} size="xs" />
                 <span>200 ml</span>
@@ -224,7 +224,7 @@ export function HydrationPage() {
             </div>
 
             {customOpen && (
-              <form className="mt-3 flex flex-col gap-3 rounded-2xl bg-surface-subtle p-3.5 sm:flex-row sm:items-end" onSubmit={saveCustomAmount}>
+              <form className="mt-2.5 flex flex-col gap-2.5 rounded-xl bg-surface-subtle p-3 sm:flex-row sm:items-end" onSubmit={saveCustomAmount}>
                 <label htmlFor="custom-water" className="flex-1 text-sm font-semibold">
                   Quantidade em ml
                   <input
@@ -241,7 +241,7 @@ export function HydrationPage() {
               </form>
             )}
 
-            <div className="mt-3 flex min-h-10 items-center justify-between gap-3">
+            <div className="mt-2 flex min-h-10 items-center justify-between gap-3">
               <p className="text-sm font-semibold text-muted-foreground">Um gesto simples, um grande cuidado.</p>
               {intake > 0 && (
                 <Button variant="ghost" size="sm" className="shrink-0 px-2.5" onClick={undo}>
@@ -252,14 +252,14 @@ export function HydrationPage() {
             </div>
           </Surface>
 
-          <Surface className="p-4 sm:p-5 lg:col-span-2">
+          <Surface className="p-3 sm:p-4 lg:col-span-2">
             <SectionHeader
               icon={Calendar01Icon}
               iconClassName="module-text"
               title="Seu consumo nos últimos 7 dias"
               description="Um panorama simples do seu ritmo, sem cobrança."
             />
-            <div className="mt-4 space-y-2.5">
+            <div className="mt-2.5 space-y-2">
               {loading
                 ? [0, 1, 2, 3].map((item) => <div key={item} className="h-5 animate-pulse rounded-full bg-muted" />)
                 : history.map((item) => (

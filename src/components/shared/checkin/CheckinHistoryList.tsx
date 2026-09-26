@@ -22,7 +22,7 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
 export function CheckinHistoryList({ items, onDelete, deletingId, compact = false }: CheckinHistoryListProps) {
   if (items.length === 0) {
     return (
-      <Surface className="p-4 text-center shadow-none">
+      <Surface className="p-3 text-center shadow-none">
         <AlumiaIcon icon={HistoryIcon} size="md" className="module-text mx-auto" />
         <p className="mt-2 text-sm font-medium">Seus registros vão aparecer aqui, no seu tempo.</p>
       </Surface>
@@ -30,10 +30,10 @@ export function CheckinHistoryList({ items, onDelete, deletingId, compact = fals
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-1.5">
       {items.map((item) => (
         <li key={item.id}>
-          <Surface as="article" className="module-whisper rounded-[1.125rem] p-3 shadow-none">
+          <Surface as="article" className="module-whisper rounded-xl p-2.5 shadow-none">
             <div className="flex items-start gap-2.5">
               <img src={MOOD_PRESENTATIONS[item.moodCategory].image} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover" />
               <div className="min-w-0 flex-1">

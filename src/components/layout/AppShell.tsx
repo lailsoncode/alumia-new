@@ -17,8 +17,8 @@ export function AppShell({ children, className, contentClassName, headerRole, mo
     <div className={cn("min-h-screen bg-background", moduleKey && MODULE_THEMES[moduleKey].themeClass, className)} data-module={moduleKey}>
       <SidebarNavigation />
       <div className="lg:pl-64">
-        <main className={cn("mx-auto w-full max-w-7xl px-4 pb-28 pt-4 sm:px-5 sm:pt-5 lg:px-6 lg:pb-8 lg:pt-6", contentClassName)}>
-          <div className="space-y-4">
+        <main className={cn("mx-auto w-full max-w-7xl px-4 pb-28 pt-3 sm:px-5 sm:pt-4 lg:px-6 lg:pb-6 lg:pt-5", contentClassName)}>
+          <div className="space-y-3">
             <Greeting role={headerRole} />
             {children}
           </div>

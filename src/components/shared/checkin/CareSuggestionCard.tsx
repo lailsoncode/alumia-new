@@ -15,10 +15,10 @@ export function CareSuggestionCard({ suggestion, onRestart, onAddTask }: CareSug
     <div aria-live="polite">
       <div className="flex items-center gap-2">
         <AlumiaIcon icon={Plant02Icon} size="md" className="module-text" />
-        <h2 className="text-lg font-semibold sm:text-xl">Uma sugestão para seu dia</h2>
+        <h2 className="text-base font-semibold sm:text-lg">Uma sugestão para seu dia</h2>
       </div>
-      <Surface className="module-whisper mt-2.5 p-3 shadow-none sm:p-4">
-        <p className="text-sm leading-relaxed sm:text-base">{suggestion.actionText}</p>
+      <Surface className="module-whisper mt-2 p-2.5 shadow-none sm:p-3">
+        <p className="text-sm leading-snug sm:text-base">{suggestion.actionText}</p>
       </Surface>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Button type="button" variant="outline" className="min-w-0 px-2" onClick={onAddTask}>

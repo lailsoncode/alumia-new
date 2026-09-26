@@ -104,12 +104,12 @@ export function CheckinPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4">
-      <Surface className="module-surface flex items-start gap-3 p-3.5 shadow-none sm:p-4">
-        <AlumiaIcon icon={SmileIcon} size="lg" className="module-text mt-0.5" />
+    <div className="mx-auto max-w-6xl space-y-3">
+      <Surface className="module-surface flex items-start gap-2.5 p-3 shadow-none">
+        <AlumiaIcon icon={SmileIcon} size="md" className="module-text mt-0.5" />
         <div>
           <h2 className="text-base font-semibold sm:text-lg">Check-in emocional da Alumia</h2>
-          <p className="mt-1 text-sm leading-relaxed text-foreground/80">
+          <p className="mt-0.5 text-sm leading-snug text-foreground/80">
             Um espaço breve para reconhecer o que você sente e escolher o cuidado que faz sentido agora.
           </p>
         </div>
@@ -123,8 +123,8 @@ export function CheckinPage() {
       )}
 
       {result ? (
-        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)]">
-          <div className="space-y-4">
+        <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)]">
+          <div className="space-y-3">
             <MoodSummaryCard result={result} />
             <CareSuggestionCard
               suggestion={result.suggestion}
@@ -133,7 +133,7 @@ export function CheckinPage() {
             />
             {taskFeedback && <InlineFeedback tone={taskFeedback.tone}>{taskFeedback.message}</InlineFeedback>}
           </div>
-          <div className="lg:rounded-[1.5rem] lg:border lg:border-border lg:bg-surface lg:p-4 lg:shadow-[var(--shadow-card)]">
+          <div className="lg:rounded-[1.125rem] lg:border lg:border-border/80 lg:bg-surface lg:p-3 lg:shadow-[var(--shadow-card)]">
             <MoodCalendar items={history} onSelect={setSelectedHistoryItem} />
           </div>
           <CheckinDetailDialog
@@ -160,8 +160,8 @@ export function CheckinPage() {
           />
         </div>
       ) : (
-        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
-          <Surface className="p-4 sm:p-5">
+        <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+          <Surface className="p-3 sm:p-4">
             {loading ? (
               <div role="status" className="flex min-h-56 items-center justify-center gap-2 text-sm text-muted-foreground">
                 <AlumiaIcon icon={SparklesIcon} size="sm" className="module-text" />
@@ -180,7 +180,7 @@ export function CheckinPage() {
                   }}
                   error={emotionError}
                 />
-                <div className="module-divider my-5 h-px" />
+                <div className="module-divider my-3.5 h-px" />
                 <NeedPicker
                   needs={needs}
                   value={needCode}
@@ -190,8 +190,8 @@ export function CheckinPage() {
                   }}
                   error={needError}
                 />
-                {submitError && <div className="mt-4"><InlineFeedback tone="danger">{submitError}</InlineFeedback></div>}
-                <div className="mt-5 flex justify-center">
+                {submitError && <div className="mt-3"><InlineFeedback tone="danger">{submitError}</InlineFeedback></div>}
+                <div className="mt-3.5 flex justify-center">
                   <Button type="submit" size="lg" disabled={submitting} className="w-full max-w-sm">
                     <AlumiaIcon icon={SentIcon} size="sm" />
                     {submitting ? "Acolhendo seu registro…" : "Realizar check-in"}

@@ -95,10 +95,10 @@ export function SettingsPage() {
   const name = profile?.firstName ? `${profile.firstName} ${profile.lastName}`.trim() : user?.email?.split("@")[0] || "Seu perfil";
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
         <section>
           <SectionHeader icon={UserIcon} iconClassName="text-primary" title="Perfil"/>
-          <Surface className="mt-3 p-4">
+          <Surface className="mt-2.5 p-3">
             <div className="flex items-center gap-3">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary/10 text-lg font-bold text-primary">
                 {profile?.avatarUrl ? <img src={profile.avatarUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : name.slice(0, 1).toUpperCase()}
@@ -111,22 +111,22 @@ export function SettingsPage() {
 
         <section>
           <SectionHeader icon={Settings01Icon} iconClassName="text-primary" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
-          <Surface className="mt-3 divide-y divide-border overflow-hidden">
-            <div className="flex min-h-16 items-center gap-3 px-4 py-2.5">
+          <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
+            <div className="flex min-h-14 items-center gap-3 px-3 py-2">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-primary" />
                 <div className="min-w-0"><p className="text-sm font-semibold">Notificações</p><p className="mt-0.5 text-xs text-muted-foreground">{notificationDescription}</p></div>
               </div>
               <PreferenceSwitch checked={notifications} onChange={toggleNotifications} label="Ativar notificações" disabled={["loading", "saving", "unsupported", "unconfigured"].includes(notificationStatus)} />
             </div>
-            <div className="flex min-h-16 items-center gap-3 px-4 py-2.5">
+            <div className="flex min-h-14 items-center gap-3 px-3 py-2">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={darkMode ? Moon01Icon : Sun01Icon} size="md" className="mt-0.5 shrink-0 text-tone-sky-fg" />
                 <div className="min-w-0"><p className="text-sm font-semibold">Tema escuro</p><p className="mt-0.5 text-xs text-muted-foreground">Use uma aparência mais confortável em ambientes escuros.</p></div>
               </div>
               <PreferenceSwitch checked={darkMode} onChange={toggleTheme} label="Ativar tema escuro" />
             </div>
-            <label className="flex min-h-16 items-center gap-3 px-4 py-2.5">
+            <label className="flex min-h-14 items-center gap-3 px-3 py-2">
               <span className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={GlobeIcon} size="md" className="mt-0.5 shrink-0 text-tone-peach-fg" />
                 <span className="min-w-0"><span className="block text-sm font-semibold">Idioma</span><span className="mt-0.5 block text-xs text-muted-foreground">Idioma usado na interface.</span></span>
@@ -136,22 +136,22 @@ export function SettingsPage() {
           </Surface>
         </section>
 
-        <section className="grid gap-3 lg:grid-cols-2">
+        <section className="grid gap-2.5 lg:grid-cols-2">
           <div>
             <SectionHeader icon={AccessibilityIcon} iconClassName="text-tone-sky-fg" title="Acessibilidade" />
-            <Surface variant="subtle" className="mt-2.5 flex items-start gap-3 p-4"><AlumiaIcon icon={AccessibilityIcon} size="md" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Preferências do dispositivo</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">A Alumia respeita redução de movimento, zoom e configurações de contraste do seu dispositivo.</p></div></Surface>
+            <Surface variant="subtle" className="mt-2 flex items-start gap-2.5 p-3 shadow-none"><AlumiaIcon icon={AccessibilityIcon} size="sm" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Preferências do dispositivo</h3><p className="mt-0.5 text-sm leading-snug text-muted-foreground">A Alumia respeita redução de movimento, zoom e configurações de contraste do seu dispositivo.</p></div></Surface>
           </div>
           <div>
             <SectionHeader icon={LockIcon} iconClassName="text-primary" title="Privacidade e segurança" />
-            <Surface variant="subtle" className="mt-2.5 flex items-start gap-3 p-4"><AlumiaIcon icon={LockIcon} size="md" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Seu cuidado é privado</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Tarefas, hidratação e informações pessoais pertencem à sua conta.</p></div></Surface>
+            <Surface variant="subtle" className="mt-2 flex items-start gap-2.5 p-3 shadow-none"><AlumiaIcon icon={LockIcon} size="sm" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Seu cuidado é privado</h3><p className="mt-0.5 text-sm leading-snug text-muted-foreground">Tarefas, hidratação e informações pessoais pertencem à sua conta.</p></div></Surface>
           </div>
         </section>
 
         <section>
           <SectionHeader icon={Settings01Icon} iconClassName="text-tone-peach-fg" title="Conta" />
-          <Surface className="mt-3 divide-y divide-border overflow-hidden">
-            <button type="button" onClick={() => navigate({ to: "/completar-perfil" })} className="flex min-h-16 w-full items-center gap-3 px-4 text-left transition-colors hover:bg-muted sm:px-5"><AlumiaIcon icon={Settings01Icon} size="sm" className="text-primary" /><span className="flex-1 text-sm font-semibold">Editar dados do perfil</span><AlumiaIcon icon={ChevronRightIcon} size="sm" className="text-muted-foreground" /></button>
-            <button type="button" onClick={logout} className="flex min-h-16 w-full items-center gap-3 px-4 text-left text-destructive transition-colors hover:bg-destructive/10 sm:px-5"><AlumiaIcon icon={Logout01Icon} size="sm" /><span className="flex-1 text-sm font-semibold">Sair da conta</span><AlumiaIcon icon={ChevronRightIcon} size="sm" /></button>
+          <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
+            <button type="button" onClick={() => navigate({ to: "/completar-perfil" })} className="flex min-h-14 w-full items-center gap-3 px-3 text-left transition-colors hover:bg-muted sm:px-4"><AlumiaIcon icon={Settings01Icon} size="sm" className="text-primary" /><span className="flex-1 text-sm font-semibold">Editar dados do perfil</span><AlumiaIcon icon={ChevronRightIcon} size="sm" className="text-muted-foreground" /></button>
+            <button type="button" onClick={logout} className="flex min-h-14 w-full items-center gap-3 px-3 text-left text-destructive transition-colors hover:bg-destructive/10 sm:px-4"><AlumiaIcon icon={Logout01Icon} size="sm" /><span className="flex-1 text-sm font-semibold">Sair da conta</span><AlumiaIcon icon={ChevronRightIcon} size="sm" /></button>
           </Surface>
         </section>
     </div>

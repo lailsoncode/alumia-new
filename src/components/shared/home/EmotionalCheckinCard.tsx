@@ -23,7 +23,7 @@ export function EmotionalCheckinCard() {
   }, []);
 
   if (loading) {
-    return <div className="h-20 animate-pulse rounded-[1.25rem] bg-muted" aria-label="Carregando check-in de hoje" />;
+    return <div className="h-20 animate-pulse rounded-[1.125rem] bg-muted" aria-label="Carregando check-in de hoje" />;
   }
 
   if (todayCheckin) {
@@ -32,14 +32,14 @@ export function EmotionalCheckinCard() {
       <button
         type="button"
         onClick={() => navigate({ to: "/check-in" })}
-        className={`module-whisper grid w-full grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 rounded-[1.25rem] border p-3 text-left shadow-none transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:grid-cols-[6rem_minmax(0,1fr)] ${MODULE_THEMES.checkin.themeClass}`}
+        className={`module-whisper grid w-full grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2.5 rounded-[1.125rem] border p-2.5 text-left shadow-none transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:grid-cols-[5rem_minmax(0,1fr)] ${MODULE_THEMES.checkin.themeClass}`}
         aria-label={`Abrir check-in de hoje: ${mood.label}`}
       >
-        <img src={mood.image} alt="" className="aspect-square w-full rounded-xl object-cover" />
+        <img src={mood.image} alt="" className="aspect-square w-full rounded-lg object-cover" />
         <span className="min-w-0">
-          <span className="block text-base font-semibold leading-snug sm:text-xl">{mood.label}</span>
+          <span className="block text-base font-semibold leading-snug sm:text-lg">{mood.label}</span>
           {todayCheckin.suggestion && (
-            <span className="mt-1 block text-sm leading-relaxed text-foreground/75 sm:text-base">
+            <span className="mt-0.5 block text-sm leading-snug text-foreground/75">
               {todayCheckin.suggestion.body}
             </span>
           )}
@@ -49,7 +49,7 @@ export function EmotionalCheckinCard() {
   }
 
   return (
-    <Surface className={`module-whisper flex items-center gap-3 rounded-[1.25rem] p-3 shadow-none ${MODULE_THEMES.checkin.themeClass}`}>
+    <Surface className={`module-whisper flex items-center gap-2.5 p-2.5 shadow-none ${MODULE_THEMES.checkin.themeClass}`}>
       <AlumiaIcon icon={SmileIcon} size="md" className="module-text" />
       <div className="min-w-0 flex-1">
         <h2 className="text-sm font-semibold sm:text-base">Como você está se sentindo hoje?</h2>
