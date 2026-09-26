@@ -33,6 +33,7 @@ export interface Task {
   /** Deixa o item com fundo destacado (lavanda) */
   highlighted?: boolean;
   done?: boolean;
+  completed_at?: string | null;
 }
 
 /**

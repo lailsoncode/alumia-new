@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CareList, EmotionalCheckinCard, HydrationCard, InfoCard, ModulesGrid } from "@/components/shared/home";
 import { InlineFeedback } from "@/components/ui/surface";
-import { getLocalDateString } from "@/lib/utils";
+import { getLocalDateString, isSameLocalDay } from "@/lib/utils";
 import { getTasks } from "@/services/tasksService";
 import type { Task } from "@/types";
 
@@ -22,14 +22,16 @@ export function HomePage() {
   useEffect(() => loadTasks(), []);
 
   const today = getLocalDateString();
-  const pendingToday = tasks.filter((task) => !task.done && (task.date ? task.date <= today : true));
+  const completedToday = tasks.filter((task) => (
+    task.done && (task.completed_at ? isSameLocalDay(task.completed_at) : task.date === today)
+  )).length;
   const message = loading
     ? "Preparando seus cuidados com calma…"
-    : pendingToday.length === 0
-      ? "Hoje não há nada pedindo sua atenção. Tudo bem — este espaço também é seu."
-      : pendingToday.length === 1
-        ? "Há um cuidado esperando por você hoje. Sem pressa, no seu ritmo."
-        : `Há ${pendingToday.length} cuidados esperando por você hoje. Um gesto de cada vez.`;
+    : completedToday === 0
+      ? "Ainda não fizemos nadinha hoje. Tudo bem, no seu tempo."
+      : completedToday === 1
+        ? "Você já fez 1 coisinha importante hoje."
+        : `Você já fez ${completedToday} coisinhas importantes hoje.`;
 
   return (
     <div className="space-y-3">

@@ -80,6 +80,7 @@ export async function updateTask(taskId: string, updates: Partial<Task>): Promis
       reminder: updates.reminder,
       module_key: updates.moduleKey ?? updates.module_key,
       done: updates.done,
+      completed_at: updates.done === undefined ? undefined : updates.done ? new Date().toISOString() : null,
     })
     .eq("id", taskId)
     .select()
