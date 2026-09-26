@@ -22,7 +22,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.oxentecode.alumia.auth</string>
+			<string>br.com.oxentecode.alumia.auth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>alumia</string>

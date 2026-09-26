@@ -2,6 +2,8 @@
 
 A Alumia mantém uma única interface React/Vite e usa Capacitor para gerar os aplicativos Android e iOS.
 
+O identificador nativo é `br.com.oxentecode.alumia`, preservando os aplicativos Android e iOS já registrados no projeto Firebase original.
+
 Os projetos nativos usam como ícone e tela de abertura a mesma personagem oficial disponível em `public/icons/alumia-icon-512.png`. O desenho não é recriado nem alterado: os arquivos específicos de Android e iOS são derivados dessa imagem por redimensionamento e enquadramento.
 
 ## Integrações incluídas

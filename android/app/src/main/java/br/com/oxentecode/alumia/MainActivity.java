@@ -1,4 +1,4 @@
-package com.oxentecode.alumia;
+package br.com.oxentecode.alumia;
 
 import com.getcapacitor.BridgeActivity;
 

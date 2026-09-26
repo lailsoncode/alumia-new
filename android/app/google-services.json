@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "696823006824",
+    "project_id": "alumia-app",
+    "storage_bucket": "alumia-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696823006824:android:969f89adc2d8615d699ddd",
+        "android_client_info": {
+          "package_name": "br.com.oxentecode.alumia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "696823006824-coceluct90mvd0e2lhluqi0rahsk7i9v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.oxentecode.alumia",
+            "certificate_hash": "2769ecd492ad136fe488ecc2c52e37569f792ad8"
+          }
+        },
+        {
+          "client_id": "696823006824-t85cmce51fhl0g64h7ivmu15m75v9871.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.oxentecode.alumia",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "696823006824-2cjdul32biddn912l0ei6fb4asngp9of.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZNvCdwUJFTe7fS6QX9qIF_Boq3csCA2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "696823006824-2cjdul32biddn912l0ei6fb4asngp9of.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "696823006824-8gghgf2oha4jc4farsnsepr2pq2v0hvj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.com.oxentecode.alumia"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
