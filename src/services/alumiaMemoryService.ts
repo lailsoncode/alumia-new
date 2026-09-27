@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabaseClient";
 
 export type AlumiaMemorySource = "user_confirmed" | "onboarding_confirmed" | "assistant_learned" | "module_observed";
-export interface AlumiaMemory { id: string; content: string; updated_at: string; source: AlumiaMemorySource }
+export type AlumiaMemoryModule = "tasks" | "student" | "hydration" | "mindfulness";
+export interface AlumiaMemory { id: string; content: string; updated_at: string; source: AlumiaMemorySource; source_module?: AlumiaMemoryModule | null }
 export interface AlumiaLearningPreference { enabled: boolean; decided: boolean; onboardingCompleted: boolean }
 
 async function userId() {
@@ -28,20 +29,13 @@ export async function getLearningPreference(): Promise<AlumiaLearningPreference>
 }
 
 export async function setMemoryEnabled(enabled: boolean) {
-  const now = new Date().toISOString();
-  const { error } = await supabase.from("alumia_ai_preferences").upsert({
-    user_id: await userId(),
-    memory_enabled: enabled,
-    memory_consent_version: 2,
-    memory_consent_at: enabled ? now : null,
-    memory_revoked_at: enabled ? null : now,
-    updated_at: now,
-  });
+  await userId();
+  const { error } = await supabase.rpc("set_alumia_learning_enabled", { p_enabled: enabled });
   if (error) throw error;
 }
 
 export async function getMemories(): Promise<AlumiaMemory[]> {
-  const { data, error } = await supabase.from("alumia_memories").select("id, content, updated_at, source")
+  const { data, error } = await supabase.from("alumia_memories").select("id, content, updated_at, source, source_module")
     .eq("user_id", await userId()).order("updated_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -51,11 +45,13 @@ export async function saveMemory(content: string, id?: string, source: AlumiaMem
   const value = content.trim();
   if (!value || value.length > 240) throw new Error("INVALID_MEMORY");
   const owner = await userId();
+  if (id) {
+    const { error } = await supabase.rpc("update_alumia_memory", { p_memory_id: id, p_content: value });
+    if (error) throw error;
+    return;
+  }
   const payload = { content: value, updated_at: new Date().toISOString(), source };
-  const query = id
-    ? supabase.from("alumia_memories").update(payload).eq("id", id).eq("user_id", owner)
-    : supabase.from("alumia_memories").upsert({ ...payload, user_id: owner }, { onConflict: "user_id,content" });
-  const { data, error } = await query.select("id").single();
+  const { data, error } = await supabase.from("alumia_memories").upsert({ ...payload, user_id: owner }, { onConflict: "user_id,content" }).select("id").single();
   if (error || !data) throw error ?? new Error("MEMORY_NOT_FOUND");
 }
 
@@ -79,11 +75,13 @@ export async function completeLearningOnboarding(memories: string[]) {
 }
 
 export async function forgetMemory(id: string) {
-  const { error } = await supabase.from("alumia_memories").delete().eq("id", id).eq("user_id", await userId());
+  await userId();
+  const { error } = await supabase.rpc("forget_alumia_memory", { p_memory_id: id });
   if (error) throw error;
 }
 
 export async function forgetAllMemories() {
-  const { error } = await supabase.from("alumia_memories").delete().eq("user_id", await userId());
+  await userId();
+  const { error } = await supabase.rpc("forget_all_alumia_memories");
   if (error) throw error;
 }

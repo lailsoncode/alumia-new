@@ -63,6 +63,13 @@ function MemoryManager() {
     URL.revokeObjectURL(url);
   }
 
+  function memoryOrigin(memory: AlumiaMemory) {
+    if (memory.source === "onboarding_confirmed") return "Perfil inicial";
+    if (memory.source === "assistant_learned") return "Aprendida na conversa";
+    if (memory.source === "module_observed") return ({ tasks: "Tarefas", student: "Estudante", hydration: "Hidratação", mindfulness: "Mindfulness" } as const)[memory.source_module as "tasks" | "student" | "hydration" | "mindfulness"] ?? "Atividade na Alumia";
+    return "Confirmada por você";
+  }
+
   return <div className="space-y-3">
     <div className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
       <div><p className="text-sm font-semibold">Permitir que a Alum.IA aprenda comigo</p><p className="mt-0.5 text-xs text-muted-foreground">Personalizar conversas usando preferências, objetivos e rotinas.</p></div>
@@ -73,6 +80,7 @@ function MemoryManager() {
     <details className="text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3 font-semibold text-primary">Saiba mais</summary>
       <div className="space-y-2 leading-relaxed">
         <p>Ao ativar, você autoriza a criação de um perfil pessoal para adaptar conversas e sugestões usando informações que fornecer e, gradualmente, atividades nos módulos da Alumia. Conversas completas não são transformadas em lembranças.</p>
+        <p>Nos módulos conectados, um padrão só vira lembrança depois de aparecer pelo menos três vezes. Tarefas fornece apenas faixa de horário; Estudante, duração planejada; Hidratação, tamanho de registro; Mindfulness, preferência por áudio ou texto. Títulos, descrições, valores, reflexões e check-ins não são copiados.</p>
         <p>As lembranças ficam na sua conta até você apagá-las. Desativar interrompe novos aprendizados e o uso do perfil, mas preserva a lista. Apagar remove as informações da memória ativa, sem desfazer processamentos anteriores.</p>
         <p>O processamento de respostas usa um provedor contratado de inteligência artificial. Dados sensíveis não fazem parte deste primeiro aprendizado; qualquer ampliação exigirá uma autorização própria e destacada.</p>
       </div>
@@ -88,7 +96,7 @@ function MemoryManager() {
       <ul className="divide-y divide-border">
         {memories.map((memory) => <li key={memory.id} className="py-3">
           <p className="break-words text-sm">{memory.content}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{memory.source === "onboarding_confirmed" ? "Perfil inicial" : memory.source === "assistant_learned" ? "Aprendida na conversa" : memory.source === "module_observed" ? "Atividade na Alumia" : "Confirmada por você"} · {new Date(memory.updated_at).toLocaleDateString("pt-BR")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{memoryOrigin(memory)} · {new Date(memory.updated_at).toLocaleDateString("pt-BR")}</p>
           <div className="mt-1 flex flex-wrap justify-end gap-1">
             {forgetting === memory.id ? <><span className="self-center text-xs">Esquecer esta lembrança?</span><Button type="button" size="sm" variant="ghost" disabled={busy} onClick={() => setForgetting(undefined)}>Cancelar</Button><Button type="button" size="sm" variant="destructive" disabled={busy} onClick={() => void run(async () => { await forgetMemory(memory.id); setMemories((rows) => rows.filter((row) => row.id !== memory.id)); setForgetting(undefined); if (editing === memory.id) { setEditing(undefined); setDraft(""); } })}>Confirmar exclusão</Button></> : <>
               <Button type="button" size="sm" variant="ghost" disabled={!enabled || busy} onClick={() => { setEditing(memory.id); setDraft(memory.content); }}>Corrigir</Button>

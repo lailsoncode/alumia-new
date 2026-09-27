@@ -2,7 +2,7 @@
 
 **ID:** `B2C-AI`
 
-**Versão:** `0.7.0`
+**Versão:** `0.8.0`
 
 **Estado:** `implementing`
 
@@ -90,7 +90,7 @@ Ficam fora deste incremento:
 - `B2C-AI-015`: ativar o provedor generativo somente quando `VITE_ENABLE_ALUMIA_AI_GENERATIVE=true` e `VITE_ALUMIA_AI_URL` estiver definido.
 - `B2C-AI-016`: autenticar o endpoint generativo com o access token da sessão Supabase e nunca expor credenciais Google no cliente.
 - `B2C-AI-017`: excluir respostas editoriais contendo dados de módulos do histórico enviado ao modelo.
-- `B2C-AI-018`: permitir ao modelo somente a função `propose_create_task`, que retorna dados tipados e não possui capacidade de executar a escrita.
+- `B2C-AI-018`: permitir ao modelo somente `propose_create_task` e `remember_user_fact`; ambas retornam dados tipados. A tarefa exige confirmação e a lembrança só é gravada pelo servidor com autorização de aprendizado ativa e evidência literal na mensagem atual.
 - `B2C-AI-019`: associar cada proposta a um identificador único e usar esse identificador em uma RPC idempotente para impedir tarefas duplicadas em confirmações repetidas.
 - `B2C-AI-020`: enviar ao modelo a data local e o fuso horário da pessoa para interpretar expressões relativas sem depender do relógio do servidor.
 
@@ -155,7 +155,7 @@ O orquestrador generativo usa uma allowlist com uma única função de proposta.
 - o Gemini usa ADC da conta `alumia-ai-runtime`, sem chave JSON;
 - a chave pública do Supabase é lida do Secret Manager e a conta não recebe `service_role`;
 - mensagens e respostas não são persistidas nem escritas em logs;
-- o modelo não recebe resultados de módulos e pode apenas devolver uma proposta tipada de criação de tarefa; essa função não executa operações;
+- o modelo não recebe resultados brutos de módulos e pode apenas devolver uma proposta tipada de tarefa ou um fato não sensível com evidência literal; as escritas continuam restritas e validadas pelo servidor;
 - a ativação depende de flag separada e continua desligada por padrão.
 
 ### Condições antes da liberação pública da IA generativa
@@ -242,7 +242,19 @@ Referências operacionais verificadas: [CVV — Ligue 188](https://cvv.org.br/li
 - Com a autorização ativa, hobbies, preferências e objetivos não sensíveis explicitamente declarados podem ser aprendidos automaticamente durante a conversa. O servidor exige uma citação literal da mensagem atual, grava com o JWT da pessoa e informa discretamente o aprendizado na resposta.
 - Ajustes apresenta um único controle de aprendizado global. Desativar interrompe uso e novas gravações; apagar todas as lembranças exige confirmação separada.
 - A interface permite visualizar origem e atualização, corrigir, excluir individualmente, exportar em JSON e excluir todas as lembranças.
-- Dados sensíveis, check-ins emocionais e inferências clínicas permanecem fora deste incremento. A integração automática com eventos dos módulos será feita em incrementos posteriores sobre esta autorização e exigirá nova versão se a finalidade ou as categorias informadas mudarem.
+- Dados sensíveis, check-ins emocionais e inferências clínicas permanecem fora deste incremento. O incremento 0.8 conecta somente sinais determinísticos e minimizados; qualquer ampliação de finalidade ou categoria exige nova versão de autorização.
+
+### Aprendizado entre módulos — incremento 0.8
+
+- Tarefas, Estudante, Hidratação e Mindfulness produzem somente padrões determinísticos após pelo menos três observações. Nenhum modelo recebe o conteúdo bruto para descobrir esses padrões.
+- Tarefas considera apenas a faixa de horário mais recorrente; títulos e descrições nunca entram na memória.
+- Estudante considera somente a duração média planejada, arredondada em blocos de cinco minutos; matérias, títulos, resultados e observações não são copiados.
+- Hidratação considera somente o tamanho de porção usado repetidamente; totais diários, frequência, metas e qualquer interpretação de saúde ficam fora.
+- Mindfulness considera somente preferência repetida por áudio ou texto; prática escolhida, categoria, reflexão e estado emocional ficam fora.
+- Financeiro, check-ins e dados emocionais não produzem lembranças. O Financeiro ainda não possui persistência real e ambas as categorias exigem avaliação específica antes de qualquer integração.
+- Cada lembrança observada possui chave estável e módulo de origem. Mudanças atualizam a mesma lembrança e a ausência do padrão remove o item.
+- Ativar o aprendizado sincroniza padrões anteriores elegíveis. Desativar interrompe o uso e novas atualizações, preservando dados até uma exclusão explícita.
+- Esquecer um padrão cria uma supressão pessoal para impedir que ele seja reaprendido. Corrigir uma lembrança observada também suprime o padrão automático e transforma a correção em informação confirmada pela pessoa.
 
 Evidência prevista nesta entrega:
 

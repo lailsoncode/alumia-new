@@ -14,7 +14,7 @@ it("permite revogar em Ajustes", async () => {
   vi.mocked(getAlumiaContextPreference).mockResolvedValue(true);
   render(<AlumiaContextPreference settings />);
   const toggle = await screen.findByRole("switch");
-  expect(toggle).toHaveAttribute("aria-checked", "true");
+  await waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "true"));
   fireEvent.click(toggle);
   await waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "false"));
   expect(setAlumiaContextPreference).toHaveBeenCalledWith(false);

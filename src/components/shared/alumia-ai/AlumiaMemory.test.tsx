@@ -38,3 +38,10 @@ it("apaga todas as lembranças somente após confirmação", async () => {
   await waitFor(() => expect(forgetAllMemories).toHaveBeenCalledOnce());
   expect(screen.queryByText("Aprende inglês")).not.toBeInTheDocument();
 });
+it("mostra o módulo de origem de um aprendizado observado", async () => {
+  vi.mocked(getMemories).mockResolvedValue([{ id: "2", content: "Costuma estudar por 25 minutos.", updated_at: "2026-09-27", source: "module_observed", source_module: "student" }]);
+  render(<AlumiaMemory settings />);
+  fireEvent.click(screen.getByRole("button", { name: /Aprendizado da Alum\.IA/ }));
+  await screen.findByText("Costuma estudar por 25 minutos.");
+  expect(screen.getByText(/Estudante ·/)).toBeInTheDocument();
+});
