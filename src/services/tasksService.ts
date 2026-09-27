@@ -82,23 +82,29 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
     }
   }
 
-  const { data, error } = await supabase
-    .from("tasks")
-    .insert([
-      {
-        user_id: user.id,
-        title: taskData.title,
-        description: taskData.description || null,
-        date: scheduledDate || null,
-        time: taskData.time || null,
-        priority: taskData.priority || null,
-        reminder: taskData.reminder || null,
-        module_key: taskData.moduleKey ?? "tasks",
-        done: false,
-      },
-    ])
-    .select()
-    .single();
+  const taskPayload = {
+    user_id: user.id,
+    title: taskData.title,
+    description: taskData.description || null,
+    date: scheduledDate || null,
+    time: taskData.time || null,
+    priority: taskData.priority || null,
+    reminder: taskData.reminder || null,
+    module_key: taskData.moduleKey ?? "tasks",
+    done: false,
+  };
+
+  const { data, error } = taskData.idempotencyKey
+    ? await supabase.rpc("create_alumia_task_once", {
+        p_action_id: taskData.idempotencyKey,
+        p_title: taskPayload.title,
+        p_description: taskPayload.description,
+        p_date: taskPayload.date,
+        p_time: taskPayload.time,
+        p_priority: taskPayload.priority,
+        p_reminder: taskPayload.reminder,
+      })
+    : await supabase.from("tasks").insert([taskPayload]).select().single();
 
   if (error) throw error;
   if (taskData.recurrence) {

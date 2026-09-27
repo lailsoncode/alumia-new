@@ -14,17 +14,34 @@ interface AddTaskSheetProps {
   onSave?: (data: AddTaskData) => void | Promise<void>;
   initialTitle?: string;
   initialDescription?: string;
+  initialDate?: string;
+  initialTime?: string;
+  initialPriority?: TaskPriority;
+  initialReminder?: TaskReminder;
+  submitLabel?: string;
   moduleKey?: AddTaskData["moduleKey"];
 }
 
-export function AddTaskSheet({ open, onClose, onSave, initialTitle = "", initialDescription = "", moduleKey }: AddTaskSheetProps) {
+export function AddTaskSheet({
+  open,
+  onClose,
+  onSave,
+  initialTitle = "",
+  initialDescription = "",
+  initialDate,
+  initialTime,
+  initialPriority = null,
+  initialReminder = null,
+  submitLabel = "Salvar tarefa",
+  moduleKey,
+}: AddTaskSheetProps) {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [active, setActive] = useState<"prioridade" | "lembrete" | null>(null);
-  const [priority, setPriority] = useState<TaskPriority>(null);
-  const [reminder, setReminder] = useState<TaskReminder>(null);
-  const [date, setDate] = useState<Date | null>(null);
-  const [time, setTime] = useState<string | null>(null);
+  const [priority, setPriority] = useState<TaskPriority>(initialPriority);
+  const [reminder, setReminder] = useState<TaskReminder>(initialReminder);
+  const [date, setDate] = useState<Date | null>(() => initialDate ? new Date(`${initialDate}T12:00:00`) : null);
+  const [time, setTime] = useState<string | null>(initialTime ?? null);
   const [recurrence, setRecurrence] = useState<TaskRecurrenceDraft | null>(null);
   const [dateOpen, setDateOpen] = useState(false);
   const [openReminderAfterDate, setOpenReminderAfterDate] = useState(false);
@@ -102,7 +119,7 @@ export function AddTaskSheet({ open, onClose, onSave, initialTitle = "", initial
 
         <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-2">
           <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>Cancelar</Button>
-          <Button type="button" onClick={save} disabled={!title.trim() || saving}>{saving ? "Salvando…" : "Salvar tarefa"}<AlumiaIcon icon={ArrowRight01Icon} size="xs" /></Button>
+          <Button type="button" onClick={save} disabled={!title.trim() || saving}>{saving ? "Salvando…" : submitLabel}<AlumiaIcon icon={ArrowRight01Icon} size="xs" /></Button>
         </div>
       </section>
       <DatePickerSheet

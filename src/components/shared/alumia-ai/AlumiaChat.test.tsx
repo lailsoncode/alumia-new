@@ -36,7 +36,13 @@ describe("Alum.IA chat", () => {
       text: "Posso criar esta tarefa para você.",
       tone: "default",
       source: "editorial",
-      proposedAction: { id: "action-1", type: "create_task", title: "comprar pão" },
+      proposedAction: {
+        id: "action-1",
+        type: "create_task",
+        title: "comprar pão",
+        priority: null,
+        reminder: null,
+      },
     });
     mockedConfirm.mockResolvedValue({ id: "task-1", title: "comprar pão" });
     render(<AlumiaChat />);
@@ -48,8 +54,41 @@ describe("Alum.IA chat", () => {
     expect(mockedConfirm).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Criar tarefa" }));
-    await waitFor(() => expect(mockedConfirm).toHaveBeenCalledWith({ id: "action-1", type: "create_task", title: "comprar pão" }));
+    await waitFor(() => expect(mockedConfirm).toHaveBeenCalledWith({
+      id: "action-1",
+      type: "create_task",
+      title: "comprar pão",
+      priority: null,
+      reminder: null,
+    }));
     expect(await screen.findByText("Tarefa criada")).toBeInTheDocument();
+  });
+
+  it("permite revisar uma proposta generativa antes da confirmação", async () => {
+    mockedRespond.mockResolvedValue({
+      text: "Preparei uma tarefa para você revisar.",
+      tone: "default",
+      source: "generative",
+      proposedAction: {
+        id: "action-2",
+        type: "create_task",
+        title: "Pagar a conta",
+        date: "2026-09-28",
+        time: "14:30",
+        priority: "alta",
+        reminder: null,
+      },
+    });
+    mockedConfirm.mockResolvedValue({ id: "task-2", title: "Pagar a conta" });
+    render(<AlumiaChat />);
+
+    fireEvent.change(screen.getByLabelText("Mensagem para a Alum.IA"), { target: { value: "Tenho que pagar a conta amanhã" } });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar mensagem" }));
+
+    expect(await screen.findByText("28/09/2026")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Revisar detalhes" }));
+    expect(screen.getByDisplayValue("Pagar a conta")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Confirmar e criar/i })).toBeInTheDocument();
   });
 
   it("limpa a conversa local e restaura a apresentação inicial", async () => {

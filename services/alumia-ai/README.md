@@ -17,11 +17,17 @@ Payload inicial:
   "history": [
     { "role": "user", "text": "Hoje está corrido" },
     { "role": "assistant", "text": "Podemos escolher uma coisa pequena." }
-  ]
+  ],
+  "context": {
+    "localDate": "2026-09-27",
+    "timeZone": "America/Recife"
+  }
 }
 ```
 
-O histórico é opcional, limitado e usado somente durante a requisição. Não é salvo pelo serviço.
+O histórico é opcional, limitado e usado somente durante a requisição. O contexto de data local e fuso horário é obrigatório para interpretar expressões como “amanhã”. Nada é salvo pelo serviço.
+
+O Gemini pode responder com texto ou chamar somente `propose_create_task`. Essa função gera uma proposta validada de título, descrição, data, horário, prioridade e lembrete; ela não escreve no banco. A confirmação e a criação idempotente acontecem no aplicativo, usando a sessão da pessoa e a RPC protegida pelo RLS.
 
 ## Cloud Run
 
@@ -37,7 +43,7 @@ Configuração implantada em 27 de setembro de 2026:
 - acesso HTTP público, mas toda chamada de chat exige JWT Supabase válido;
 - mínimo de instâncias zero, timeout de 60 segundos e limite inicial de três instâncias;
 - limite defensivo inicial de 12 gerações por minuto por usuário e por instância;
-- revisão atual `alumia-ai-00002-6pn`, servindo 100% do tráfego;
+- revisão atual `alumia-ai-00003-cs9`, servindo 100% do tráfego;
 - URL estável `https://alumia-ai-696823006824.southamerica-east1.run.app`.
 
 O frontend possui integração autenticada, mas ela permanece desligada por padrão por `VITE_ENABLE_ALUMIA_AI_GENERATIVE=false`. A ativação pública depende dos gates restantes do [ADR-011](../../docs/sdd/adrs/011-alumia-ai-hybrid-cloud.md).

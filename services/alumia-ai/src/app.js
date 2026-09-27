@@ -25,7 +25,12 @@ function parseChatBody(body) {
     history.push({ role: item.role, text });
   }
 
-  return { message, history };
+  const localDate = body.context?.localDate;
+  const timeZone = body.context?.timeZone;
+  if (typeof localDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(localDate)) return null;
+  if (typeof timeZone !== "string" || !/^[A-Za-z0-9_+\-/]{1,64}$/.test(timeZone)) return null;
+
+  return { message, history, context: { localDate, timeZone } };
 }
 
 export function createApp({ authorize, generate, allowedOrigins = new Set(), checkRateLimit = () => ({ allowed: true }) }) {
@@ -87,8 +92,18 @@ export function createApp({ authorize, generate, allowedOrigins = new Set(), che
         return;
       }
 
-      const message = await generate(input);
-      response.json({ mode: "generative", message, requestId });
+      const result = await generate(input);
+      if (result.kind === "proposal" && result.proposal?.type === "create_task") {
+        response.json({
+          mode: "proposal",
+          message: "Preparei uma tarefa para você revisar. Ela só será criada depois da sua confirmação.",
+          proposal: { id: crypto.randomUUID(), ...result.proposal },
+          requestId,
+        });
+        return;
+      }
+      if (result.kind !== "message" || !result.text) throw new Error("MODEL_INVALID_RESULT");
+      response.json({ mode: "generative", message: result.text, requestId });
     } catch (error) {
       const status = error?.status === 429 ? 429 : 503;
       response.status(status).json({ error: status === 429 ? "RATE_LIMITED" : "ASSISTANT_UNAVAILABLE", requestId });

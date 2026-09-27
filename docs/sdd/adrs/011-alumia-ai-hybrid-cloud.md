@@ -20,7 +20,7 @@ Adotar uma arquitetura híbrida:
 - o aplicativo envia o JWT Supabase; o serviço revalida a sessão com o Supabase Auth antes de processar a mensagem;
 - o serviço nunca recebe `service_role` e não possui permissão implícita para ignorar RLS;
 - o runtime usa uma service account dedicada e Application Default Credentials, sem chave JSON;
-- a primeira API generativa não executa ferramentas e não recebe conteúdo dos módulos;
+- a API generativa não recebe conteúdo dos módulos nem executa ferramentas; o Gemini pode somente produzir uma proposta tipada pela função `propose_create_task`;
 - ferramentas futuras serão server-side, tipadas, limitadas por allowlist e separadas entre leitura e proposta de escrita;
 - toda escrita continuará dependendo de confirmação explícita da pessoa e de uma operação idempotente no domínio;
 - texto de conversa não será enviado para Cloud Logging, analytics ou tracing;
@@ -36,13 +36,10 @@ Aplicação autenticada
       → valida origem e formato
       → revalida JWT em Supabase Auth
       → aplica limite e barreira de crise
-      → Gemini via ADC
-      → resposta textual sem persistência
-
-Futuro:
       → proposta tipada de ferramenta
       → confirmação na interface
       → RPC/serviço de domínio com JWT do usuário e RLS
+      → resposta textual ou proposta sem persistência
 ```
 
 ## Configuração aprovada
@@ -77,7 +74,7 @@ O ID do modelo é configurável por ambiente para permitir troca controlada por 
 - o serviço Cloud Run precisa de CORS, quotas e proteção contra abuso;
 - `global` melhora disponibilidade do modelo, mas a política de processamento precisa ser refletida no consentimento;
 - a service account e seus papéis precisam de revisão periódica;
-- tool calling só poderá entrar depois de idempotência, auditoria e testes contra prompt injection.
+- a ampliação do tool calling para leituras ou novas ações só poderá entrar depois de auditoria e testes contra prompt injection.
 
 ## Alternativas rejeitadas
 
@@ -111,4 +108,7 @@ Rejeitada porque duplica o domínio já reconstruído no Supabase e aumenta o ri
 - chamada sintética direta ao `gemini-3.5-flash` concluída sem dados de usuário;
 - custo inicial limitado por escala zero e máximo de três instâncias;
 - integração do frontend implementada sob flag separada, desativada por padrão;
+- proposta estruturada de criação de tarefa implantada na revisão `alumia-ai-00003-cs9`; o modelo apenas propõe e a interface exige confirmação;
+- RPC `create_alumia_task_once` aplicada no Supabase com identificador único por usuário para garantir idempotência;
+- validação unitária da allowlist, dos argumentos da proposta e do fluxo de confirmação concluída;
 - gates de consentimento, avaliação, auditoria de logs e smoke autenticado ainda bloqueiam a liberação pública.

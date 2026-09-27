@@ -67,13 +67,23 @@ describe("Alum.IA editorial provider", () => {
   it("cria somente a ação explicitamente confirmada", async () => {
     mockedCreateTask.mockResolvedValue({ id: "task-1", title: "comprar pão" });
 
-    await confirmAlumiaAction({ id: "action-1", type: "create_task", title: "comprar pão" });
-
-    expect(mockedCreateTask).toHaveBeenCalledWith({
+    await confirmAlumiaAction({
+      id: "action-1",
+      type: "create_task",
       title: "comprar pão",
       priority: null,
       reminder: null,
+    });
+
+    expect(mockedCreateTask).toHaveBeenCalledWith({
+      title: "comprar pão",
+      description: undefined,
+      date: undefined,
+      time: undefined,
+      priority: null,
+      reminder: null,
       moduleKey: "alumia_ai",
+      idempotencyKey: "action-1",
     });
   });
 
@@ -118,5 +128,40 @@ describe("Alum.IA editorial provider", () => {
       { role: "user", text: "Estou cansado" },
       { role: "assistant", text: "Vamos com calma" },
     ]);
+    expect(JSON.parse(String(request.body)).context).toEqual(expect.objectContaining({
+      localDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      timeZone: expect.any(String),
+    }));
+  });
+
+  it("transforma uma proposta remota em ação confirmável sem gravar", async () => {
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
+    vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
+    mockedGetSession.mockResolvedValue({
+      data: { session: { access_token: "jwt-valid" } },
+      error: null,
+    } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      mode: "proposal",
+      message: "Preparei uma tarefa para você revisar.",
+      proposal: {
+        id: "20a0db9d-f122-4c3d-b93d-e983c830c205",
+        type: "create_task",
+        title: "Pagar a conta",
+        date: "2026-09-28",
+        priority: "alta",
+        reminder: null,
+      },
+    }), { status: 200 })));
+
+    const result = await respondToAlumia("Preciso pagar a conta amanhã e é importante");
+
+    expect(result.source).toBe("generative");
+    expect(result.proposedAction).toMatchObject({
+      title: "Pagar a conta",
+      date: "2026-09-28",
+      priority: "alta",
+    });
+    expect(mockedCreateTask).not.toHaveBeenCalled();
   });
 });

@@ -2,6 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createApp } from "../src/app.js";
 
+function chatBody(message, history = []) {
+  return JSON.stringify({
+    message,
+    history,
+    context: { localDate: "2026-09-27", timeZone: "America/Recife" },
+  });
+}
+
 async function withServer(options, run) {
   const server = createApp(options).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
@@ -43,7 +51,7 @@ test("interrompe geração diante de possível crise", async () => {
     const response = await fetch(`${baseUrl}/v1/chat`, {
       method: "POST",
       headers: { "authorization": "Bearer valid", "content-type": "application/json" },
-      body: JSON.stringify({ message: "Eu quero morrer" }),
+      body: chatBody("Eu quero morrer"),
     });
     const body = await response.json();
     assert.equal(response.status, 200);
@@ -56,7 +64,7 @@ test("interrompe geração diante de possível crise", async () => {
 test("gera resposta somente após validar origem, sessão e payload", async () => {
   await withServer({
     authorize: async (token) => token === "valid" ? { id: "user-1" } : null,
-    generate: async ({ message }) => `Resposta para: ${message}`,
+    generate: async ({ message }) => ({ kind: "message", text: `Resposta para: ${message}` }),
     allowedOrigins: new Set(["http://localhost:8080"]),
   }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/v1/chat`, {
@@ -66,7 +74,7 @@ test("gera resposta somente após validar origem, sessão e payload", async () =
         "content-type": "application/json",
         "origin": "http://localhost:8080",
       },
-      body: JSON.stringify({ message: "Um próximo passo" }),
+      body: chatBody("Um próximo passo"),
     });
     assert.equal(response.status, 200);
     assert.deepEqual((await response.json()).mode, "generative");
@@ -106,7 +114,7 @@ test("limita a geração por usuário sem bloquear a resposta de segurança", as
     const limited = await fetch(`${baseUrl}/v1/chat`, {
       method: "POST",
       headers: { "authorization": "Bearer valid", "content-type": "application/json" },
-      body: JSON.stringify({ message: "Quero conversar" }),
+      body: chatBody("Quero conversar"),
     });
     assert.equal(limited.status, 429);
     assert.equal(limited.headers.get("retry-after"), "30");
@@ -115,9 +123,53 @@ test("limita a geração por usuário sem bloquear a resposta de segurança", as
     const safety = await fetch(`${baseUrl}/v1/chat`, {
       method: "POST",
       headers: { "authorization": "Bearer valid", "content-type": "application/json" },
-      body: JSON.stringify({ message: "Eu quero morrer" }),
+      body: chatBody("Eu quero morrer"),
     });
     assert.equal(safety.status, 200);
     assert.equal((await safety.json()).mode, "safety");
+  });
+});
+
+test("devolve uma proposta com identificador sem executar a tarefa", async () => {
+  await withServer({
+    authorize: async () => ({ id: "user-1" }),
+    generate: async () => ({
+      kind: "proposal",
+      proposal: {
+        type: "create_task",
+        title: "Pagar a conta",
+        date: "2026-09-28",
+        priority: null,
+        reminder: null,
+      },
+    }),
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/chat`, {
+      method: "POST",
+      headers: { "authorization": "Bearer valid", "content-type": "application/json" },
+      body: chatBody("Preciso pagar a conta amanhã"),
+    });
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.mode, "proposal");
+    assert.equal(body.proposal.type, "create_task");
+    assert.equal(body.proposal.title, "Pagar a conta");
+    assert.match(body.proposal.id, /^[0-9a-f-]{36}$/);
+  });
+});
+
+test("recusa contexto temporal ausente ou inválido", async () => {
+  await withServer({
+    authorize: async () => ({ id: "user-1" }),
+    generate: async () => ({ kind: "message", text: "resposta" }),
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/chat`, {
+      method: "POST",
+      headers: { "authorization": "Bearer valid", "content-type": "application/json" },
+      body: JSON.stringify({ message: "Olá" }),
+    });
+    assert.equal(response.status, 400);
   });
 });

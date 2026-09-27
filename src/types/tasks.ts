@@ -54,6 +54,7 @@ export interface Task {
   last_postponed_from?: string | null;
   postponed_at?: string | null;
   recurrence?: TaskRecurrence | null;
+  alumia_action_id?: string | null;
 }
 
 /**
@@ -68,4 +69,5 @@ export interface AddTaskData {
   time?: string;
   moduleKey?: ModuleKey;
   recurrence?: TaskRecurrenceInput;
+  idempotencyKey?: string;
 }

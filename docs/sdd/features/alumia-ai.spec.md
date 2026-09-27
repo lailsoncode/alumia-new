@@ -2,7 +2,7 @@
 
 **ID:** `B2C-AI`
 
-**Versão:** `0.2.0`
+**Versão:** `0.3.0`
 
 **Estado:** `implementing`
 
@@ -33,8 +33,10 @@ Incluído:
 - respostas editoriais determinísticas para os primeiros fluxos;
 - resumo de tarefas privadas da própria pessoa;
 - sugestão de prática publicada de Mindfulness;
-- proposta de criação de tarefa sem data;
+- proposta estruturada de criação de tarefa, com extração apenas dos detalhes explicitamente informados;
 - confirmação explícita antes de criar a tarefa;
+- revisão dos detalhes da proposta no formulário de Tarefas antes da confirmação;
+- criação idempotente por RPC, protegida pela sessão e pelas políticas RLS;
 - interrupção do fluxo de ferramentas quando houver linguagem de possível crise;
 - opção de limpar a conversa;
 - liberação por flag, ativa por padrão somente em desenvolvimento.
@@ -50,7 +52,7 @@ Ficam fora deste incremento:
 - áudio ou voz;
 - leitura de check-ins emocionais, hidratação, estudante ou finanças;
 - envio de conteúdo de Tarefas ou Mindfulness ao modelo;
-- tool calling ou execução de módulos pelo modelo;
+- leitura de módulos ou execução direta de ferramentas pelo modelo;
 - ações destrutivas, conclusão, exclusão ou reagendamento automático;
 - acesso a dados B2B, ocupacionais ou administrativos;
 - recomendações clínicas, financeiras ou jurídicas;
@@ -64,7 +66,7 @@ Ficam fora deste incremento:
 - `B2C-AI-004`: responder a pedidos de organização mostrando no máximo três tarefas pendentes e sem enviar títulos para analytics ou logs.
 - `B2C-AI-005`: sugerir somente práticas publicadas do catálogo editorial de Mindfulness.
 - `B2C-AI-006`: representar qualquer escrita como proposta estruturada e exigir confirmação explícita imediatamente antes da execução.
-- `B2C-AI-007`: criar tarefa confirmada com `module_key = alumia_ai`, sem inferir data, horário, prioridade ou lembrete que a pessoa não informou por meio de controles próprios.
+- `B2C-AI-007`: criar tarefa confirmada com `module_key = alumia_ai`, sem inventar data, horário, prioridade ou lembrete que a pessoa não informou na conversa ou na revisão da proposta.
 - `B2C-AI-008`: desabilitar confirmações repetidas enquanto a ação estiver em andamento e apresentar resultado ou falha recuperável.
 - `B2C-AI-009`: ao identificar linguagem de possível crise, não consultar módulos nem propor ações; oferecer orientação humana e contatos de ajuda sem afirmar diagnóstico.
 - `B2C-AI-010`: nunca consultar ou expor dados B2B, respostas ocupacionais, organizações, relatórios ou metadados corporativos na conversa pessoal.
@@ -75,6 +77,9 @@ Ficam fora deste incremento:
 - `B2C-AI-015`: ativar o provedor generativo somente quando `VITE_ENABLE_ALUMIA_AI_GENERATIVE=true` e `VITE_ALUMIA_AI_URL` estiver definido.
 - `B2C-AI-016`: autenticar o endpoint generativo com o access token da sessão Supabase e nunca expor credenciais Google no cliente.
 - `B2C-AI-017`: excluir respostas editoriais contendo dados de módulos do histórico enviado ao modelo.
+- `B2C-AI-018`: permitir ao modelo somente a função `propose_create_task`, que retorna dados tipados e não possui capacidade de executar a escrita.
+- `B2C-AI-019`: associar cada proposta a um identificador único e usar esse identificador em uma RPC idempotente para impedir tarefas duplicadas em confirmações repetidas.
+- `B2C-AI-020`: enviar ao modelo a data local e o fuso horário da pessoa para interpretar expressões relativas sem depender do relógio do servidor.
 
 ## 5. Estados e transições
 
@@ -82,7 +87,8 @@ Ficam fora deste incremento:
 entrada → conversa local → resposta editorial
                       ↘ pergunta aberta → JWT revalidado → Gemini → resposta generativa
                       ↘ consulta privada → resposta
-                      ↘ proposta de ação → confirmar → executando → concluída | falhou
+                      ↘ proposta de ação → revisar detalhes → confirmar → RPC idempotente → concluída | falhou
+                                          ↘ criar diretamente → RPC idempotente → concluída | falhou
                                           ↘ agora não
                       ↘ possível crise → orientação humana, sem ferramenta
 
@@ -100,6 +106,11 @@ type AlumiaProposedAction = {
   id: string;
   type: "create_task";
   title: string;
+  description?: string | null;
+  date?: string | null;
+  time?: string | null;
+  priority?: "baixa" | "media" | "alta" | null;
+  reminder?: string | null;
 };
 
 type AlumiaAssistantResult = {
@@ -111,7 +122,7 @@ type AlumiaAssistantResult = {
 };
 ```
 
-O contrato futuro com o orquestrador generativo deve usar ações tipadas e allowlist. Texto produzido pelo modelo nunca é executado como comando, SQL ou chamada arbitrária.
+O orquestrador generativo usa uma allowlist com uma única função de proposta. A chamada de função é tratada como dado não confiável, validada no servidor e novamente no cliente. Texto produzido pelo modelo nunca é executado como comando, SQL ou chamada arbitrária. A escrita é feita pelo serviço de Tarefas somente depois da confirmação.
 
 ## 7. Segurança, privacidade e retenção
 
@@ -120,7 +131,7 @@ O contrato futuro com o orquestrador generativo deve usar ações tipadas e allo
 - nenhuma mensagem é persistida;
 - nenhuma mensagem deixa o cliente para um provedor de IA;
 - consultas usam a sessão Supabase existente e as políticas RLS;
-- criação de tarefa reutiliza o serviço protegido do módulo Tarefas;
+- criação de tarefa reutiliza o serviço protegido do módulo Tarefas e a RPC idempotente `create_alumia_task_once`;
 - não existe segredo de modelo no bundle;
 - a interface informa essas limitações diretamente.
 
@@ -131,7 +142,7 @@ O contrato futuro com o orquestrador generativo deve usar ações tipadas e allo
 - o Gemini usa ADC da conta `alumia-ai-runtime`, sem chave JSON;
 - a chave pública do Supabase é lida do Secret Manager e a conta não recebe `service_role`;
 - mensagens e respostas não são persistidas nem escritas em logs;
-- o modelo não recebe resultados de módulos e não possui ferramentas nesta fase;
+- o modelo não recebe resultados de módulos e pode apenas devolver uma proposta tipada de criação de tarefa; essa função não executa operações;
 - a ativação depende de flag separada e continua desligada por padrão.
 
 ### Condições antes da liberação pública da IA generativa
@@ -157,8 +168,9 @@ Aplicação Alumia
     → provedor editorial determinístico
     → orquestrador server-side no Google Cloud (prévia generativa sob flag)
        → Gemini/Vertex AI
-       → ferramentas Alumia com allowlist
-          → Supabase/Postgres + RLS/RPC
+       → proposta tipada em allowlist, sem execução no servidor de IA
+          → confirmação no aplicativo
+             → Supabase/Postgres + RLS/RPC idempotente
 ```
 
 O Supabase permanece como fonte de verdade para identidade, dados e autorização. O serviço no Google Cloud, quando aprovado, recebe um token do usuário, valida identidade e escopo e executa apenas ferramentas server-side explícitas. Uma resposta do modelo não amplia permissões.
@@ -192,6 +204,10 @@ Referências operacionais verificadas: [CVV — Ligue 188](https://cvv.org.br/li
 - `B2C-AI-AC-13`: sem a flag generativa, nenhuma mensagem é enviada ao Cloud Run ou ao Gemini.
 - `B2C-AI-AC-14`: com a flag generativa, uma sessão ausente ou inválida é recusada e nenhuma resposta de módulo entra no histórico remoto.
 - `B2C-AI-AC-15`: a interface identifica visualmente respostas produzidas com IA e mantém ações de escrita no fluxo editorial confirmável.
+- `B2C-AI-AC-16`: “preciso pagar a conta amanhã às 14:30, é importante” produz uma proposta com data local, horário e prioridade alta, sem criar a tarefa.
+- `B2C-AI-AC-17`: “Revisar detalhes” abre o formulário preenchido e permite corrigir os campos antes da escrita.
+- `B2C-AI-AC-18`: duas confirmações com o mesmo identificador de proposta retornam a mesma tarefa, sem duplicar o registro.
+- `B2C-AI-AC-19`: argumentos desconhecidos, datas ou horários inválidos e funções fora da allowlist são recusados como proposta.
 
 ## 11. Evidência e pendências
 
@@ -201,8 +217,9 @@ Evidência prevista nesta entrega:
 - serviço substituível em `src/services/alumiaAIService.ts`;
 - rota `/alumia` e interface em `src/components/shared/alumia-ai`;
 - integração controlada com Tarefas e Mindfulness;
+- proposta estruturada do Gemini, revisão no formulário e confirmação idempotente por RPC;
 - flags documentadas em `.env.example`;
 - serviço `services/alumia-ai` implantado no Cloud Run com identidade dedicada e Secret Manager;
 - teste sintético do modelo, health check e recusa de requisição sem JWT.
 
-Permanecem pendentes para liberação pública: revisão profissional do texto de crise, teste autenticado ponta a ponta com usuário sintético, teste negativo de RLS com dois usuários, idempotência server-side das ações, auditoria manual de acessibilidade, telemetria técnica aprovada, consentimento e política de processamento.
+Permanecem pendentes para liberação pública: revisão profissional do texto de crise, teste autenticado ponta a ponta com usuário sintético, teste negativo de RLS com dois usuários, auditoria manual de acessibilidade, telemetria técnica aprovada, consentimento e política de processamento.

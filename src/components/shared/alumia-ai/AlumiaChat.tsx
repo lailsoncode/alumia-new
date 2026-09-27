@@ -13,9 +13,10 @@ import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
+import { AddTaskSheet } from "@/components/shared/tasks/AddTaskSheet";
 import { cn } from "@/lib/utils";
 import { confirmAlumiaAction, isAlumiaGenerativeEnabled, respondToAlumia } from "@/services/alumiaAIService";
-import type { AlumiaConversationMessage } from "@/types";
+import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
 
 type ActionState = "pending" | "saving" | "done" | "cancelled" | "error";
 
@@ -46,6 +47,7 @@ export function AlumiaChat() {
   const [actionStates, setActionStates] = useState<Record<string, ActionState>>({});
   const [input, setInput] = useState("");
   const [responding, setResponding] = useState(false);
+  const [editingAction, setEditingAction] = useState<AlumiaProposedAction | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -104,9 +106,8 @@ export function AlumiaChat() {
     }
   }
 
-  async function confirmAction(message: AlumiaConversationMessage) {
-    const action = message.proposedAction;
-    if (!action || actionStates[action.id] === "saving" || actionStates[action.id] === "done") return;
+  async function confirmAction(action: AlumiaProposedAction | undefined) {
+    if (!action || actionStates[action.id] === "saving" || actionStates[action.id] === "done") return false;
 
     setActionStates((current) => ({ ...current, [action.id]: "saving" }));
     try {
@@ -123,8 +124,10 @@ export function AlumiaChat() {
           navigation: { label: "Abrir tarefas", to: "/tarefas" },
         },
       ]);
+      return true;
     } catch {
       setActionStates((current) => ({ ...current, [action.id]: "error" }));
+      return false;
     }
   }
 
@@ -136,6 +139,21 @@ export function AlumiaChat() {
     setMessages([FIRST_MESSAGE]);
     setActionStates({});
     setInput("");
+    setEditingAction(null);
+  }
+
+  async function confirmEditedAction(data: AddTaskData) {
+    if (!editingAction) return;
+    const confirmed = await confirmAction({
+      ...editingAction,
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      time: data.time,
+      priority: data.priority,
+      reminder: data.reminder,
+    });
+    if (!confirmed) throw new Error("TASK_CONFIRMATION_FAILED");
   }
 
   return (
@@ -220,6 +238,15 @@ export function AlumiaChat() {
                   <div className="mt-3 rounded-xl border border-border/80 bg-surface p-3 text-foreground">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ação proposta</p>
                     <p className="mt-1 font-semibold">Criar tarefa: {action.title}</p>
+                    {(action.description || action.date || action.time || action.priority || action.reminder) && (
+                      <dl className="mt-2 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                        {action.description && <div className="sm:col-span-2"><dt className="sr-only">Descrição</dt><dd>{action.description}</dd></div>}
+                        {action.date && <div><dt className="inline font-semibold">Data: </dt><dd className="inline">{new Date(`${action.date}T12:00:00`).toLocaleDateString("pt-BR")}</dd></div>}
+                        {action.time && <div><dt className="inline font-semibold">Horário: </dt><dd className="inline">{action.time}</dd></div>}
+                        {action.priority && <div><dt className="inline font-semibold">Prioridade: </dt><dd className="inline">{action.priority}</dd></div>}
+                        {action.reminder && <div><dt className="inline font-semibold">Lembrete: </dt><dd className="inline">{action.reminder === "na_hora" ? "na hora" : action.reminder.replace("min", " min antes")}</dd></div>}
+                      </dl>
+                    )}
 
                     {(actionState === "pending" || actionState === "error") && (
                       <div className="mt-3">
@@ -231,7 +258,10 @@ export function AlumiaChat() {
                         )}
                         <div className="flex flex-wrap gap-2">
                           {actionState === "pending" ? (
-                            <Button type="button" size="sm" onClick={() => void confirmAction(message)}>Criar tarefa</Button>
+                            <>
+                              <Button type="button" size="sm" onClick={() => void confirmAction(action)}>Criar tarefa</Button>
+                              <Button type="button" size="sm" variant="outline" onClick={() => setEditingAction(action)}>Revisar detalhes</Button>
+                            </>
                           ) : (
                             <Button type="button" size="sm" variant="outline" onClick={() => navigate({ to: "/tarefas" })}>Ver tarefas</Button>
                           )}
@@ -300,6 +330,22 @@ export function AlumiaChat() {
           </form>
         </div>
       </Surface>
+      {editingAction && (
+        <AddTaskSheet
+          key={editingAction.id}
+          open
+          onClose={() => setEditingAction(null)}
+          onSave={confirmEditedAction}
+          initialTitle={editingAction.title}
+          initialDescription={editingAction.description}
+          initialDate={editingAction.date}
+          initialTime={editingAction.time}
+          initialPriority={editingAction.priority}
+          initialReminder={editingAction.reminder}
+          submitLabel="Confirmar e criar"
+          moduleKey="alumia_ai"
+        />
+      )}
     </div>
   );
 }

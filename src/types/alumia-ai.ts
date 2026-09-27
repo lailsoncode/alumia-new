@@ -1,9 +1,16 @@
 export type AlumiaIntent = "tasks" | "mindfulness" | "create_task" | "crisis" | "capabilities";
 
+import type { TaskPriority, TaskReminder } from "./tasks";
+
 export interface AlumiaProposedAction {
   id: string;
   type: "create_task";
   title: string;
+  description?: string;
+  date?: string;
+  time?: string;
+  priority: TaskPriority;
+  reminder: TaskReminder;
 }
 
 export interface AlumiaNavigation {

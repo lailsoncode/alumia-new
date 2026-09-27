@@ -9,9 +9,40 @@ const CRISIS_RESPONSE =
   "Sinto muito que este momento esteja tão difícil. Eu não consigo oferecer o apoio humano que uma situação assim merece. Se puder, procure agora alguém de confiança para ficar com você. No Brasil, o CVV atende gratuitamente pelo 188. Se houver perigo imediato ou uma emergência, ligue para o SAMU no 192 ou procure o serviço de emergência da sua região.";
 
 type RemoteChatResponse = {
-  mode?: "generative" | "safety";
+  mode?: "generative" | "safety" | "proposal";
   message?: string;
+  proposal?: unknown;
 };
+
+function parseRemoteProposal(value: unknown): AlumiaProposedAction | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const proposal = value as Record<string, unknown>;
+  const id = typeof proposal.id === "string" ? proposal.id : "";
+  const title = typeof proposal.title === "string" ? proposal.title.trim() : "";
+  const description = typeof proposal.description === "string" ? proposal.description.trim() : undefined;
+  const date = typeof proposal.date === "string" ? proposal.date : undefined;
+  const time = typeof proposal.time === "string" ? proposal.time : undefined;
+  const priority = proposal.priority ?? null;
+  const reminder = proposal.reminder ?? null;
+
+  if (proposal.type !== "create_task" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return undefined;
+  if (!title || title.length > 120 || (description && description.length > 500)) return undefined;
+  if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return undefined;
+  if (time && (!date || !/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(time))) return undefined;
+  if (priority !== null && !["alta", "media", "baixa"].includes(String(priority))) return undefined;
+  if (reminder !== null && (!date || !time || !["na_hora", "5min", "15min", "30min"].includes(String(reminder)))) return undefined;
+
+  return {
+    id,
+    type: "create_task",
+    title,
+    description: description || undefined,
+    date,
+    time,
+    priority: priority as AlumiaProposedAction["priority"],
+    reminder: reminder as AlumiaProposedAction["reminder"],
+  };
+}
 
 function generativeServiceUrl() {
   if (import.meta.env.VITE_ENABLE_ALUMIA_AI_GENERATIVE !== "true") return null;
@@ -41,18 +72,28 @@ async function requestGenerativeResponse(message: string, history: AlumiaConvers
       authorization: `Bearer ${accessToken}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ message, history: safeHistory }),
+    body: JSON.stringify({
+      message,
+      history: safeHistory,
+      context: {
+        localDate: getLocalDateString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+      },
+    }),
     signal: AbortSignal.timeout(15_000),
   });
 
   if (!response.ok) throw new Error(`ALUMIA_SERVICE_${response.status}`);
   const payload = await response.json() as RemoteChatResponse;
   if (!payload.message?.trim()) throw new Error("ALUMIA_EMPTY_RESPONSE");
+  const proposedAction = payload.mode === "proposal" ? parseRemoteProposal(payload.proposal) : undefined;
+  if (payload.mode === "proposal" && !proposedAction) throw new Error("ALUMIA_INVALID_PROPOSAL");
 
   return {
     text: payload.message.trim(),
     tone: payload.mode === "safety" ? "safety" : "default",
-    source: payload.mode === "generative" ? "generative" : "editorial",
+    source: payload.mode === "generative" || payload.mode === "proposal" ? "generative" : "editorial",
+    proposedAction,
   };
 }
 
@@ -107,7 +148,13 @@ export async function respondToAlumia(
         text: "Posso criar esta tarefa para você. Confira o texto antes de confirmar:",
         tone: "default",
         source: "editorial",
-        proposedAction: { id: actionId(), type: "create_task", title },
+        proposedAction: {
+          id: actionId(),
+          type: "create_task",
+          title,
+          priority: null,
+          reminder: null,
+        },
       };
     }
   }
@@ -154,8 +201,12 @@ export async function confirmAlumiaAction(action: AlumiaProposedAction) {
   if (action.type !== "create_task") throw new Error("Ação não permitida.");
   return createTask({
     title: action.title,
-    priority: null,
-    reminder: null,
+    description: action.description,
+    date: action.date,
+    time: action.time,
+    priority: action.priority,
+    reminder: action.reminder,
     moduleKey: "alumia_ai",
+    idempotencyKey: action.id,
   });
 }
