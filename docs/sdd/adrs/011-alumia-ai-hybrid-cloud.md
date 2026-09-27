@@ -16,7 +16,7 @@ Adotar uma arquitetura híbrida:
 
 - Supabase continua responsável por identidade, dados, RLS e operações de domínio;
 - um serviço dedicado `alumia-ai` roda no Cloud Run em `southamerica-east1`;
-- o serviço usa o Google Gen AI SDK e o modelo Gemini `gemini-3.5-flash` pela Agent Platform/Vertex AI na localização `global`;
+- o serviço usa o Google Gen AI SDK e o modelo Gemini `gemini-3.5-flash-lite` pela Agent Platform/Vertex AI na localização `global`;
 - o aplicativo envia o JWT Supabase; o serviço revalida a sessão com o Supabase Auth antes de processar a mensagem;
 - o serviço nunca recebe `service_role` e não possui permissão implícita para ignorar RLS;
 - o runtime usa uma service account dedicada e Application Default Credentials, sem chave JSON;
@@ -49,7 +49,7 @@ Aplicação autenticada
 | Projeto Google Cloud | `alumia-app` |
 | Região Cloud Run | `southamerica-east1` |
 | Localização do modelo | `global` |
-| Modelo inicial | `gemini-3.5-flash` |
+| Modelo atual | `gemini-3.5-flash-lite` |
 | Serviço | `alumia-ai` |
 | Autenticação de usuário | JWT Supabase revalidado no Auth API |
 | Autenticação Google | ADC da service account do Cloud Run |
@@ -105,10 +105,11 @@ Rejeitada porque duplica o domínio já reconstruído no Supabase e aumenta o ri
 
 - gates 1 e 2 concluídos: identidade dedicada sem chave, Secret Manager, revisão Cloud Run e health check;
 - JWT ausente é recusado com `401`; o teste autenticado ponta a ponta com usuário sintético continua pendente;
-- chamada sintética direta ao `gemini-3.5-flash` concluída sem dados de usuário;
+- chamadas sintéticas diretas ao `gemini-3.5-flash-lite` concluídas sem dados de usuário, incluindo proposta estruturada de tarefa;
 - custo inicial limitado por escala zero e máximo de três instâncias;
 - integração do frontend implementada sob flag separada, desativada por padrão;
 - proposta estruturada de criação de tarefa implantada na revisão `alumia-ai-00003-cs9`; o modelo apenas propõe e a interface exige confirmação;
+- modelo padrão atualizado para `gemini-3.5-flash-lite` na revisão `alumia-ai-00004-mr6` após medição sintética de menor latência;
 - RPC `create_alumia_task_once` aplicada no Supabase com identificador único por usuário para garantir idempotência;
 - validação unitária da allowlist, dos argumentos da proposta e do fluxo de confirmação concluída;
 - gates de consentimento, avaliação, auditoria de logs e smoke autenticado ainda bloqueiam a liberação pública.

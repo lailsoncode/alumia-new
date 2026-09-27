@@ -8,7 +8,7 @@ export function readConfig() {
   return {
     project: process.env.GOOGLE_CLOUD_PROJECT?.trim() || "alumia-app",
     location: process.env.GOOGLE_CLOUD_LOCATION?.trim() || "global",
-    model: process.env.ALUMIA_AI_MODEL?.trim() || "gemini-3.5-flash",
+    model: process.env.ALUMIA_AI_MODEL?.trim() || "gemini-3.5-flash-lite",
     supabaseUrl: required("SUPABASE_URL").replace(/\/$/, ""),
     supabaseAnonKey: required("SUPABASE_ANON_KEY"),
     allowedOrigins: new Set(
