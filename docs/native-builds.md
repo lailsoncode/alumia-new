@@ -16,13 +16,14 @@ Os projetos nativos usam como ícone e tela de abertura a mesma personagem ofici
 
 O esquema de retorno da autenticação é `alumia://auth/callback`.
 
-## Configuração externa necessária
+## Estado das integrações externas
 
-1. No Supabase, em **Authentication → URL Configuration**, incluir `alumia://auth/**` na lista de URLs permitidas.
-2. No aplicativo da Alumia no OneSignal, adicionar a plataforma Android e fornecer a credencial Firebase/FCM.
-3. No mesmo aplicativo do OneSignal, adicionar a plataforma iOS e fornecer a chave APNs `.p8`, Key ID e Team ID.
-4. No Xcode, selecionar a equipe Apple do projeto antes de gerar um archive para dispositivo ou App Store.
-5. Na Play Console, criar ou selecionar a chave usada para assinar o AAB de produção.
+- Supabase: o retorno `alumia://auth/**` está permitido.
+- Firebase: as assinaturas da Play Store, da chave de upload e de desenvolvimento estão registradas; o `google-services.json` do projeto contém os clientes OAuth correspondentes.
+- Google Cloud: a chave Android criada pelo Firebase está limitada ao pacote `br.com.oxentecode.alumia` e às assinaturas Android registradas.
+- OneSignal: Android está ativo com FCM v1 e o SDK Capacitor está selecionado.
+- Play Console: a Assinatura de Apps do Google Play está ativa e a redefinição para a nova chave de upload foi solicitada. O primeiro AAB assinado com a nova chave só deve ser enviado após a aprovação do Google.
+- iOS: o projeto e o App ID já estão preparados. APNs, equipe de assinatura e publicação dependem de uma conta Apple Developer.
 
 O App ID pode ser compartilhado entre Web, Android e iOS. Se for necessário usar aplicativos separados no OneSignal, definir `VITE_ONESIGNAL_NATIVE_APP_ID` no ambiente de build.
 
@@ -38,6 +39,12 @@ npm run native:android
 # Gera um APK de depuração
 npm run native:android:debug
 
+# Gera o AAB assinado para a Play Console
+npm run native:android:bundle
+
+# Gera um APK de release assinado para testes diretos
+npm run native:android:apk
+
 # Abre o Xcode
 npm run native:ios
 
@@ -46,6 +53,21 @@ npm run native:doctor
 ```
 
 O APK de depuração é criado em `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+O AAB assinado é criado em `android/app/build/outputs/bundle/release/app-release.aab`. A versão Android atual é `1.3.0` (`versionCode` 46), imediatamente posterior ao bundle 45 publicado no Play Console.
+
+## Assinatura Android
+
+O Gradle procura as credenciais nesta ordem:
+
+1. variáveis `ALUMIA_ANDROID_KEYSTORE_PATH`, `ALUMIA_ANDROID_KEYSTORE_PASSWORD`, `ALUMIA_ANDROID_KEY_ALIAS` e `ALUMIA_ANDROID_KEY_PASSWORD`;
+2. arquivo indicado por `ALUMIA_ANDROID_KEYSTORE_PROPERTIES`;
+3. `android/keystore.properties`;
+4. `~/.config/alumia/android/keystore.properties`.
+
+Os arquivos de assinatura e propriedades ficam fora do Git. Neste computador, a chave de upload está em `~/.config/alumia/android/alumia-upload.jks`, com permissão somente para o usuário. Mantenha um backup criptografado do `.jks` e das senhas: perder a chave exige outra redefinição da chave de upload no Play Console.
+
+O certificado público usado para registrar ou redefinir a chave de upload fica em `~/.config/alumia/android/alumia-upload-certificate.pem`.
 
 ## Comportamento dos lembretes
 

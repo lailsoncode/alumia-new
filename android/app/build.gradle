@@ -1,5 +1,27 @@
 apply plugin: 'com.android.application'
 
+def signingProperties = new Properties()
+def defaultSigningPropertiesFile = new File(System.getProperty('user.home'), '.config/alumia/android/keystore.properties')
+def projectSigningPropertiesFile = rootProject.file('keystore.properties')
+def signingPropertiesFile = System.getenv('ALUMIA_ANDROID_KEYSTORE_PROPERTIES')
+        ? file(System.getenv('ALUMIA_ANDROID_KEYSTORE_PROPERTIES'))
+        : (projectSigningPropertiesFile.exists() ? projectSigningPropertiesFile : defaultSigningPropertiesFile)
+
+if (signingPropertiesFile.exists()) {
+    signingPropertiesFile.withInputStream { signingProperties.load(it) }
+}
+
+def releaseStoreFile = System.getenv('ALUMIA_ANDROID_KEYSTORE_PATH') ?: signingProperties.getProperty('storeFile')
+def releaseStorePassword = System.getenv('ALUMIA_ANDROID_KEYSTORE_PASSWORD') ?: signingProperties.getProperty('storePassword')
+def releaseKeyAlias = System.getenv('ALUMIA_ANDROID_KEY_ALIAS') ?: signingProperties.getProperty('keyAlias')
+def releaseKeyPassword = System.getenv('ALUMIA_ANDROID_KEY_PASSWORD') ?: signingProperties.getProperty('keyPassword')
+def releaseSigningConfigured = [releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it }
+def releaseTaskRequested = gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') }
+
+if (releaseTaskRequested && !releaseSigningConfigured) {
+    throw new GradleException('Release signing is not configured. See docs/native-builds.md.')
+}
+
 android {
     namespace = "br.com.oxentecode.alumia"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +29,8 @@ android {
         applicationId "br.com.oxentecode.alumia"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 46
+        versionName "1.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +38,19 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (releaseSigningConfigured) {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

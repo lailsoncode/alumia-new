@@ -19,6 +19,14 @@ dist-ssr
 *.local
 .env
 
+# Android signing credentials
+android/keystore.properties
+android/key.properties
+*.jks
+*.keystore
+*firebase-adminsdk*.json
+*service-account*.json
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

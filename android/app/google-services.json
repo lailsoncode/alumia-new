@@ -14,11 +14,35 @@
       },
       "oauth_client": [
         {
+          "client_id": "696823006824-2rpqa11r9l5t0rb16g2hhrgno4htvva5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.oxentecode.alumia",
+            "certificate_hash": "c826a23bd7309051631e25e0a705fdec6ee8aa08"
+          }
+        },
+        {
+          "client_id": "696823006824-9sclouvvk95itbvhmj0f1uhmf7v0nhoj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.oxentecode.alumia",
+            "certificate_hash": "88a68a84484d480d777f72e8576cbb9fd7c4e23c"
+          }
+        },
+        {
           "client_id": "696823006824-coceluct90mvd0e2lhluqi0rahsk7i9v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "br.com.oxentecode.alumia",
             "certificate_hash": "2769ecd492ad136fe488ecc2c52e37569f792ad8"
+          }
+        },
+        {
+          "client_id": "696823006824-ip7cbtevngdpqo1d94f337l9plofku6m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.oxentecode.alumia",
+            "certificate_hash": "1cb86d48656fbff9e277f3358347f51b17073641"
           }
         },
         {
