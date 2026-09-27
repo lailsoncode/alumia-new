@@ -24,6 +24,7 @@ const appShellHeaders = {
   "/estudante": "Planeje seus estudos com leveza, um passo possível de cada vez.",
   "/mindfulness": "Uma pausa breve pode caber no seu momento, sem obrigação.",
   "/financeiro": "Cuidar do seu dinheiro também pode ser leve. Vamos olhar juntos?",
+  "/alumia": "Vamos encontrar um próximo passo possível, com você no controle.",
   "/ajustes": "Sua conta, suas preferências e sua privacidade.",
 } as const;
 
@@ -37,6 +38,7 @@ const routeModules: Partial<Record<keyof typeof appShellHeaders, ModuleKey>> = {
   "/estudante": "student",
   "/mindfulness": "mindfulness",
   "/financeiro": "finance",
+  "/alumia": "alumia_ai",
 };
 
 function NotFoundComponent() {

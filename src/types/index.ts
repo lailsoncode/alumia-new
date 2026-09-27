@@ -1,4 +1,5 @@
 export * from "./tasks";
+export * from "./alumia-ai";
 export * from "./modules";
 export * from "./auth";
 export * from "./hydration";

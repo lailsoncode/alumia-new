@@ -19,12 +19,13 @@ describe("ModulesList", () => {
     expect(screen.getByRole("button", { name: "Acessar check-in emocional" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Acessar estudante" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Acessar mindfulness" })).toBeEnabled();
-    expect(screen.getAllByText("Em breve")).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Acessar alum.ia" })).toBeEnabled();
+    expect(screen.queryByText("Em breve")).not.toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Tarefas está ativo" })).toBeChecked();
     expect(screen.getByRole("switch", { name: "Tarefas está ativo" })).toBeDisabled();
     expect(screen.getByRole("switch", { name: "Check-in emocional está ativo" })).toBeChecked();
-    expect(screen.getByRole("switch", { name: "Alum.IA estará disponível em breve" })).not.toBeChecked();
-    expect(screen.getByRole("switch", { name: "Alum.IA estará disponível em breve" })).toBeDisabled();
+    expect(screen.getByRole("switch", { name: "Alum.IA está disponível como prévia" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Alum.IA está disponível como prévia" })).toBeDisabled();
   });
 
   it("navega para um módulo ativo", () => {
@@ -43,5 +44,11 @@ describe("ModulesList", () => {
     render(<ModulesList />);
     fireEvent.click(screen.getByRole("button", { name: "Acessar mindfulness" }));
     expect(navigate).toHaveBeenCalledWith({ to: "/mindfulness" });
+  });
+
+  it("navega para a prévia da Alum.IA", () => {
+    render(<ModulesList />);
+    fireEvent.click(screen.getByRole("button", { name: "Acessar alum.ia" }));
+    expect(navigate).toHaveBeenCalledWith({ to: "/alumia" });
   });
 });

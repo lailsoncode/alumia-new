@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { MODULE_THEMES } from "@/lib/module-themes";
 
+const alumiaPreviewEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ALUMIA_AI_PREVIEW === "true";
+
 const activeModules = [
   {
     ...MODULE_THEMES.tasks,
@@ -39,13 +41,18 @@ const activeModules = [
     description: "Cuide do seu dinheiro sem culpa",
     to: "/financeiro" as const,
   },
+  ...(alumiaPreviewEnabled ? [{
+    ...MODULE_THEMES.alumia_ai,
+    description: "Converse e escolha o próximo passo possível",
+    to: "/alumia" as const,
+  }] : []),
 ];
 
 const catalogModules = [
   { ...MODULE_THEMES.tasks, active: true },
   { ...MODULE_THEMES.hydration, active: true },
   { ...MODULE_THEMES.checkin, active: true },
-  { ...MODULE_THEMES.alumia_ai, active: false },
+  { ...MODULE_THEMES.alumia_ai, active: alumiaPreviewEnabled, preview: alumiaPreviewEnabled },
   { ...MODULE_THEMES.mindfulness, active: true },
   { ...MODULE_THEMES.student, active: true },
   { ...MODULE_THEMES.finance, active: true },
@@ -90,8 +97,10 @@ export function ModulesList() {
 
         <div className="mt-2.5 grid gap-2 lg:grid-cols-2">
           {catalogModules.map((module) => {
-            const status = module.active ? "Ativo" : "Em breve";
-            const switchLabel = module.active ? `${module.label} está ativo` : `${module.label} estará disponível em breve`;
+            const status = "preview" in module && module.preview ? "Prévia" : module.active ? "Ativo" : "Em breve";
+            const switchLabel = "preview" in module && module.preview
+              ? `${module.label} está disponível como prévia`
+              : module.active ? `${module.label} está ativo` : `${module.label} estará disponível em breve`;
 
             return (
               <article key={module.key} className={`module-whisper flex min-h-14 items-center gap-2.5 rounded-xl border px-3 py-1.5 shadow-none ${module.themeClass}`}>

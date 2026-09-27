@@ -1,0 +1,66 @@
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AlumiaChat } from "./AlumiaChat";
+import { confirmAlumiaAction, respondToAlumia } from "@/services/alumiaAIService";
+
+const navigate = vi.fn();
+
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => navigate,
+}));
+
+vi.mock("@/services/alumiaAIService", () => ({
+  confirmAlumiaAction: vi.fn(),
+  isAlumiaGenerativeEnabled: vi.fn(() => false),
+  respondToAlumia: vi.fn(),
+}));
+
+const mockedRespond = vi.mocked(respondToAlumia);
+const mockedConfirm = vi.mocked(confirmAlumiaAction);
+
+describe("Alum.IA chat", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
+  });
+
+  it("explica a privacidade da prévia antes da primeira mensagem", () => {
+    render(<AlumiaChat />);
+
+    expect(screen.getByText(/mensagens não são salvas nem enviadas/i)).toBeInTheDocument();
+    expect(screen.getByText(/nenhuma ação acontece sem você confirmar/i)).toBeInTheDocument();
+  });
+
+  it("exige confirmação antes de executar uma tarefa proposta", async () => {
+    mockedRespond.mockResolvedValue({
+      text: "Posso criar esta tarefa para você.",
+      tone: "default",
+      source: "editorial",
+      proposedAction: { id: "action-1", type: "create_task", title: "comprar pão" },
+    });
+    mockedConfirm.mockResolvedValue({ id: "task-1", title: "comprar pão" });
+    render(<AlumiaChat />);
+
+    fireEvent.change(screen.getByLabelText("Mensagem para a Alum.IA"), { target: { value: "Crie uma tarefa comprar pão" } });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar mensagem" }));
+
+    expect(await screen.findByText("Criar tarefa: comprar pão")).toBeInTheDocument();
+    expect(mockedConfirm).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Criar tarefa" }));
+    await waitFor(() => expect(mockedConfirm).toHaveBeenCalledWith({ id: "action-1", type: "create_task", title: "comprar pão" }));
+    expect(await screen.findByText("Tarefa criada")).toBeInTheDocument();
+  });
+
+  it("limpa a conversa local e restaura a apresentação inicial", async () => {
+    mockedRespond.mockResolvedValue({ text: "Uma resposta breve.", tone: "default", source: "editorial" });
+    render(<AlumiaChat />);
+
+    fireEvent.click(screen.getByRole("button", { name: "O que merece atenção hoje?" }));
+    expect(await screen.findByText("Uma resposta breve.")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Limpar conversa atual" }));
+    expect(screen.queryByText("Uma resposta breve.")).not.toBeInTheDocument();
+    expect(screen.getByText(/Oi, eu sou a Alum\.IA/i)).toBeInTheDocument();
+  });
+});

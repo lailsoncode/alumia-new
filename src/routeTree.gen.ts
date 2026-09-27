@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AjustesRouteImport } from './routes/ajustes'
+import { Route as AlumiaRouteImport } from './routes/alumia'
 import { Route as CheckInRouteImport } from './routes/check-in'
 import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
 import { Route as EstudanteRouteImport } from './routes/estudante'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AjustesRoute = AjustesRouteImport.update({
   id: '/ajustes',
   path: '/ajustes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlumiaRoute = AlumiaRouteImport.update({
+  id: '/alumia',
+  path: '/alumia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckInRoute = CheckInRouteImport.update({
@@ -98,6 +104,7 @@ const CheckInHistoricoRoute = CheckInHistoricoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/alumia': typeof AlumiaRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
   '/estudante': typeof EstudanteRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/alumia': typeof AlumiaRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
   '/estudante': typeof EstudanteRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/alumia': typeof AlumiaRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
   '/estudante': typeof EstudanteRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ajustes'
+    | '/alumia'
     | '/check-in'
     | '/completar-perfil'
     | '/estudante'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ajustes'
+    | '/alumia'
     | '/check-in'
     | '/completar-perfil'
     | '/estudante'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ajustes'
+    | '/alumia'
     | '/check-in'
     | '/completar-perfil'
     | '/estudante'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AjustesRoute: typeof AjustesRoute
+  AlumiaRoute: typeof AlumiaRoute
   CheckInRoute: typeof CheckInRoute
   CompletarPerfilRoute: typeof CompletarPerfilRoute
   EstudanteRoute: typeof EstudanteRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/ajustes'
       fullPath: '/ajustes'
       preLoaderRoute: typeof AjustesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alumia': {
+      id: '/alumia'
+      path: '/alumia'
+      fullPath: '/alumia'
+      preLoaderRoute: typeof AlumiaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/check-in': {
@@ -318,6 +338,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AjustesRoute: AjustesRoute,
+  AlumiaRoute: AlumiaRoute,
   CheckInRoute: CheckInRoute,
   CompletarPerfilRoute: CompletarPerfilRoute,
   EstudanteRoute: EstudanteRoute,

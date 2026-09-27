@@ -9,7 +9,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 
 | Objetivo | Requisitos principais | Incrementos | Evidência esperada |
 |---|---|---|---|
-| Experiência B2C privada | `IDN-*`, `B2C-ONB-*`, `B2C-CHK-*`, `B2C-TSK-*`, `B2C-MND-*`, `B2C-HYD-*`, `B2C-STU-*` | 001, 002, 005, 010 | testes RLS, component tests e smoke B2C |
+| Experiência B2C privada | `IDN-*`, `B2C-ONB-*`, `B2C-CHK-*`, `B2C-TSK-*`, `B2C-MND-*`, `B2C-HYD-*`, `B2C-STU-*`, `B2C-AI-*` | 001, 002, 005, 010 e prévia Alum.IA | testes RLS, component tests e smoke B2C |
 | Benefício empresarial privado | `ENT-*`, `B2B-BEN-*` | 003 | testes de assento, vínculo, revogação e isolamento |
 | Gestão NR-1 | `B2B-ORG-*`, `B2B-CYC-*`, `B2B-MTH-*`, `B2B-PAR-*`, `B2B-RSK-*`, `B2B-ACT-*`, `B2B-EXP-*` | 004, 006, 007 | revisão técnica, RLS, supressão, snapshots e export |
 | Operação master | `ADM-*` | 003, 008 | testes de papéis, auditoria e operação em staging |
@@ -40,7 +40,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 | Conteúdo é versionado | `CONST-08`, `CNT-*` | constraint, fluxo de publicação e snapshot |
 | Sem diagnóstico | `CONST-04`, `B2B` | revisão editorial e técnica |
 | Sem gamificação punitiva | `CONST-01` | revisão de UX e testes de conteúdo |
-| IA fora do MVP | `CONST-09` | ausência de provider/secret/bundle no MVP |
+| IA generativa controlada | `CONST-09`, `B2C-AI-*` | prévia editorial ativa; Cloud Run/Vertex implantado sob flag separada e liberação pública condicionada ao ADR-011 |
 | Rota reflete a tela | `ARCH-ROUTE-002` | E2E de navegação, reload e deep link |
 
 ## 4. Estado dos incrementos

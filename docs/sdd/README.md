@@ -46,11 +46,13 @@ Regras do processo:
 | [`design-system-spec.md`](design-system-spec.md) | Interface, Hugeicons e acessibilidade | proposed |
 | [`features/b2c-core.spec.md`](features/b2c-core.spec.md) | Experiência pessoal B2C | proposed |
 | [`features/task-creation.spec.md`](features/task-creation.spec.md) | Criação, recorrência, avisos e origem das tarefas | proposed |
+| [`features/alumia-ai.spec.md`](features/alumia-ai.spec.md) | Assistente pessoal, limites, ações confirmáveis e evolução generativa | implementing |
 | [`features/b2b-nr1.spec.md`](features/b2b-nr1.spec.md) | Alumia Empresas e fluxo NR-1 | proposed |
 | [`features/platform-admin.spec.md`](features/platform-admin.spec.md) | Painel master da Alumia | proposed |
 | [`increments/001-foundation-and-private-checkin.md`](increments/001-foundation-and-private-checkin.md) | Primeiro incremento pronto para implementação | ready |
 | [`delivery-plan.md`](delivery-plan.md) | Ordem, dependências e gates de entrega | proposed |
 | [`traceability.md`](traceability.md) | Relação entre objetivos, requisitos, incrementos e evidências | active |
+| [`adrs/011-alumia-ai-hybrid-cloud.md`](adrs/011-alumia-ai-hybrid-cloud.md) | Supabase para identidade/dados e Google Cloud para orquestração da Alum.IA | accepted |
 | [`templates/feature-spec-template.md`](templates/feature-spec-template.md) | Modelo para novas especificações | active |
 
 ## Hierarquia de autoridade

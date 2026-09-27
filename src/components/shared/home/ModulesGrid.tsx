@@ -4,12 +4,15 @@ import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { MODULE_THEMES } from "@/lib/module-themes";
 
+const alumiaPreviewEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ALUMIA_AI_PREVIEW === "true";
+
 const modules = [
   { ...MODULE_THEMES.tasks, to: "/tarefas" as const },
   { ...MODULE_THEMES.checkin, to: "/check-in" as const },
   { ...MODULE_THEMES.hydration, to: "/hidratacao" as const },
   { ...MODULE_THEMES.student, to: "/estudante" as const },
   { ...MODULE_THEMES.mindfulness, to: "/mindfulness" as const },
+  ...(alumiaPreviewEnabled ? [{ ...MODULE_THEMES.alumia_ai, to: "/alumia" as const }] : []),
 ];
 
 export function ModulesGrid() {
