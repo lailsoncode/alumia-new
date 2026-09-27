@@ -9,6 +9,7 @@ const modules = [
   { ...MODULE_THEMES.checkin, to: "/check-in" as const },
   { ...MODULE_THEMES.hydration, to: "/hidratacao" as const },
   { ...MODULE_THEMES.student, to: "/estudante" as const },
+  { ...MODULE_THEMES.mindfulness, to: "/mindfulness" as const },
 ];
 
 export function ModulesGrid() {

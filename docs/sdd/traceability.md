@@ -51,7 +51,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 | `INC-002` | backlog | não iniciada | pendente |
 | `INC-003` | backlog | não iniciada | pendente |
 | `INC-004` | backlog | não iniciada | pendente |
-| `INC-005` | backlog | não iniciada | pendente |
+| `INC-005` | ready parcial | Mindfulness e Hidratação implementados; preferências pendentes | RLS e smoke conectados pendentes |
 | `INC-006` | backlog | não iniciada | pendente |
 | `INC-007` | backlog | não iniciada | pendente |
 | `INC-008` | backlog | não iniciada | pendente |

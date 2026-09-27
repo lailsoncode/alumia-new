@@ -29,6 +29,11 @@ const activeModules = [
     description: "Planeje, foque e revise com leveza",
     to: "/estudante" as const,
   },
+  {
+    ...MODULE_THEMES.mindfulness,
+    description: "Encontre pausas curtas em áudio ou texto",
+    to: "/mindfulness" as const,
+  },
 ];
 
 const catalogModules = [
@@ -36,7 +41,7 @@ const catalogModules = [
   { ...MODULE_THEMES.hydration, active: true },
   { ...MODULE_THEMES.checkin, active: true },
   { ...MODULE_THEMES.alumia_ai, active: false },
-  { ...MODULE_THEMES.mindfulness, active: false },
+  { ...MODULE_THEMES.mindfulness, active: true },
   { ...MODULE_THEMES.student, active: true },
 ];
 

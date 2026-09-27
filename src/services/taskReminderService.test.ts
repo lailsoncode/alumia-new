@@ -28,6 +28,7 @@ describe("taskReminderService", () => {
 
   it("direciona compromissos acadêmicos ao módulo Estudante", () => {
     expect(getTaskReminderRoute({ module_key: "student" })).toBe("/estudante");
+    expect(getTaskReminderRoute({ module_key: "mindfulness" })).toBe("/mindfulness");
     expect(getTaskReminderRoute({ module_key: "tasks" })).toBe("/tarefas");
   });
 });

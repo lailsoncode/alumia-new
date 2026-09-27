@@ -100,6 +100,8 @@ Os critérios `B2C-TSK-AC-01` a `B2C-TSK-AC-15` estão na especificação detalh
 
 ## 6. Mindfulness
 
+Os requisitos detalhados, contratos de dados, estados e evidências desta vertical estão em [`mindfulness.spec.md`](mindfulness.spec.md).
+
 ### Requisitos
 
 - `B2C-MND-001`: listar práticas publicadas por duração e técnica.

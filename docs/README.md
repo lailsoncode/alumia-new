@@ -27,6 +27,7 @@ Esta pasta reúne a documentação de produto, arquitetura, pesquisa e planejame
 | [B2C](sdd/features/b2c-core.spec.md) | Experiência pessoal de autocuidado |
 | [Tarefas](sdd/features/task-creation.spec.md) | Criação, recorrência semanal, notificações, alarmes e origem Estudante |
 | [Estudante](sdd/features/student-module.spec.md) | Agenda acadêmica, foco pausável, reflexão e revisões gentis |
+| [Mindfulness](sdd/features/mindfulness.spec.md) | Catálogo, práticas em áudio/texto, reflexão e lembretes gentis |
 | [B2B e NR-1](sdd/features/b2b-nr1.spec.md) | Alumia Empresas e gestão de riscos psicossociais |
 | [Painel master](sdd/features/platform-admin.spec.md) | Operação central da plataforma |
 | [Plano de entregas](sdd/delivery-plan.md) | Incrementos, dependências e gates |

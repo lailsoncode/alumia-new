@@ -16,6 +16,7 @@ import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
 import { Route as EstudanteRouteImport } from './routes/estudante'
 import { Route as HidratacaoRouteImport } from './routes/hidratacao'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MindfulnessRouteImport } from './routes/mindfulness'
 import { Route as ModulosRouteImport } from './routes/modulos'
 import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
 import { Route as RegistroRouteImport } from './routes/registro'
@@ -57,6 +58,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MindfulnessRoute = MindfulnessRouteImport.update({
+  id: '/mindfulness',
+  path: '/mindfulness',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ModulosRoute = ModulosRouteImport.update({
   id: '/modulos',
   path: '/modulos',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/estudante': typeof EstudanteRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
+  '/mindfulness': typeof MindfulnessRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/registro': typeof RegistroRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/estudante': typeof EstudanteRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
+  '/mindfulness': typeof MindfulnessRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/registro': typeof RegistroRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/estudante': typeof EstudanteRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
+  '/mindfulness': typeof MindfulnessRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/registro': typeof RegistroRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/estudante'
     | '/hidratacao'
     | '/login'
+    | '/mindfulness'
     | '/modulos'
     | '/nova-senha'
     | '/registro'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/estudante'
     | '/hidratacao'
     | '/login'
+    | '/mindfulness'
     | '/modulos'
     | '/nova-senha'
     | '/registro'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/estudante'
     | '/hidratacao'
     | '/login'
+    | '/mindfulness'
     | '/modulos'
     | '/nova-senha'
     | '/registro'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   EstudanteRoute: typeof EstudanteRoute
   HidratacaoRoute: typeof HidratacaoRoute
   LoginRoute: typeof LoginRoute
+  MindfulnessRoute: typeof MindfulnessRoute
   ModulosRoute: typeof ModulosRoute
   NovaSenhaRoute: typeof NovaSenhaRoute
   RegistroRoute: typeof RegistroRoute
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mindfulness': {
+      id: '/mindfulness'
+      path: '/mindfulness'
+      fullPath: '/mindfulness'
+      preLoaderRoute: typeof MindfulnessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/modulos': {
       id: '/modulos'
       path: '/modulos'
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   EstudanteRoute: EstudanteRoute,
   HidratacaoRoute: HidratacaoRoute,
   LoginRoute: LoginRoute,
+  MindfulnessRoute: MindfulnessRoute,
   ModulosRoute: ModulosRoute,
   NovaSenhaRoute: NovaSenhaRoute,
   RegistroRoute: RegistroRoute,

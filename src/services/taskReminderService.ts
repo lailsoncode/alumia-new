@@ -2,7 +2,10 @@ import { Capacitor } from "@capacitor/core";
 import type { Task, TaskReminder } from "@/types";
 
 export function getTaskReminderRoute(task: Pick<Task, "moduleKey" | "module_key">) {
-  return (task.moduleKey ?? task.module_key) === "student" ? "/estudante" : "/tarefas";
+  const moduleKey = task.moduleKey ?? task.module_key;
+  if (moduleKey === "student") return "/estudante";
+  if (moduleKey === "mindfulness") return "/mindfulness";
+  return "/tarefas";
 }
 
 const reminderMinutes: Record<Exclude<TaskReminder, null>, number> = {
