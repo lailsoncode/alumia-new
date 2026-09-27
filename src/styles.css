@@ -244,7 +244,7 @@
   .tone-rose { background: var(--tone-rose); color: var(--tone-rose-fg); }
   .tone-sun { background: var(--tone-sun); color: var(--tone-sun-fg); }
 
-  :where(.module-theme-alumia-ai, .module-theme-tasks, .module-theme-checkin, .module-theme-mindfulness, .module-theme-hydration, .module-theme-student) {
+  :where(.module-theme-alumia-ai, .module-theme-tasks, .module-theme-checkin, .module-theme-mindfulness, .module-theme-hydration, .module-theme-student, .module-theme-finance) {
     --primary: var(--module-accent);
     --primary-foreground: var(--module-on-accent);
     --accent: var(--module-soft);
@@ -301,13 +301,21 @@
     --module-on-accent: oklch(0.99 0.008 270);
     --module-border: color-mix(in oklab, var(--module-accent) 38%, transparent);
   }
+  .module-theme-finance {
+    --module-soft: oklch(0.92 0.052 155);
+    --module-accent: oklch(0.59 0.105 157);
+    --module-strong: oklch(0.34 0.085 158);
+    --module-on-accent: oklch(0.99 0.008 155);
+    --module-border: color-mix(in oklab, var(--module-accent) 36%, transparent);
+  }
 
   .dark .module-theme-alumia-ai,
   .dark .module-theme-tasks,
   .dark .module-theme-checkin,
   .dark .module-theme-mindfulness,
   .dark .module-theme-hydration,
-  .dark .module-theme-student {
+  .dark .module-theme-student,
+  .dark .module-theme-finance {
     --module-on-accent: oklch(0.19 0.025 260);
   }
   .dark .module-theme-alumia-ai { --module-accent: oklch(0.76 0.075 198); }
@@ -316,6 +324,11 @@
   .dark .module-theme-mindfulness { --module-accent: oklch(0.75 0.085 160); }
   .dark .module-theme-hydration { --module-accent: oklch(0.76 0.08 208); }
   .dark .module-theme-student { --module-accent: oklch(0.76 0.085 270); }
+  .dark .module-theme-finance {
+    --module-soft: oklch(0.31 0.055 157);
+    --module-accent: oklch(0.75 0.085 157);
+    --module-strong: oklch(0.9 0.04 157);
+  }
 
   .module-surface {
     background: color-mix(in oklab, var(--module-soft) 42%, var(--surface));

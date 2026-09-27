@@ -34,6 +34,11 @@ const activeModules = [
     description: "Encontre pausas curtas em áudio ou texto",
     to: "/mindfulness" as const,
   },
+  {
+    ...MODULE_THEMES.finance,
+    description: "Cuide do seu dinheiro sem culpa",
+    to: "/financeiro" as const,
+  },
 ];
 
 const catalogModules = [
@@ -43,6 +48,7 @@ const catalogModules = [
   { ...MODULE_THEMES.alumia_ai, active: false },
   { ...MODULE_THEMES.mindfulness, active: true },
   { ...MODULE_THEMES.student, active: true },
+  { ...MODULE_THEMES.finance, active: true },
 ];
 
 export function ModulesList() {

@@ -3,12 +3,13 @@ import {
   AiBrain01Icon,
   CheckListIcon,
   GlassWaterIcon,
+  Wallet02Icon,
   SmileIcon,
   Yoga01Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 
-export type ModuleKey = "alumia_ai" | "tasks" | "checkin" | "mindfulness" | "hydration" | "student";
+export type ModuleKey = "alumia_ai" | "tasks" | "checkin" | "mindfulness" | "hydration" | "student" | "finance";
 
 interface ModuleTheme {
   key: ModuleKey;
@@ -24,6 +25,7 @@ export const MODULE_THEMES: Record<ModuleKey, ModuleTheme> = {
   mindfulness: { key: "mindfulness", label: "Mindfulness", icon: Yoga01Icon, themeClass: "module-theme-mindfulness" },
   hydration: { key: "hydration", label: "Hidratação", icon: GlassWaterIcon, themeClass: "module-theme-hydration" },
   student: { key: "student", label: "Estudante", icon: AiBookIcon, themeClass: "module-theme-student" },
+  finance: { key: "finance", label: "Financeiro", icon: Wallet02Icon, themeClass: "module-theme-finance" },
 };
 
 export function resolveModuleKey(value?: string | null): ModuleKey {
