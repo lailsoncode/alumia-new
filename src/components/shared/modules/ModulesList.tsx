@@ -24,6 +24,11 @@ const activeModules = [
     description: "Pausas para hidratação e cuidado",
     to: "/hidratacao" as const,
   },
+  {
+    ...MODULE_THEMES.student,
+    description: "Planeje, foque e revise com leveza",
+    to: "/estudante" as const,
+  },
 ];
 
 const catalogModules = [
@@ -32,7 +37,7 @@ const catalogModules = [
   { ...MODULE_THEMES.checkin, active: true },
   { ...MODULE_THEMES.alumia_ai, active: false },
   { ...MODULE_THEMES.mindfulness, active: false },
-  { ...MODULE_THEMES.student, active: false },
+  { ...MODULE_THEMES.student, active: true },
 ];
 
 export function ModulesList() {

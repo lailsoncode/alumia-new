@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getTaskNotificationId, getTaskReminderDate, getTaskScheduleDate } from "./taskReminderService";
+import { getTaskNotificationId, getTaskReminderDate, getTaskReminderRoute, getTaskScheduleDate } from "./taskReminderService";
 
 describe("taskReminderService", () => {
   it("calcula o instante do lembrete no horário local", () => {
@@ -24,5 +24,10 @@ describe("taskReminderService", () => {
     expect(first).not.toBe(getTaskNotificationId(taskId, "reminder"));
     expect(first).toBeGreaterThan(0);
     expect(first).toBeLessThanOrEqual(0x7fffffff);
+  });
+
+  it("direciona compromissos acadêmicos ao módulo Estudante", () => {
+    expect(getTaskReminderRoute({ module_key: "student" })).toBe("/estudante");
+    expect(getTaskReminderRoute({ module_key: "tasks" })).toBe("/tarefas");
   });
 });

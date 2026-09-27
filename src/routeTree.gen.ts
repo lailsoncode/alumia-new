@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as CheckInRouteImport } from './routes/check-in'
 import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
+import { Route as EstudanteRouteImport } from './routes/estudante'
 import { Route as HidratacaoRouteImport } from './routes/hidratacao'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ModulosRouteImport } from './routes/modulos'
@@ -39,6 +40,11 @@ const CheckInRoute = CheckInRouteImport.update({
 const CompletarPerfilRoute = CompletarPerfilRouteImport.update({
   id: '/completar-perfil',
   path: '/completar-perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstudanteRoute = EstudanteRouteImport.update({
+  id: '/estudante',
+  path: '/estudante',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HidratacaoRoute = HidratacaoRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/ajustes': typeof AjustesRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/estudante': typeof EstudanteRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
   '/modulos': typeof ModulosRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/ajustes': typeof AjustesRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/estudante': typeof EstudanteRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
   '/modulos': typeof ModulosRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/ajustes': typeof AjustesRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/estudante': typeof EstudanteRoute
   '/hidratacao': typeof HidratacaoRoute
   '/login': typeof LoginRoute
   '/modulos': typeof ModulosRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/check-in'
     | '/completar-perfil'
+    | '/estudante'
     | '/hidratacao'
     | '/login'
     | '/modulos'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/check-in'
     | '/completar-perfil'
+    | '/estudante'
     | '/hidratacao'
     | '/login'
     | '/modulos'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/check-in'
     | '/completar-perfil'
+    | '/estudante'
     | '/hidratacao'
     | '/login'
     | '/modulos'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AjustesRoute: typeof AjustesRoute
   CheckInRoute: typeof CheckInRoute
   CompletarPerfilRoute: typeof CompletarPerfilRoute
+  EstudanteRoute: typeof EstudanteRoute
   HidratacaoRoute: typeof HidratacaoRoute
   LoginRoute: typeof LoginRoute
   ModulosRoute: typeof ModulosRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/completar-perfil'
       fullPath: '/completar-perfil'
       preLoaderRoute: typeof CompletarPerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estudante': {
+      id: '/estudante'
+      path: '/estudante'
+      fullPath: '/estudante'
+      preLoaderRoute: typeof EstudanteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hidratacao': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AjustesRoute: AjustesRoute,
   CheckInRoute: CheckInRoute,
   CompletarPerfilRoute: CompletarPerfilRoute,
+  EstudanteRoute: EstudanteRoute,
   HidratacaoRoute: HidratacaoRoute,
   LoginRoute: LoginRoute,
   ModulosRoute: ModulosRoute,

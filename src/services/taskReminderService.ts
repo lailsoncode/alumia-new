@@ -1,7 +1,9 @@
 import { Capacitor } from "@capacitor/core";
 import type { Task, TaskReminder } from "@/types";
 
-const REMINDER_ROUTE = "/tarefas";
+export function getTaskReminderRoute(task: Pick<Task, "moduleKey" | "module_key">) {
+  return (task.moduleKey ?? task.module_key) === "student" ? "/estudante" : "/tarefas";
+}
 
 const reminderMinutes: Record<Exclude<TaskReminder, null>, number> = {
   na_hora: 0,
@@ -62,6 +64,7 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
   if (permission.display !== "granted") return false;
 
   const notifications = [];
+  const reminderRoute = getTaskReminderRoute(task);
   if (scheduledDate.getTime() > Date.now()) {
     notifications.push({
         id: getTaskNotificationId(task.id, "scheduled"),
@@ -72,7 +75,7 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
         autoCancel: true,
         foreground: true,
         isExactNotification: true,
-        extra: { taskId: task.id, route: REMINDER_ROUTE },
+        extra: { taskId: task.id, route: reminderRoute },
     });
   }
 
@@ -86,7 +89,7 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
       autoCancel: true,
       foreground: true,
       isExactNotification: true,
-      extra: { taskId: task.id, route: REMINDER_ROUTE },
+      extra: { taskId: task.id, route: reminderRoute },
     });
   }
 

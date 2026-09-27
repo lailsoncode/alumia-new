@@ -3,3 +3,4 @@ export * from "./modules";
 export * from "./auth";
 export * from "./hydration";
 export * from "./checkin";
+export * from "./student";

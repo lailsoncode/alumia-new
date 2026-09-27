@@ -21,6 +21,7 @@ O desenvolvimento alterna verticais completas. Cada incremento deve atravessar b
 | `INC-007` | Achados, inventário, plano de ação e export | INC-006 | snapshot, auditoria e dossiê verificados |
 | `INC-008` | Painel master completo, conteúdo, privacidade e comercial | INC-003/007 | menor privilégio e operação auditável |
 | `INC-009` | PWA, notificações, pilotos e endurecimento | anteriores | backup, restore, segurança e smoke |
+| `INC-010` | Estudante: agenda, foco e revisão gentil | INC-002/009 | RLS privado, timer e revisão testados |
 
 ## 3. Relação com as 18 semanas
 

@@ -9,7 +9,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 
 | Objetivo | Requisitos principais | Incrementos | Evidência esperada |
 |---|---|---|---|
-| Experiência B2C privada | `IDN-*`, `B2C-ONB-*`, `B2C-CHK-*`, `B2C-TSK-*`, `B2C-MND-*`, `B2C-HYD-*` | 001, 002, 005 | testes RLS, component tests e smoke B2C |
+| Experiência B2C privada | `IDN-*`, `B2C-ONB-*`, `B2C-CHK-*`, `B2C-TSK-*`, `B2C-MND-*`, `B2C-HYD-*`, `B2C-STU-*` | 001, 002, 005, 010 | testes RLS, component tests e smoke B2C |
 | Benefício empresarial privado | `ENT-*`, `B2B-BEN-*` | 003 | testes de assento, vínculo, revogação e isolamento |
 | Gestão NR-1 | `B2B-ORG-*`, `B2B-CYC-*`, `B2B-MTH-*`, `B2B-PAR-*`, `B2B-RSK-*`, `B2B-ACT-*`, `B2B-EXP-*` | 004, 006, 007 | revisão técnica, RLS, supressão, snapshots e export |
 | Operação master | `ADM-*` | 003, 008 | testes de papéis, auditoria e operação em staging |
@@ -56,6 +56,7 @@ Esta matriz liga intenção de produto, especificação, entrega e evidência. E
 | `INC-007` | backlog | não iniciada | pendente |
 | `INC-008` | backlog | não iniciada | pendente |
 | `INC-009` | backlog | não iniciada | pendente |
+| `INC-010` | implemented | implementada | RLS e smoke conectados pendentes |
 
 ## 5. Evidência de verificação
 

@@ -21,6 +21,7 @@ const appShellHeaders = {
   "/check-in": "Vamos cuidar de como você está se sentindo?",
   "/check-in/historico": "Seus sentimentos, acolhidos no seu tempo.",
   "/hidratacao": "Cada gole é um gesto de carinho com você.",
+  "/estudante": "Planeje seus estudos com leveza, um passo possível de cada vez.",
   "/ajustes": "Sua conta, suas preferências e sua privacidade.",
 } as const;
 
@@ -31,6 +32,7 @@ const routeModules: Partial<Record<keyof typeof appShellHeaders, ModuleKey>> = {
   "/check-in": "checkin",
   "/check-in/historico": "checkin",
   "/hidratacao": "hydration",
+  "/estudante": "student",
 };
 
 function NotFoundComponent() {

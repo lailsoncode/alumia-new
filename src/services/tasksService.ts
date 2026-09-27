@@ -2,6 +2,11 @@ import { supabase } from "../lib/supabaseClient";
 import type { Task, AddTaskData } from "../types";
 import { cancelTaskReminder, scheduleTaskReminder } from "./taskReminderService";
 
+type TaskUpdates = Omit<Partial<Task>, "date" | "time"> & {
+  date?: string | null;
+  time?: string | null;
+};
+
 /**
  * @file tasksService.ts
  * @description Serviço responsável pelas chamadas de API e Supabase relacionadas ao módulo de tarefas.
@@ -72,7 +77,7 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
  * @param {Partial<Task>} updates Campos a serem modificados na tarefa.
  * @returns {Promise<Task>} A tarefa atualizada.
  */
-export async function updateTask(taskId: string, updates: Partial<Task>): Promise<Task> {
+export async function updateTask(taskId: string, updates: TaskUpdates): Promise<Task> {
   const { data, error } = await supabase
     .from("tasks")
     .update({
