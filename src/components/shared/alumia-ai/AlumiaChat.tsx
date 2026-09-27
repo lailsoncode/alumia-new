@@ -31,12 +31,6 @@ const FIRST_MESSAGE: AlumiaConversationMessage = {
   tone: "default",
 };
 
-const quickPrompts = [
-  "Quero conversar um pouco",
-  "Quero organizar meu dia",
-  "Quero uma pausa breve",
-];
-
 function messageId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -303,20 +297,6 @@ export function AlumiaChat() {
         </div>
 
         <div className="border-t border-border/70 p-3 sm:p-4">
-          <div className="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="Sugestões de mensagem">
-            {quickPrompts.map((prompt) => (
-              <button
-                key={prompt}
-                type="button"
-                disabled={responding}
-                onClick={() => void sendMessage(prompt)}
-                className="min-h-11 shrink-0 rounded-xl border border-border bg-surface px-3 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-surface-subtle disabled:opacity-50"
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-
           <form onSubmit={handleSubmit} className="flex items-end gap-2">
             <div className="min-w-0 flex-1">
               <label htmlFor="alumia-message" className="sr-only">Mensagem para a Alum.IA</label>

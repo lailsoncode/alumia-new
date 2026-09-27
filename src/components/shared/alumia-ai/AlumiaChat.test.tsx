@@ -95,11 +95,22 @@ describe("Alum.IA chat", () => {
     mockedRespond.mockResolvedValue({ text: "Uma resposta breve.", tone: "default", source: "editorial" });
     render(<AlumiaChat />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Quero conversar um pouco" }));
+    fireEvent.change(screen.getByLabelText("Mensagem para a Alum.IA"), { target: { value: "Quero conversar um pouco" } });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar mensagem" }));
     expect(await screen.findByText("Uma resposta breve.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Limpar conversa atual" }));
     expect(screen.queryByText("Uma resposta breve.")).not.toBeInTheDocument();
     expect(screen.getByText(/Oi, eu sou a Alum\.IA/i)).toBeInTheDocument();
+  });
+
+  it("mantém a entrada da conversa aberta, sem atalhos que direcionem o assunto", () => {
+    render(<AlumiaChat />);
+
+    expect(screen.queryByLabelText("Sugestões de mensagem")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Mensagem para a Alum.IA")).toHaveAttribute(
+      "placeholder",
+      "Escreva o que faria diferença agora…",
+    );
   });
 });
