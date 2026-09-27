@@ -13,7 +13,18 @@ const crisisSignals = [
 ];
 
 const taskSignals = ["tarefa", "tarefas", "prioridade", "prioridades", "organizar meu dia", "o que fazer hoje"];
-const mindfulnessSignals = ["pausa", "respirar", "respiracao", "mindfulness", "acalmar", "ansioso", "ansiosa", "sobrecarregado", "sobrecarregada"];
+const mindfulnessSignals = [
+  "quero uma pausa",
+  "preciso de uma pausa",
+  "pausa breve",
+  "quero respirar",
+  "me ajude a respirar",
+  "exercicio de respiracao",
+  "pratica de respiracao",
+  "pratica de mindfulness",
+  "quero meditar",
+  "preciso me acalmar",
+];
 
 export function normalizeAlumiaText(value: string) {
   return value

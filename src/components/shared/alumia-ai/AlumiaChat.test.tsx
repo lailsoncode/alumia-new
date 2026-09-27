@@ -95,7 +95,7 @@ describe("Alum.IA chat", () => {
     mockedRespond.mockResolvedValue({ text: "Uma resposta breve.", tone: "default", source: "editorial" });
     render(<AlumiaChat />);
 
-    fireEvent.click(screen.getByRole("button", { name: "O que merece atenção hoje?" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quero conversar um pouco" }));
     expect(await screen.findByText("Uma resposta breve.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Limpar conversa atual" }));

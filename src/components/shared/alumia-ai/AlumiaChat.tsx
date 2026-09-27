@@ -26,15 +26,15 @@ const FIRST_MESSAGE: AlumiaConversationMessage = {
   id: "alumia-welcome",
   role: "assistant",
   text: isAlumiaGenerativeEnabled()
-    ? "Oi, eu sou a Alum.IA. Posso conversar com você e ajudar com tarefas e pausas de Mindfulness. A conversa fica somente nesta tela e nenhuma ação acontece sem você confirmar."
+    ? "Oi, eu sou a Alum.IA. Pode falar comigo do seu jeito. Estou aqui para acompanhar a conversa e, quando você quiser, também posso ajudar a cuidar dos seus próximos passos."
     : "Oi, eu sou a Alum.IA. Nesta prévia, posso ajudar com tarefas e pausas de Mindfulness usando respostas editoriais. A conversa fica somente nesta tela e nenhuma ação acontece sem você confirmar.",
   tone: "default",
 };
 
 const quickPrompts = [
-  "O que merece atenção hoje?",
+  "Quero conversar um pouco",
+  "Quero organizar meu dia",
   "Quero uma pausa breve",
-  "Crie uma tarefa comprar pão",
 ];
 
 function messageId() {
@@ -174,7 +174,7 @@ export function AlumiaChat() {
               </span>
             </div>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Uma assistente para organizar o próximo passo possível — sem cobrança e sem agir por você.
+              Uma assistente pessoal para conversar, compreender o momento e ajudar quando você quiser agir.
             </p>
           </div>
         </div>

@@ -21,6 +21,12 @@ describe("Alum.IA intent rules", () => {
     expect(classifyAlumiaIntent("Quero uma pausa para respirar")) .toBe("mindfulness");
   });
 
+  it("não transforma a expressão de um sentimento em pedido de Mindfulness", () => {
+    expect(classifyAlumiaIntent("Estou ansioso e queria conversar")) .toBe("capabilities");
+    expect(classifyAlumiaIntent("Hoje me sinto muito sobrecarregada")) .toBe("capabilities");
+    expect(classifyAlumiaIntent("Preciso me acalmar")) .toBe("mindfulness");
+  });
+
   it("usa capacidades como resposta segura para texto não reconhecido", () => {
     expect(classifyAlumiaIntent("Como você pode me ajudar?")) .toBe("capabilities");
   });

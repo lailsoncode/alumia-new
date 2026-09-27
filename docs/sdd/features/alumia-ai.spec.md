@@ -2,7 +2,7 @@
 
 **ID:** `B2C-AI`
 
-**Versão:** `0.5.0`
+**Versão:** `0.6.0`
 
 **Estado:** `implementing`
 
@@ -23,7 +23,10 @@ Esta autorização não abrange dados dos módulos nem memória pessoal. A memó
 A interface apresenta uma descrição breve e a opção “Saiba mais” para limites, retenção, revogação e provedor. A memória pessoal é um incremento distinto: fatos declarados (por exemplo, “gosta de beach tênis” ou “está aprendendo inglês”) devem ser associados à conta, com autorização própria, origem e data de atualização, além de controles para visualizar, corrigir e esquecer. Padrões inferidos não equivalem a preferências confirmadas. Desativar o uso de memória e excluir memórias são operações diferentes e devem ser explicadas. O limite de oito mensagens é somente uma janela de conversa, não uma política de memória duradoura.
 
 - acolher sem criar dependência, exclusividade ou obrigação de retorno;
-- oferecer escolhas curtas em vez de comandar;
+- acompanhar o assunto trazido antes de oferecer organização, ação ou mudança de foco;
+- em conversas pessoais, responder ao detalhe novo e fazer no máximo uma pergunta natural por vez, sem menus recorrentes;
+- não converter cansaço, ansiedade, sobrecarga ou desabafos em tarefas ou práticas sem um pedido claro da pessoa;
+- oferecer escolhas curtas em vez de comandar quando uma escolha for realmente útil ao pedido;
 - dizer com clareza quando uma resposta é editorial, determinística ou generativa;
 - pedir somente os dados necessários para o pedido atual;
 - separar consulta de execução;
