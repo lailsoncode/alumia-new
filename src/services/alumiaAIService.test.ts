@@ -3,6 +3,8 @@ import { confirmAlumiaAction, respondToAlumia } from "./alumiaAIService";
 import { createTask, getTasks } from "./tasksService";
 import { getMindfulnessPractices } from "./mindfulnessService";
 import { supabase } from "@/lib/supabaseClient";
+import { getAlumiaContextPreference } from "./alumiaPreferencesService";
+vi.mock("./alumiaPreferencesService", () => ({ getAlumiaContextPreference: vi.fn() }));
 
 vi.mock("./tasksService", () => ({
   createTask: vi.fn(),
@@ -25,6 +27,8 @@ const mockedGetSession = vi.mocked(supabase.auth.getSession);
 describe("Alum.IA editorial provider", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "false");
+    vi.mocked(getAlumiaContextPreference).mockResolvedValue(false);
   });
 
   afterEach(() => {
@@ -100,6 +104,7 @@ describe("Alum.IA editorial provider", () => {
   });
 
   it("usa o Cloud Run autenticado apenas quando a fase generativa está habilitada", async () => {
+    vi.mocked(getAlumiaContextPreference).mockResolvedValue(true);
     vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
     vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
     mockedGetSession.mockResolvedValue({
@@ -162,6 +167,20 @@ describe("Alum.IA editorial provider", () => {
       date: "2026-09-28",
       priority: "alta",
     });
+    expect(mockedCreateTask).not.toHaveBeenCalled();
+  });
+
+  it.each([null, false, "failure"] as const)("não transmite histórico quando a autorização é %s", async (preference) => {
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
+    vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
+    if (preference === "failure") vi.mocked(getAlumiaContextPreference).mockRejectedValue(new Error("offline"));
+    else vi.mocked(getAlumiaContextPreference).mockResolvedValue(preference);
+    mockedGetSession.mockResolvedValue({ data: { session: { access_token: "jwt-valid" } }, error: null } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ mode: "generative", message: "Bom dia! Qual tarefa?" })));
+    vi.stubGlobal("fetch", fetchMock);
+    await respondToAlumia("Oi, queria criar uma tarefa", [{ id: "old", role: "user", text: "Mensagem anterior" }]);
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body)).history).toEqual([]);
+    expect(mockedGetTasks).not.toHaveBeenCalled();
     expect(mockedCreateTask).not.toHaveBeenCalled();
   });
 });

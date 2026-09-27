@@ -43,7 +43,9 @@ Configuração implantada em 27 de setembro de 2026:
 - acesso HTTP público, mas toda chamada de chat exige JWT Supabase válido;
 - mínimo de instâncias zero, timeout de 60 segundos e limite inicial de três instâncias;
 - limite defensivo inicial de 12 gerações por minuto por usuário e por instância;
-- revisão atual `alumia-ai-00004-mr6`, servindo 100% do tráfego;
+- revisão atual `alumia-ai-00005-wpb`, servindo 100% do tráfego;
 - URL estável `https://alumia-ai-696823006824.southamerica-east1.run.app`.
 
 O frontend possui integração autenticada, mas ela permanece desligada por padrão por `VITE_ENABLE_ALUMIA_AI_GENERATIVE=false`. A ativação pública depende dos gates restantes do [ADR-011](../../docs/sdd/adrs/011-alumia-ai-hybrid-cloud.md).
+
+O histórico só é utilizado quando `alumia_ai_preferences.conversation_context` está autorizado na versão 1. A preferência é consultada com o JWT da pessoa e RLS em cada solicitação. Ausência, revogação ou falha de leitura descarta o histórico antes de chamar o modelo. A aplicação também deixa de enviar histórico nessa situação. O limite atual é de oito mensagens; não existe memória persistente de fatos pessoais nesta revisão.

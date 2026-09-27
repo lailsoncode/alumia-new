@@ -2,7 +2,7 @@
 
 **ID:** `B2C-AI`
 
-**Versão:** `0.3.0`
+**Versão:** `0.4.0`
 
 **Estado:** `implementing`
 
@@ -13,6 +13,14 @@ A pessoa conversa por texto com uma assistente de cuidado e organização que ex
 A Alum.IA não é terapeuta, profissional de saúde, consultora financeira ou representante da empresa que oferece o benefício. Ela não diagnostica, não prescreve, não garante resultados e não transforma sinais pessoais em avaliação profissional.
 
 ## 2. Princípios de interação
+
+### Contexto autorizado da conversa
+
+O contexto começa desativado. Na primeira utilização generativa, a pessoa pode autorizar o processamento de até oito mensagens anteriores da conversa atual no Google Cloud ou continuar sem contexto. A decisão (versão 1) é persistida por conta em `alumia_ai_preferences`, protegida por RLS; nenhuma mensagem é persistida. Ajustes oferece um switch para ativar ou revogar. A revogação vale para as próximas solicitações e não desfaz processamento já iniciado. O backend consulta a preferência autenticada em cada requisição e remove o histórico se a autorização estiver ausente, revogada, inválida ou indisponível. O cliente também impede o envio nessa situação.
+
+Esta autorização não abrange dados dos módulos, memória entre sessões nem aprendizado de preferências. Essas capacidades continuam pendentes de implementação e de controles específicos. Consultas explícitas a Tarefas e o fluxo de Mindfulness ainda são locais. Pedidos conversacionais de criação são encaminhados ao Gemini, que pergunta o conteúdo quando o pedido estiver incompleto.
+
+A interface apresenta uma descrição breve e a opção “Saiba mais” para limites, retenção, revogação e provedor. A memória pessoal é um incremento distinto: fatos declarados (por exemplo, “gosta de beach tênis” ou “está aprendendo inglês”) devem ser associados à conta, com autorização própria, origem e data de atualização, além de controles para visualizar, corrigir e esquecer. Padrões inferidos não equivalem a preferências confirmadas. Desativar o uso de memória e excluir memórias são operações diferentes e devem ser explicadas. O limite de oito mensagens é somente uma janela de conversa, não uma política de memória duradoura.
 
 - acolher sem criar dependência, exclusividade ou obrigação de retorno;
 - oferecer escolhas curtas em vez de comandar;

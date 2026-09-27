@@ -10,6 +10,7 @@ import { disablePushNotifications, enablePushNotifications, getPushNotificationS
 import { getTasks } from "@/services/tasksService";
 import { synchronizeTaskReminders } from "@/services/taskReminderService";
 import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
+import { AlumiaContextPreference } from "@/components/shared/alumia-ai/AlumiaContextPreference";
 
 function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
   return (
@@ -143,6 +144,7 @@ export function SettingsPage() {
           </Surface>
         </section>
 
+        <AlumiaContextPreference settings />
         <section className="grid gap-2.5 lg:grid-cols-2">
           <div>
             <SectionHeader icon={AccessibilityIcon} iconClassName="text-tone-sky-fg" title="Acessibilidade" />

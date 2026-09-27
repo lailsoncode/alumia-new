@@ -4,6 +4,7 @@ import { getLocalDateString } from "@/lib/utils";
 import type { AlumiaAssistantResult, AlumiaConversationMessage, AlumiaProposedAction, MindfulnessPractice, Task } from "@/types";
 import { getMindfulnessPractices } from "./mindfulnessService";
 import { createTask, getTasks } from "./tasksService";
+import { getAlumiaContextPreference } from "./alumiaPreferencesService";
 
 const CRISIS_RESPONSE =
   "Sinto muito que este momento esteja tão difícil. Eu não consigo oferecer o apoio humano que uma situação assim merece. Se puder, procure agora alguém de confiança para ficar com você. No Brasil, o CVV atende gratuitamente pelo 188. Se houver perigo imediato ou uma emergência, ligue para o SAMU no 192 ou procure o serviço de emergência da sua região.";
@@ -61,7 +62,8 @@ async function requestGenerativeResponse(message: string, history: AlumiaConvers
   const accessToken = data.session?.access_token;
   if (error || !accessToken) throw new Error("ALUMIA_SESSION_UNAVAILABLE");
 
-  const safeHistory = history
+  const contextAllowed = await getAlumiaContextPreference().catch(() => false);
+  const safeHistory = (contextAllowed === true ? history : [])
     .filter((item) => item.role === "user" || item.source === "generative")
     .slice(-8)
     .map(({ role, text }) => ({ role, text }));
@@ -139,6 +141,12 @@ export async function respondToAlumia(
 
   if (intent === "crisis") {
     return { text: CRISIS_RESPONSE, tone: "safety", source: "editorial" };
+  }
+
+  // Only explicit module reads use the local provider; conversational creation goes to Gemini.
+  const explicitTaskRead = /(?:quais|mostr[ae]|listar?|ver|pendentes|atrasad[ao]s|o que merece atenção)/i.test(message);
+  if (isAlumiaGenerativeEnabled() && intent !== "mindfulness" && !(intent === "tasks" && explicitTaskRead)) {
+    return requestGenerativeResponse(message, history);
   }
 
   if (intent === "create_task") {

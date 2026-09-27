@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
 import { AddTaskSheet } from "@/components/shared/tasks/AddTaskSheet";
+import { AlumiaContextPreference } from "./AlumiaContextPreference";
 import { cn } from "@/lib/utils";
 import { confirmAlumiaAction, isAlumiaGenerativeEnabled, respondToAlumia } from "@/services/alumiaAIService";
 import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
@@ -177,11 +178,12 @@ export function AlumiaChat() {
         </div>
       </Surface>
 
+      {isAlumiaGenerativeEnabled() && <AlumiaContextPreference />}
       <Surface variant="subtle" className="flex items-start gap-2.5 p-3 text-sm leading-relaxed">
         <AlumiaIcon icon={LockIcon} size="sm" className="module-text mt-0.5" />
         <p>
           {isAlumiaGenerativeEnabled()
-            ? "Suas mensagens não são salvas. Perguntas abertas são processadas pela Alum.IA no Google Cloud; dados de Tarefas e Mindfulness não são enviados ao modelo."
+            ? "Você decide o que compartilhar. A conversa fica só nesta tela, e qualquer ação precisa da sua confirmação."
             : "Nesta etapa, suas mensagens não são salvas nem enviadas a um modelo de IA. A Alum.IA consulta apenas Tarefas e Mindfulness quando você pede."}
         </p>
       </Surface>

@@ -92,6 +92,8 @@ export function createApp({ authorize, generate, allowedOrigins = new Set(), che
         return;
       }
 
+      // The authenticated preference is authoritative, never a client-supplied flag.
+      if (user.contextEnabled !== true) input.history = [];
       const result = await generate(input);
       if (result.kind === "proposal" && result.proposal?.type === "create_task") {
         response.json({

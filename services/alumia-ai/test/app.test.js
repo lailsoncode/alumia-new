@@ -10,6 +10,25 @@ function chatBody(message, history = []) {
   });
 }
 
+for (const enabled of [true, false, undefined]) {
+  test(`histórico só chega ao modelo com autorização: ${enabled}`, async () => {
+    const history = [{ role: "user", text: "mensagem anterior privada" }];
+    await withServer({
+      authorize: async () => ({ id: "user-1", contextEnabled: enabled }),
+      generate: async (input) => {
+        assert.deepEqual(input.history, enabled === true ? history : []);
+        return { kind: "message", text: "Olá" };
+      },
+    }, async (url) => {
+      const response = await fetch(`${url}/v1/chat`, {
+        method: "POST", headers: { authorization: "Bearer valid", "content-type": "application/json" },
+        body: chatBody("Olá", history),
+      });
+      assert.equal(response.status, 200);
+    });
+  });
+}
+
 async function withServer(options, run) {
   const server = createApp(options).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
