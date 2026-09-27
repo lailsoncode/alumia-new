@@ -33,7 +33,7 @@ function parseChatBody(body) {
   return { message, history, context: { localDate, timeZone } };
 }
 
-export function createApp({ authorize, generate, readMemories = async () => [], allowedOrigins = new Set(), checkRateLimit = () => ({ allowed: true }) }) {
+export function createApp({ authorize, generate, readMemories = async () => [], writeMemory = async () => {}, allowedOrigins = new Set(), checkRateLimit = () => ({ allowed: true }) }) {
   const app = express();
   app.disable("x-powered-by");
   app.use(express.json({ limit: "16kb" }));
@@ -98,7 +98,8 @@ export function createApp({ authorize, generate, readMemories = async () => [], 
       input.memories = input.memoryEnabled ? await readMemories({ token, userId: user.id }) : [];
       const result = await generate(input);
       if (result.kind === "memory_proposal" && input.memoryEnabled) {
-        response.json({ mode: "memory_proposal", message: "Posso guardar isso para nossas próximas conversas?", memorySuggestion: result.memorySuggestion, requestId });
+        await writeMemory({ token, userId: user.id, content: result.memorySuggestion.content });
+        response.json({ mode: "memory_learned", message: `Vou lembrar que ${result.memorySuggestion.content.charAt(0).toLocaleLowerCase("pt-BR")}${result.memorySuggestion.content.slice(1)}.`, learnedMemory: result.memorySuggestion, requestId });
         return;
       }
       if (result.kind === "proposal" && result.proposal?.type === "create_task") {

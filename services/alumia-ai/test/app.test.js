@@ -201,6 +201,45 @@ test("devolve uma proposta com identificador sem executar a tarefa", async () =>
   });
 });
 
+test("grava lembrança automaticamente apenas com autorização validada", async () => {
+  let written;
+  await withServer({
+    authorize: async () => ({ id: "user-1", memoryEnabled: true }),
+    generate: async () => ({ kind: "memory_proposal", memorySuggestion: { content: "Gosta de beach tênis" } }),
+    writeMemory: async (value) => { written = value; },
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/chat`, {
+      method: "POST",
+      headers: { authorization: "Bearer valid", "content-type": "application/json" },
+      body: chatBody("Eu gosto de beach tênis"),
+    });
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.mode, "memory_learned");
+    assert.deepEqual(body.learnedMemory, { content: "Gosta de beach tênis" });
+    assert.deepEqual(written, { token: "valid", userId: "user-1", content: "Gosta de beach tênis" });
+  });
+});
+
+test("não grava lembrança quando a autorização não está ativa", async () => {
+  let written = false;
+  await withServer({
+    authorize: async () => ({ id: "user-1", memoryEnabled: false }),
+    generate: async () => ({ kind: "memory_proposal", memorySuggestion: { content: "Gosta de beach tênis" } }),
+    writeMemory: async () => { written = true; },
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/chat`, {
+      method: "POST",
+      headers: { authorization: "Bearer valid", "content-type": "application/json" },
+      body: chatBody("Eu gosto de beach tênis"),
+    });
+    assert.equal(response.status, 503);
+    assert.equal(written, false);
+  });
+});
+
 test("recusa contexto temporal ausente ou inválido", async () => {
   await withServer({
     authorize: async () => ({ id: "user-1" }),

@@ -1,15 +1,16 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(6);
+select plan(7);
 create temporary table memory_test_results (result text);
 grant all on memory_test_results to authenticated;
 insert into auth.users (id) values ('fd9111ef-1421-4f9a-aec5-303875342001'), ('fd9111ef-1421-4f9a-aec5-303875342002');
 insert into public.alumia_ai_preferences (user_id, memory_enabled, memory_consent_version)
-values ('fd9111ef-1421-4f9a-aec5-303875342001', true, 1), ('fd9111ef-1421-4f9a-aec5-303875342002', false, 1);
+values ('fd9111ef-1421-4f9a-aec5-303875342001', true, 2), ('fd9111ef-1421-4f9a-aec5-303875342002', false, 2);
 set local role authenticated;
 select set_config('request.jwt.claim.sub', 'fd9111ef-1421-4f9a-aec5-303875342001', true);
 insert into memory_test_results select lives_ok($$insert into public.alumia_memories (user_id, content) values (auth.uid(), 'Aprende inglês')$$, 'authorized owner can save');
-insert into memory_test_results select is((select count(*)::int from public.alumia_memories), 1, 'owner sees own memory');
+insert into memory_test_results select lives_ok($$insert into public.alumia_memories (user_id, content, source) values (auth.uid(), 'Gosta de beach tênis', 'assistant_learned')$$, 'authorized assistant learning can save');
+insert into memory_test_results select is((select count(*)::int from public.alumia_memories), 2, 'owner sees own memories');
 select set_config('request.jwt.claim.sub', 'fd9111ef-1421-4f9a-aec5-303875342002', true);
 insert into memory_test_results select is((select count(*)::int from public.alumia_memories), 0, 'other account cannot read');
 insert into memory_test_results select throws_ok($$insert into public.alumia_memories (user_id, content) values (auth.uid(), 'Gosta de tênis')$$, '42501', null, 'disabled account cannot save');

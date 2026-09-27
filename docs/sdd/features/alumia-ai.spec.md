@@ -2,7 +2,7 @@
 
 **ID:** `B2C-AI`
 
-**Versão:** `0.6.0`
+**Versão:** `0.7.0`
 
 **Estado:** `implementing`
 
@@ -18,7 +18,7 @@ A Alum.IA não é terapeuta, profissional de saúde, consultora financeira ou re
 
 O contexto começa desativado. Na primeira utilização generativa, a pessoa pode autorizar o processamento de até oito mensagens anteriores da conversa atual no Google Cloud ou continuar sem contexto. A decisão (versão 1) é persistida por conta em `alumia_ai_preferences`, protegida por RLS; nenhuma mensagem é persistida. Ajustes oferece um switch para ativar ou revogar. A revogação vale para as próximas solicitações e não desfaz processamento já iniciado. O backend consulta a preferência autenticada em cada requisição e remove o histórico se a autorização estiver ausente, revogada, inválida ou indisponível. O cliente também impede o envio nessa situação.
 
-Esta autorização não abrange dados dos módulos nem memória pessoal. A memória pessoal tem autorização independente em “Minhas lembranças”, disponível no chat e em Ajustes. Consultas explícitas a Tarefas e o fluxo de Mindfulness ainda são locais. Pedidos conversacionais de criação são encaminhados ao Gemini, que pergunta o conteúdo quando o pedido estiver incompleto.
+Esta autorização não abrange aprendizado pessoal. O aprendizado possui autorização global independente, explícita e versionada, disponível no primeiro diálogo e em Ajustes. Ela possui a finalidade determinada de formar um perfil com preferências, objetivos e rotinas para personalizar conversas e sugestões. A pessoa não escolhe módulos individualmente: fontes não sensíveis serão conectadas gradualmente sob a mesma finalidade informada. Qualquer ampliação para categorias sensíveis exigirá autorização própria e destacada. Consultas explícitas a Tarefas e o fluxo de Mindfulness ainda são locais. Pedidos conversacionais de criação são encaminhados ao Gemini, que pergunta o conteúdo quando o pedido estiver incompleto.
 
 A interface apresenta uma descrição breve e a opção “Saiba mais” para limites, retenção, revogação e provedor. A memória pessoal é um incremento distinto: fatos declarados (por exemplo, “gosta de beach tênis” ou “está aprendendo inglês”) devem ser associados à conta, com autorização própria, origem e data de atualização, além de controles para visualizar, corrigir e esquecer. Padrões inferidos não equivalem a preferências confirmadas. Desativar o uso de memória e excluir memórias são operações diferentes e devem ser explicadas. O limite de oito mensagens é somente uma janela de conversa, não uma política de memória duradoura.
 
@@ -33,6 +33,8 @@ A interface apresenta uma descrição breve e a opção “Saiba mais” para li
 - permitir desistir, corrigir e recomeçar sem punição;
 - não inferir diagnóstico, risco clínico, capacidade profissional ou valor pessoal;
 - nunca disponibilizar conversas ou contexto B2C à empresa, suporte ou painel master.
+- permitir recusar o aprendizado sem perder acesso à Alumia, revogar a autorização de forma facilitada e distinguir revogação de exclusão;
+- permitir consultar, corrigir, baixar e apagar as lembranças do perfil pessoal;
 
 ## 3. Incrementos ativos — prévia segura e conversa generativa controlada
 
@@ -231,6 +233,16 @@ Referências operacionais verificadas: [CVV — Ligue 188](https://cvv.org.br/li
 - Interface permite adicionar, corrigir e esquecer cada lembrança. Desativar preserva a lista e impede uso e novas gravações; esquecer exclui a linha ativa, sem desfazer respostas anteriores.
 - Conversas não são persistidas. O prompt orienta a não propor atributos sensíveis, credenciais nem dados de terceiros; não é uma garantia de classificação perfeita.
 - Testes cobrem autorização independente, isolamento via RLS, revogação, proposta sem gravação e confirmação de exclusão.
+
+### Aprendizado pessoal — incremento 0.7
+
+- A autorização de aprendizado usa `memory_consent_version=2`; permissões da versão 1 não são ampliadas automaticamente e as lembranças existentes são preservadas.
+- No primeiro acesso sem decisão, um diálogo explica finalidade, categorias iniciais, uso de provedor contratado, revogação e exclusão antes de oferecer “Permitir e começar”. “Agora não” registra a recusa e não limita o restante do produto.
+- O perfil inicial é formado por quatro perguntas opcionais, uma por vez. Antes da gravação, a pessoa revisa um resumo com prioridade, objetivo, forma de apoio e abordagens a evitar.
+- Com a autorização ativa, hobbies, preferências e objetivos não sensíveis explicitamente declarados podem ser aprendidos automaticamente durante a conversa. O servidor exige uma citação literal da mensagem atual, grava com o JWT da pessoa e informa discretamente o aprendizado na resposta.
+- Ajustes apresenta um único controle de aprendizado global. Desativar interrompe uso e novas gravações; apagar todas as lembranças exige confirmação separada.
+- A interface permite visualizar origem e atualização, corrigir, excluir individualmente, exportar em JSON e excluir todas as lembranças.
+- Dados sensíveis, check-ins emocionais e inferências clínicas permanecem fora deste incremento. A integração automática com eventos dos módulos será feita em incrementos posteriores sobre esta autorização e exigirá nova versão se a finalidade ou as categorias informadas mudarem.
 
 Evidência prevista nesta entrega:
 

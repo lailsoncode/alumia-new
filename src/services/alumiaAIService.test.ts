@@ -170,6 +170,24 @@ describe("Alum.IA editorial provider", () => {
     expect(mockedCreateTask).not.toHaveBeenCalled();
   });
 
+  it("apresenta discretamente uma lembrança já gravada pelo serviço autorizado", async () => {
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
+    vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
+    mockedGetSession.mockResolvedValue({
+      data: { session: { access_token: "jwt-valid" } }, error: null,
+    } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      mode: "memory_learned",
+      message: "Vou lembrar que gosta de beach tênis.",
+      learnedMemory: { content: "Gosta de beach tênis" },
+    }), { status: 200 })));
+
+    const result = await respondToAlumia("Eu gosto de beach tênis");
+
+    expect(result.learnedMemory).toEqual({ content: "Gosta de beach tênis" });
+    expect(result.text).toContain("Vou lembrar");
+  });
+
   it.each([null, false, "failure"] as const)("não transmite histórico quando a autorização é %s", async (preference) => {
     vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
     vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");

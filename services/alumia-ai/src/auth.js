@@ -21,7 +21,7 @@ export function createSupabaseAuthorizer({ supabaseUrl, supabaseAnonKey, fetchIm
       if (preference.ok) {
         const rows = await preference.json();
         contextEnabled = rows[0]?.consent_version === 1 && rows[0]?.conversation_context === true;
-        memoryEnabled = rows[0]?.memory_consent_version === 1 && rows[0]?.memory_enabled === true;
+        memoryEnabled = rows[0]?.memory_consent_version === 2 && rows[0]?.memory_enabled === true;
       }
     } catch { /* Failure to check consent must never enable context. */ }
     return { id: user.id, contextEnabled, memoryEnabled };

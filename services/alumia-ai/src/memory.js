@@ -1,6 +1,6 @@
 export const PROPOSE_MEMORY = {
-  name: "propose_user_memory",
-  description: "Propõe uma lembrança pessoal explicitamente declarada nesta mensagem para o usuário confirmar. Nunca salva automaticamente.",
+  name: "remember_user_fact",
+  description: "Registra, quando o aprendizado estiver autorizado, um hobby, preferência ou objetivo não sensível explicitamente declarado na mensagem atual.",
   parametersJsonSchema: {
     type: "object", additionalProperties: false,
     properties: {
@@ -12,12 +12,29 @@ export const PROPOSE_MEMORY = {
 };
 
 export function normalizeMemoryProposal(call, message) {
-  if (call?.name !== "propose_user_memory") return null;
+  if (call?.name !== "remember_user_fact") return null;
   const { content, quote } = call.args ?? {};
   if (typeof content !== "string" || typeof quote !== "string") return null;
   const value = content.trim();
   if (!value || value.length > 240 || quote.trim().length < 5 || !message.includes(quote)) return null;
   return { content: value };
+}
+
+export function createMemoryWriter({ supabaseUrl, supabaseAnonKey, fetchImpl = fetch }) {
+  return async ({ token, userId, content }) => {
+    const response = await fetchImpl(`${supabaseUrl}/rest/v1/alumia_memories?on_conflict=user_id,content`, {
+      method: "POST",
+      headers: {
+        apikey: supabaseAnonKey,
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+        prefer: "resolution=merge-duplicates,return=minimal",
+      },
+      body: JSON.stringify({ user_id: userId, content, source: "assistant_learned", updated_at: new Date().toISOString() }),
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok) throw new Error("MEMORY_WRITE_FAILED");
+  };
 }
 
 export function createMemoryReader({ supabaseUrl, supabaseAnonKey, fetchImpl = fetch }) {

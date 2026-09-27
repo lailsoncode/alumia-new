@@ -14,5 +14,6 @@ test("prioriza a conversa antes de produtividade", () => {
 test("mantém ações e opiniões sob controle da pessoa", () => {
   assert.match(SYSTEM_INSTRUCTION, /ajude a pessoa a pensar sem decidir por ela/i);
   assert.match(SYSTEM_INSTRUCTION, /Só ofereça organização quando a pessoa pedir/i);
-  assert.match(SYSTEM_INSTRUCTION, /Uma proposta de tarefa ou lembrança sempre será confirmada/i);
+  assert.match(SYSTEM_INSTRUCTION, /Uma proposta de tarefa sempre será confirmada/i);
+  assert.match(SYSTEM_INSTRUCTION, /lembrança não sensível pode ser gravada automaticamente/i);
 });

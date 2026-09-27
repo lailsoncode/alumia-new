@@ -10,8 +10,8 @@ const CRISIS_RESPONSE =
   "Sinto muito que este momento esteja tão difícil. Eu não consigo oferecer o apoio humano que uma situação assim merece. Se puder, procure agora alguém de confiança para ficar com você. No Brasil, o CVV atende gratuitamente pelo 188. Se houver perigo imediato ou uma emergência, ligue para o SAMU no 192 ou procure o serviço de emergência da sua região.";
 
 type RemoteChatResponse = {
-  mode?: "generative" | "safety" | "proposal" | "memory_proposal";
-  memorySuggestion?: { content?: unknown };
+  mode?: "generative" | "safety" | "proposal" | "memory_learned";
+  learnedMemory?: { content?: unknown };
   message?: string;
   proposal?: unknown;
 };
@@ -91,15 +91,15 @@ async function requestGenerativeResponse(message: string, history: AlumiaConvers
   if (!payload.message?.trim()) throw new Error("ALUMIA_EMPTY_RESPONSE");
   const proposedAction = payload.mode === "proposal" ? parseRemoteProposal(payload.proposal) : undefined;
   if (payload.mode === "proposal" && !proposedAction) throw new Error("ALUMIA_INVALID_PROPOSAL");
-  const memoryText = payload.mode === "memory_proposal" ? payload.memorySuggestion?.content : undefined;
-  if (payload.mode === "memory_proposal" && (typeof memoryText !== "string" || !memoryText.trim() || memoryText.length > 240)) throw new Error("ALUMIA_INVALID_MEMORY");
+  const memoryText = payload.mode === "memory_learned" ? payload.learnedMemory?.content : undefined;
+  if (payload.mode === "memory_learned" && (typeof memoryText !== "string" || !memoryText.trim() || memoryText.length > 240)) throw new Error("ALUMIA_INVALID_MEMORY");
 
   return {
     text: payload.message.trim(),
     tone: payload.mode === "safety" ? "safety" : "default",
     source: payload.mode === "safety" ? "editorial" : "generative",
     proposedAction,
-    memorySuggestion: typeof memoryText === "string" ? { content: memoryText.trim() } : undefined,
+    learnedMemory: typeof memoryText === "string" ? { content: memoryText.trim() } : undefined,
   };
 }
 

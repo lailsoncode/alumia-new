@@ -43,11 +43,11 @@ Configuração implantada em 27 de setembro de 2026:
 - acesso HTTP público, mas toda chamada de chat exige JWT Supabase válido;
 - mínimo de instâncias zero, timeout de 60 segundos e limite inicial de três instâncias;
 - limite defensivo inicial de 12 gerações por minuto por usuário e por instância;
-- revisão atual `alumia-ai-00007-4mt`, servindo 100% do tráfego;
+- revisão atual `alumia-ai-00009-szl`, servindo 100% do tráfego;
 - URL estável `https://alumia-ai-696823006824.southamerica-east1.run.app`.
 
 O frontend possui integração autenticada, mas ela permanece desligada por padrão por `VITE_ENABLE_ALUMIA_AI_GENERATIVE=false`. A ativação pública depende dos gates restantes do [ADR-011](../../docs/sdd/adrs/011-alumia-ai-hybrid-cloud.md).
 
 O histórico só é utilizado quando `alumia_ai_preferences.conversation_context` está autorizado na versão 1. A preferência é consultada com o JWT da pessoa e RLS em cada solicitação. Ausência, revogação ou falha de leitura descarta o histórico antes de chamar o modelo. A aplicação também deixa de enviar histórico nessa situação. O limite atual é de oito mensagens.
 
-A memória pessoal usa autorização independente (`memory_enabled`, `memory_consent_version=1`). Com autorização, o backend consulta até 50 fatos recentes de `alumia_memories` usando JWT e RLS. O modelo apenas propõe novas lembranças: a confirmação, edição e exclusão são feitas pela pessoa na interface. Conversas inteiras não são persistidas; a desativação preserva os fatos mas interrompe seu uso. Falha de leitura das lembranças interrompe a geração, evitando fingir conhecer uma memória indisponível.
+A memória pessoal usa autorização independente (`memory_enabled`, `memory_consent_version=2`). A versão 2 representa a finalidade explícita de aprendizado pessoal; autorizações anteriores não são ampliadas automaticamente. Com autorização, o backend consulta até 50 fatos recentes de `alumia_memories` usando JWT e RLS. Hobbies, preferências e objetivos não sensíveis declarados na mensagem atual podem ser gravados automaticamente, sempre com evidência literal validada, RLS e indicação na resposta. O perfil inicial é revisado antes da gravação; a interface permite consultar, corrigir, exportar, revogar o uso e excluir lembranças. Conversas inteiras não são persistidas; a desativação preserva os fatos mas interrompe seu uso. Falha de leitura ou escrita interrompe a geração, evitando uma falsa indicação de aprendizado.

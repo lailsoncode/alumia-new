@@ -15,7 +15,8 @@ import { Surface } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
 import { AddTaskSheet } from "@/components/shared/tasks/AddTaskSheet";
 import { AlumiaContextPreference } from "./AlumiaContextPreference";
-import { AlumiaMemory, MemorySuggestion } from "./AlumiaMemory";
+import { AlumiaMemory } from "./AlumiaMemory";
+import { AlumiaLearningOnboarding } from "./AlumiaLearningOnboarding";
 import { cn } from "@/lib/utils";
 import { confirmAlumiaAction, isAlumiaGenerativeEnabled, respondToAlumia } from "@/services/alumiaAIService";
 import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
@@ -69,7 +70,7 @@ export function AlumiaChat() {
           tone: result.tone,
           source: result.source,
           proposedAction: result.proposedAction,
-          memorySuggestion: result.memorySuggestion,
+          learnedMemory: result.learnedMemory,
           navigation: result.navigation,
         },
       ]);
@@ -155,6 +156,7 @@ export function AlumiaChat() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-3">
+      {isAlumiaGenerativeEnabled() && <AlumiaLearningOnboarding />}
       <Surface className="module-surface p-3 sm:p-4">
         <div className="flex items-start gap-3">
           <span className="module-whisper flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border module-text">
@@ -226,7 +228,7 @@ export function AlumiaChat() {
                   </p>
                 )}
                 <p className="whitespace-pre-line">{message.text}</p>
-                {message.memorySuggestion && <MemorySuggestion content={message.memorySuggestion.content} />}
+                {message.learnedMemory && <p className="mt-2 text-xs text-muted-foreground">Aprendido com sua autorização · você pode corrigir ou apagar em Ajustes.</p>}
 
                 {message.tone === "safety" && (
                   <div className="mt-3 flex flex-wrap gap-2" aria-label="Contatos de apoio">
