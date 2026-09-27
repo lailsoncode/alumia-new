@@ -2,7 +2,7 @@
 
 **ID:** `B2C-TSK`
 
-**Versão:** `0.2.0`
+**Versão:** `0.3.0`
 
 **Estado:** `proposed`
 
@@ -23,6 +23,7 @@ Incluído:
 - alarme opcional com antecedência configurável;
 - identificação visual do módulo que originou ou contextualiza a tarefa;
 - conclusão, reagendamento e desativação da recorrência.
+- reagendamento diário automático e gentil de tarefas não concluídas.
 
 Fora deste incremento:
 
@@ -56,6 +57,7 @@ Fora deste incremento:
 - `B2C-TSK-012`: respeitar horário de silêncio, permissão do sistema e revogação do canal sem alterar o estado da tarefa.
 - `B2C-TSK-013`: persistir o `moduleKey` da tarefa e usar o tema e o ícone correspondentes em qualquer lista; Estudante usa o ícone de graduação e Hidratação usa sua identidade ciano.
 - `B2C-TSK-014`: registrar analytics técnicos sem título, descrição, data exata ou conteúdo pessoal.
+- `B2C-TSK-015`: mover tarefas simples ou recorrentes não concluídas em dias anteriores para o dia atual, preservando a última data anterior e exibindo a mudança sem linguagem punitiva.
 
 ## 5. Estados e transições
 
@@ -73,6 +75,7 @@ aviso planejado → enviado | cancelado | falhou
 - concluir uma ocorrência não encerra a regra recorrente;
 - desativar a recorrência cancela avisos futuros ainda não enviados e preserva o histórico;
 - ignorar uma notificação ou alarme não marca a tarefa como falha.
+- uma tarefa pendente que atravessa a virada do dia volta ao estado planejado no novo dia e registra a data de onde veio.
 
 ## 6. Dados
 
@@ -84,6 +87,7 @@ aviso planejado → enviado | cancelado | falhou
 - `scheduled_local_date` e `scheduled_local_time` para tarefa simples;
 - `timezone` quando o agendamento depender da intenção local;
 - `alarm_offset_minutes` nullable, limitado a `0`, `5`, `15` ou `30`.
+- `last_postponed_from`, `postponed_at` e `postponed_count` registram o reagendamento automático sem criar um estado de falha.
 
 ### `task_recurrence_rules`
 
@@ -189,6 +193,7 @@ O tema da tarefa é contextual. Uma tarefa manual criada no gerenciador recebe `
 - `B2C-TSK-AC-13`: outro usuário, organização, suporte ou platform admin não consegue ler o conteúdo da tarefa.
 - `B2C-TSK-AC-14`: ao tentar configurar lembrete sem data, a pessoa é conduzida ao agendamento; a API rejeita lembrete sem data e alarme relativo sem horário.
 - `B2C-TSK-AC-15`: em viewport de 360 px, ações, prioridades e alarmes não quebram em uma segunda linha nem causam rolagem horizontal na página.
+- `B2C-TSK-AC-16`: ao abrir ou retomar o app depois da data planejada, a tarefa pendente aparece no dia atual com o marcador “Reagendada de {data anterior}” e não permanece em uma seção de atraso.
 
 ## 10. Testes
 

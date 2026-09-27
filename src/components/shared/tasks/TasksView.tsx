@@ -24,14 +24,25 @@ export function TasksView() {
     setError(null);
     getTasks().then(setTasks).catch(() => setError("Não foi possível carregar suas tarefas.")).finally(() => setLoading(false));
   };
-  useEffect(() => load(), []);
+  useEffect(() => {
+    load();
+    const receiveSynchronizedTasks = (event: Event) => {
+      setTasks((event as CustomEvent<Task[]>).detail);
+      setLoading(false);
+    };
+    window.addEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
+    return () => window.removeEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
+  }, []);
 
   const toggleDone = async (id: string) => {
     const current = tasks.find((task) => task.id === id);
     if (!current) return;
     const done = !current.done;
     setTasks((items) => items.map((task) => task.id === id ? { ...task, done } : task));
-    try { await updateTask(id, { done }); }
+    try {
+      await updateTask(id, { done });
+      if (done && current.recurrence?.active) load();
+    }
     catch {
       setTasks((items) => items.map((task) => task.id === id ? current : task));
       setError("A alteração não foi salva. Tente novamente.");
@@ -43,14 +54,15 @@ export function TasksView() {
       const createdTask = await createTask(data);
       setTasks((items) => [...items, createdTask]);
     }
-    catch { setError("Não foi possível adicionar essa tarefa."); }
+    catch (createError) { setError("Não foi possível adicionar essa tarefa."); throw createError; }
   };
 
   const today = getLocalDateString();
-  const important = tasks.filter((task) => task.priority === "alta" && task.date && ((!task.done && task.date <= today) || (task.done && task.date === today)));
-  const scheduled = tasks.filter((task) => task.priority !== "alta" && task.date && ((!task.done && task.date <= today) || (task.done && task.date === today)));
+  const byTime = (first: Task, second: Task) => (first.time || "23:59").localeCompare(second.time || "23:59");
+  const important = tasks.filter((task) => task.priority === "alta" && task.date && ((!task.done && task.date === today) || (task.done && task.date === today))).sort(byTime);
+  const scheduled = tasks.filter((task) => task.priority !== "alta" && task.date && ((!task.done && task.date === today) || (task.done && task.date === today))).sort(byTime);
   const backlog = tasks.filter((task) => !task.date && !task.done);
-  const upcoming = tasks.filter((task) => task.date && task.date > today && !task.done);
+  const upcoming = tasks.filter((task) => task.date && task.date > today && !task.done).sort((first, second) => `${first.date} ${first.time || "23:59"}`.localeCompare(`${second.date} ${second.time || "23:59"}`));
   const sections = [
     {
       title: "Importa hoje",

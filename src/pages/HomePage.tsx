@@ -19,7 +19,15 @@ export function HomePage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => loadTasks(), []);
+  useEffect(() => {
+    loadTasks();
+    const receiveSynchronizedTasks = (event: Event) => {
+      setTasks((event as CustomEvent<Task[]>).detail);
+      setLoading(false);
+    };
+    window.addEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
+    return () => window.removeEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
+  }, []);
 
   const today = getLocalDateString();
   const completedToday = tasks.filter((task) => (

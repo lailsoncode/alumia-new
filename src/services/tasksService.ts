@@ -1,5 +1,7 @@
 import { supabase } from "../lib/supabaseClient";
-import type { Task, AddTaskData } from "../types";
+import { getLocalDateString } from "../lib/utils";
+import { getIsoWeekday, getNextRecurrenceDate } from "../lib/tasks";
+import type { Task, AddTaskData, TaskRecurrence } from "../types";
 import { cancelTaskReminder, scheduleTaskReminder } from "./taskReminderService";
 
 type TaskUpdates = Omit<Partial<Task>, "date" | "time"> & {
@@ -23,14 +25,33 @@ export async function getTasks(): Promise<Task[]> {
   const user = sessionData.session?.user;
   if (!user) return [];
 
+  const { data: rolledRows, error: rolloverError } = await supabase.rpc("rollover_overdue_tasks", { p_today: getLocalDateString() });
+  if (rolloverError) throw rolloverError;
+
   const { data, error } = await supabase
     .from("tasks")
-    .select("*")
+    .select("*, recurrence:task_recurrence_rules(id, frequency, weekdays, starts_on, timezone, active)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
   if (error) throw error;
-  return data || [];
+  const tasks = (data || []).map((row) => {
+    const recurrenceRow = Array.isArray(row.recurrence) ? row.recurrence[0] : row.recurrence;
+    return {
+      ...row,
+      recurrence: recurrenceRow ? {
+        id: recurrenceRow.id,
+        frequency: recurrenceRow.frequency,
+        weekdays: recurrenceRow.weekdays ?? undefined,
+        startsOn: recurrenceRow.starts_on,
+        timezone: recurrenceRow.timezone,
+        active: recurrenceRow.active,
+      } as TaskRecurrence : null,
+    } as Task;
+  });
+  const rolledTaskIds = new Set((rolledRows ?? []).map((row: { task_id: string }) => row.task_id));
+  await Promise.allSettled(tasks.filter((task) => rolledTaskIds.has(task.id)).map((task) => scheduleTaskReminder(task)));
+  return tasks;
 }
 
 /**
@@ -44,6 +65,22 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
   if (sessionError) throw sessionError;
   const user = sessionData.session?.user;
   if (!user) throw new Error("Usuário não autenticado.");
+  if (taskData.reminder && (!taskData.date || !taskData.time)) {
+    throw new Error("Lembretes precisam de data e horário.");
+  }
+  if (taskData.recurrence && !taskData.date) {
+    throw new Error("Recorrências precisam de uma data inicial.");
+  }
+  if (taskData.recurrence?.frequency === "weekly" && !taskData.recurrence.weekdays?.length) {
+    throw new Error("Escolha pelo menos um dia para a recorrência semanal.");
+  }
+  let scheduledDate = taskData.date;
+  if (scheduledDate && taskData.recurrence?.frequency === "weekly") {
+    const selectedDate = new Date(`${scheduledDate}T00:00:00`);
+    if (!taskData.recurrence.weekdays?.includes(getIsoWeekday(selectedDate))) {
+      scheduledDate = getNextRecurrenceDate(scheduledDate, "weekly", taskData.recurrence.weekdays);
+    }
+  }
 
   const { data, error } = await supabase
     .from("tasks")
@@ -52,7 +89,7 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
         user_id: user.id,
         title: taskData.title,
         description: taskData.description || null,
-        date: taskData.date || null,
+        date: scheduledDate || null,
         time: taskData.time || null,
         priority: taskData.priority || null,
         reminder: taskData.reminder || null,
@@ -64,6 +101,21 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
     .single();
 
   if (error) throw error;
+  if (taskData.recurrence) {
+    const { error: recurrenceError } = await supabase.from("task_recurrence_rules").insert({
+      task_id: data.id,
+      user_id: user.id,
+      frequency: taskData.recurrence.frequency,
+      weekdays: taskData.recurrence.frequency === "weekly" ? taskData.recurrence.weekdays : null,
+      starts_on: scheduledDate,
+      timezone: taskData.recurrence.timezone,
+    });
+    if (recurrenceError) {
+      await supabase.from("tasks").delete().eq("id", data.id);
+      throw recurrenceError;
+    }
+    data.recurrence = { id: "pending", active: true, ...taskData.recurrence, startsOn: scheduledDate as string };
+  }
   await scheduleTaskReminder(data, Boolean(taskData.reminder)).catch((scheduleError) => {
     console.error("Não foi possível agendar o lembrete local:", scheduleError);
   });
@@ -78,6 +130,16 @@ export async function createTask(taskData: AddTaskData): Promise<Task> {
  * @returns {Promise<Task>} A tarefa atualizada.
  */
 export async function updateTask(taskId: string, updates: TaskUpdates): Promise<Task> {
+  if (updates.done === true) {
+    const { data, error } = await supabase.rpc("complete_task_and_schedule_next", { p_task_id: taskId });
+    if (error) throw error;
+    const completed = (Array.isArray(data) ? data[0] : data) as Task | null;
+    if (!completed) throw new Error("A tarefa não foi encontrada.");
+    await cancelTaskReminder(taskId).catch((scheduleError) => {
+      console.error("Não foi possível remover o lembrete concluído:", scheduleError);
+    });
+    return completed;
+  }
   const { data, error } = await supabase
     .from("tasks")
     .update({
@@ -89,7 +151,7 @@ export async function updateTask(taskId: string, updates: TaskUpdates): Promise<
       reminder: updates.reminder,
       module_key: updates.moduleKey ?? updates.module_key,
       done: updates.done,
-      completed_at: updates.done === undefined ? undefined : updates.done ? new Date().toISOString() : null,
+      completed_at: updates.done === undefined ? undefined : null,
     })
     .eq("id", taskId)
     .select()

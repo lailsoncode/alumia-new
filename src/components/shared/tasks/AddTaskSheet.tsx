@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { AlarmClockIcon, ArrowRight01Icon, CalendarAdd01Icon, Cancel01Icon, FlagIcon } from "@hugeicons/core-free-icons";
+import { AlarmClockIcon, ArrowRight01Icon, CalendarAdd01Icon, Cancel01Icon, FlagIcon, RepeatIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
-import type { AddTaskData, TaskPriority, TaskReminder } from "@/types";
+import { formatRecurrence } from "@/lib/tasks";
+import type { AddTaskData, TaskPriority, TaskRecurrenceDraft, TaskReminder } from "@/types";
 import { DatePickerSheet } from "./DatePickerSheet";
 import { PrioritySelector } from "./PrioritySelector";
 import { ReminderSelector } from "./ReminderSelector";
@@ -24,8 +25,11 @@ export function AddTaskSheet({ open, onClose, onSave, initialTitle = "", initial
   const [reminder, setReminder] = useState<TaskReminder>(null);
   const [date, setDate] = useState<Date | null>(null);
   const [time, setTime] = useState<string | null>(null);
+  const [recurrence, setRecurrence] = useState<TaskRecurrenceDraft | null>(null);
   const [dateOpen, setDateOpen] = useState(false);
   const [openReminderAfterDate, setOpenReminderAfterDate] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   if (!open) return null;
 
   const dateLabel = date
@@ -46,8 +50,29 @@ export function AddTaskSheet({ open, onClose, onSave, initialTitle = "", initial
 
   const save = async () => {
     const dateValue = date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}` : undefined;
-    await onSave?.({ title: title.trim(), description: description.trim(), priority, reminder, date: dateValue, time: time || undefined, moduleKey });
-    setTitle(""); setDescription(""); setPriority(null); setReminder(null); setDate(null); setTime(null); setActive(null); onClose();
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onSave?.({
+        title: title.trim(),
+        description: description.trim(),
+        priority,
+        reminder,
+        date: dateValue,
+        time: time || undefined,
+        moduleKey,
+        recurrence: recurrence && dateValue ? {
+          ...recurrence,
+          startsOn: dateValue,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+        } : undefined,
+      });
+      setTitle(""); setDescription(""); setPriority(null); setReminder(null); setDate(null); setTime(null); setRecurrence(null); setActive(null); onClose();
+    } catch {
+      setSaveError("Não foi possível salvar agora. Seu rascunho continua aqui.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -72,23 +97,28 @@ export function AddTaskSheet({ open, onClose, onSave, initialTitle = "", initial
         </div>
         {active === "prioridade" && <PrioritySelector selectedPriority={priority} onChangePriority={setPriority} />}
         {active === "lembrete" && <ReminderSelector selectedReminder={reminder} onChangeReminder={setReminder} />}
+        {recurrence && <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary"><AlumiaIcon icon={RepeatIcon} size="xs" />{formatRecurrence(recurrence)}</p>}
+        {saveError && <p role="alert" className="mt-2 text-sm text-destructive">{saveError}</p>}
 
         <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-2">
-          <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button type="button" onClick={save} disabled={!title.trim()}>Salvar tarefa<AlumiaIcon icon={ArrowRight01Icon} size="xs" /></Button>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button type="button" onClick={save} disabled={!title.trim() || saving}>{saving ? "Salvando…" : "Salvar tarefa"}<AlumiaIcon icon={ArrowRight01Icon} size="xs" /></Button>
         </div>
       </section>
       <DatePickerSheet
         open={dateOpen}
         onClose={() => { setDateOpen(false); setOpenReminderAfterDate(false); }}
-        onSave={(selectedDate, selectedTime) => {
+        onSave={(selectedDate, selectedTime, selectedRecurrence) => {
           setDate(selectedDate);
           setTime(selectedTime);
+          setRecurrence(selectedRecurrence);
+          if (!selectedDate) setReminder(null);
           if (openReminderAfterDate && selectedDate && selectedTime) setActive("lembrete");
           setOpenReminderAfterDate(false);
         }}
         initialDate={date}
         initialTime={time}
+        initialRecurrence={recurrence}
         requireTime={openReminderAfterDate || Boolean(reminder)}
       />
     </>

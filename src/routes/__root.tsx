@@ -151,9 +151,35 @@ function RuntimeIntegrations() {
 
   useEffect(() => {
     if (loading || !user) return;
-    void getTasks()
-      .then(synchronizeTaskReminders)
-      .catch((error) => console.error("Erro ao sincronizar lembretes locais:", error));
+    let midnightTimer: ReturnType<typeof setTimeout>;
+
+    const syncTasks = () => getTasks()
+      .then(async (tasks) => {
+        await synchronizeTaskReminders(tasks);
+        window.dispatchEvent(new CustomEvent("alumia:tasks-synchronized", { detail: tasks }));
+      })
+      .catch((error) => console.error("Erro ao sincronizar tarefas:", error));
+
+    const scheduleMidnightSync = () => {
+      const now = new Date();
+      const nextMidnight = new Date(now);
+      nextMidnight.setHours(24, 0, 1, 0);
+      midnightTimer = setTimeout(() => {
+        void syncTasks().finally(scheduleMidnightSync);
+      }, nextMidnight.getTime() - now.getTime());
+    };
+
+    const syncWhenVisible = () => {
+      if (document.visibilityState === "visible") void syncTasks();
+    };
+
+    void syncTasks();
+    scheduleMidnightSync();
+    document.addEventListener("visibilitychange", syncWhenVisible);
+    return () => {
+      clearTimeout(midnightTimer);
+      document.removeEventListener("visibilitychange", syncWhenVisible);
+    };
   }, [loading, user]);
 
   return null;

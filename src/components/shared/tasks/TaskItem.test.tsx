@@ -16,4 +16,14 @@ describe("TaskItem", () => {
     expect(item).not.toHaveClass("module-surface");
     expect(screen.getByText("Hidratação")).toBeInTheDocument();
   });
+
+  it("explica quando uma tarefa foi reagendada automaticamente", () => {
+    render(
+      <ul>
+        <TaskItem task={{ id: "moved-task", title: "Fazer uma pausa", date: "2026-09-27", last_postponed_from: "2026-09-26" }} />
+      </ul>,
+    );
+
+    expect(screen.getByText(/Reagendada de 26 de set\./)).toBeInTheDocument();
+  });
 });

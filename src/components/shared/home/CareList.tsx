@@ -21,7 +21,7 @@ export function CareList({ tasks, loading, onRefresh }: CareListProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const today = getLocalDateString();
   const pending = tasks
-    .filter((task) => !task.done && (task.date ? task.date <= today : true))
+    .filter((task) => !task.done && (task.date ? task.date === today : true))
     .sort((a, b) => (a.priority === "alta" && b.priority !== "alta" ? -1 : 0));
 
   const completeTask = async (id: string) => {

@@ -153,8 +153,9 @@ export function CheckinPage() {
               try {
                 await createTask(task);
                 setTaskFeedback({ message: "A sugestão foi adicionada às suas tarefas.", tone: "success" });
-              } catch {
+              } catch (error) {
                 setTaskFeedback({ message: "Não conseguimos adicionar a tarefa agora.", tone: "danger" });
+                throw error;
               }
             }}
           />

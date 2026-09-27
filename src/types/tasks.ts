@@ -15,6 +15,22 @@ export type TaskPriority = "alta" | "media" | "baixa" | null;
  */
 export type TaskReminder = "na_hora" | "5min" | "15min" | "30min" | null;
 
+export type TaskRecurrenceFrequency = "daily" | "weekly";
+
+export interface TaskRecurrenceInput {
+  frequency: TaskRecurrenceFrequency;
+  weekdays?: number[];
+  startsOn: string;
+  timezone: string;
+}
+
+export interface TaskRecurrence extends TaskRecurrenceInput {
+  id: string;
+  active: boolean;
+}
+
+export type TaskRecurrenceDraft = Pick<TaskRecurrenceInput, "frequency" | "weekdays">;
+
 /**
  * Interface principal representando uma Tarefa no sistema.
  */
@@ -34,6 +50,10 @@ export interface Task {
   highlighted?: boolean;
   done?: boolean;
   completed_at?: string | null;
+  postponed_count?: number;
+  last_postponed_from?: string | null;
+  postponed_at?: string | null;
+  recurrence?: TaskRecurrence | null;
 }
 
 /**
@@ -47,4 +67,5 @@ export interface AddTaskData {
   date?: string;
   time?: string;
   moduleKey?: ModuleKey;
+  recurrence?: TaskRecurrenceInput;
 }
