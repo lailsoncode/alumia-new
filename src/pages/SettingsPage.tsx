@@ -120,6 +120,7 @@ export function SettingsPage() {
         <section>
           <SectionHeader icon={Settings01Icon} iconClassName="text-primary" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
           <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
+            <AlumiaContextPreference settings />
             <div className="flex min-h-14 items-center gap-3 px-3 py-2">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-primary" />
@@ -144,7 +145,6 @@ export function SettingsPage() {
           </Surface>
         </section>
 
-        <AlumiaContextPreference settings />
         <section className="grid gap-2.5 lg:grid-cols-2">
           <div>
             <SectionHeader icon={AccessibilityIcon} iconClassName="text-tone-sky-fg" title="Acessibilidade" />

@@ -178,7 +178,6 @@ export function AlumiaChat() {
         </div>
       </Surface>
 
-      {isAlumiaGenerativeEnabled() && <AlumiaContextPreference />}
       <Surface variant="subtle" className="flex items-start gap-2.5 p-3 text-sm leading-relaxed">
         <AlumiaIcon icon={LockIcon} size="sm" className="module-text mt-0.5" />
         <p>
@@ -200,6 +199,7 @@ export function AlumiaChat() {
           </Button>
         </div>
 
+        {isAlumiaGenerativeEnabled() && <AlumiaContextPreference />}
         <div
           role="log"
           aria-live="polite"
