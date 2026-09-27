@@ -1,0 +1,23 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(6);
+create temporary table memory_test_results (result text);
+grant all on memory_test_results to authenticated;
+insert into auth.users (id) values ('fd9111ef-1421-4f9a-aec5-303875342001'), ('fd9111ef-1421-4f9a-aec5-303875342002');
+insert into public.alumia_ai_preferences (user_id, memory_enabled, memory_consent_version)
+values ('fd9111ef-1421-4f9a-aec5-303875342001', true, 1), ('fd9111ef-1421-4f9a-aec5-303875342002', false, 1);
+set local role authenticated;
+select set_config('request.jwt.claim.sub', 'fd9111ef-1421-4f9a-aec5-303875342001', true);
+insert into memory_test_results select lives_ok($$insert into public.alumia_memories (user_id, content) values (auth.uid(), 'Aprende inglês')$$, 'authorized owner can save');
+insert into memory_test_results select is((select count(*)::int from public.alumia_memories), 1, 'owner sees own memory');
+select set_config('request.jwt.claim.sub', 'fd9111ef-1421-4f9a-aec5-303875342002', true);
+insert into memory_test_results select is((select count(*)::int from public.alumia_memories), 0, 'other account cannot read');
+insert into memory_test_results select throws_ok($$insert into public.alumia_memories (user_id, content) values (auth.uid(), 'Gosta de tênis')$$, '42501', null, 'disabled account cannot save');
+select set_config('request.jwt.claim.sub', 'fd9111ef-1421-4f9a-aec5-303875342001', true);
+update public.alumia_ai_preferences set memory_enabled = false where user_id = auth.uid();
+insert into memory_test_results select throws_ok($$update public.alumia_memories set content = 'Aprende francês' where user_id = auth.uid()$$, '42501', null, 'revocation blocks updates');
+delete from public.alumia_memories where user_id = auth.uid();
+insert into memory_test_results select is((select count(*)::int from public.alumia_memories), 0, 'owner can forget even when disabled');
+insert into memory_test_results select * from finish();
+select json_agg(result) as results from memory_test_results;
+rollback;

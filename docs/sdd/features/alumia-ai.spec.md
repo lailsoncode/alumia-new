@@ -2,7 +2,7 @@
 
 **ID:** `B2C-AI`
 
-**Versão:** `0.4.0`
+**Versão:** `0.5.0`
 
 **Estado:** `implementing`
 
@@ -18,7 +18,7 @@ A Alum.IA não é terapeuta, profissional de saúde, consultora financeira ou re
 
 O contexto começa desativado. Na primeira utilização generativa, a pessoa pode autorizar o processamento de até oito mensagens anteriores da conversa atual no Google Cloud ou continuar sem contexto. A decisão (versão 1) é persistida por conta em `alumia_ai_preferences`, protegida por RLS; nenhuma mensagem é persistida. Ajustes oferece um switch para ativar ou revogar. A revogação vale para as próximas solicitações e não desfaz processamento já iniciado. O backend consulta a preferência autenticada em cada requisição e remove o histórico se a autorização estiver ausente, revogada, inválida ou indisponível. O cliente também impede o envio nessa situação.
 
-Esta autorização não abrange dados dos módulos, memória entre sessões nem aprendizado de preferências. Essas capacidades continuam pendentes de implementação e de controles específicos. Consultas explícitas a Tarefas e o fluxo de Mindfulness ainda são locais. Pedidos conversacionais de criação são encaminhados ao Gemini, que pergunta o conteúdo quando o pedido estiver incompleto.
+Esta autorização não abrange dados dos módulos nem memória pessoal. A memória pessoal tem autorização independente em “Minhas lembranças”, disponível no chat e em Ajustes. Consultas explícitas a Tarefas e o fluxo de Mindfulness ainda são locais. Pedidos conversacionais de criação são encaminhados ao Gemini, que pergunta o conteúdo quando o pedido estiver incompleto.
 
 A interface apresenta uma descrição breve e a opção “Saiba mais” para limites, retenção, revogação e provedor. A memória pessoal é um incremento distinto: fatos declarados (por exemplo, “gosta de beach tênis” ou “está aprendendo inglês”) devem ser associados à conta, com autorização própria, origem e data de atualização, além de controles para visualizar, corrigir e esquecer. Padrões inferidos não equivalem a preferências confirmadas. Desativar o uso de memória e excluir memórias são operações diferentes e devem ser explicadas. O limite de oito mensagens é somente uma janela de conversa, não uma política de memória duradoura.
 
@@ -56,7 +56,7 @@ Incluído:
 Ficam fora deste incremento:
 
 - armazenamento de conversas;
-- memória entre sessões;
+- armazenamento integral de conversas entre sessões e inferência automática de preferências;
 - áudio ou voz;
 - leitura de check-ins emocionais, hidratação, estudante ou finanças;
 - envio de conteúdo de Tarefas ou Mindfulness ao modelo;
@@ -218,6 +218,16 @@ Referências operacionais verificadas: [CVV — Ligue 188](https://cvv.org.br/li
 - `B2C-AI-AC-19`: argumentos desconhecidos, datas ou horários inválidos e funções fora da allowlist são recusados como proposta.
 
 ## 11. Evidência e pendências
+
+### Memória pessoal — incremento 0.5
+
+- Permissão `memory_enabled` com versão própria, inicialmente desativada; validada no backend em cada solicitação.
+- Fatos confirmados persistem em `alumia_memories` com proprietário, origem e datas. RLS restringe leitura/exclusão à conta e exige permissão ativa para inserir/editar.
+- Gemini propõe fatos declarados na mensagem atual por `propose_user_memory`; validação exige citação literal da mensagem e limite de 240 caracteres. Cada gravação exige confirmação. Essa checagem não prova equivalência semântica, por isso a revisão humana continua necessária.
+- O modelo recebe até 50 lembranças mais recentes com memória ativa; trata-as como dados, sem ampliar permissões ou executar instruções contidas nelas. Não é RAG vetorial.
+- Interface permite adicionar, corrigir e esquecer cada lembrança. Desativar preserva a lista e impede uso e novas gravações; esquecer exclui a linha ativa, sem desfazer respostas anteriores.
+- Conversas não são persistidas. O prompt orienta a não propor atributos sensíveis, credenciais nem dados de terceiros; não é uma garantia de classificação perfeita.
+- Testes cobrem autorização independente, isolamento via RLS, revogação, proposta sem gravação e confirmação de exclusão.
 
 Evidência prevista nesta entrega:
 

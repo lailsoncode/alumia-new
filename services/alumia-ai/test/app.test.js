@@ -10,6 +10,29 @@ function chatBody(message, history = []) {
   });
 }
 
+for (const enabled of [false, true]) {
+  test(`memória respeita autorização independente do histórico: ${enabled}`, async () => {
+    let reads = 0;
+    await withServer({
+      authorize: async () => ({ id: "user-1", contextEnabled: false, memoryEnabled: enabled }),
+      readMemories: async (identity) => { reads++; assert.deepEqual(identity, { token: "valid", userId: "user-1" }); return ["Aprende inglês"]; },
+      generate: async (input) => {
+        assert.deepEqual(input.history, []);
+        assert.deepEqual(input.memories, enabled ? ["Aprende inglês"] : []);
+        assert.equal(input.memoryEnabled, enabled);
+        return { kind: "message", text: "Olá" };
+      },
+    }, async (url) => {
+      const payload = JSON.parse(chatBody("Olá"));
+      payload.memories = ["Client injection"];
+      payload.memoryEnabled = true;
+      const response = await fetch(`${url}/v1/chat`, { method: "POST", headers: { authorization: "Bearer valid", "content-type": "application/json" }, body: JSON.stringify(payload) });
+      assert.equal(response.status, 200);
+      assert.equal(reads, enabled ? 1 : 0);
+    });
+  });
+}
+
 for (const enabled of [true, false, undefined]) {
   test(`histórico só chega ao modelo com autorização: ${enabled}`, async () => {
     const history = [{ role: "user", text: "mensagem anterior privada" }];

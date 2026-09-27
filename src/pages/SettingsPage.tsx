@@ -11,6 +11,7 @@ import { getTasks } from "@/services/tasksService";
 import { synchronizeTaskReminders } from "@/services/taskReminderService";
 import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
 import { AlumiaContextPreference } from "@/components/shared/alumia-ai/AlumiaContextPreference";
+import { AlumiaMemory } from "@/components/shared/alumia-ai/AlumiaMemory";
 
 function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
   return (
@@ -121,6 +122,7 @@ export function SettingsPage() {
           <SectionHeader icon={Settings01Icon} iconClassName="text-primary" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
           <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
             <AlumiaContextPreference settings />
+            <AlumiaMemory settings />
             <div className="flex min-h-14 items-center gap-3 px-3 py-2">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-primary" />

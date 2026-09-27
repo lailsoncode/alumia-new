@@ -3,11 +3,13 @@ import { createSupabaseAuthorizer } from "./auth.js";
 import { readConfig } from "./config.js";
 import { createGeminiGenerator } from "./gemini.js";
 import { createInMemoryRateLimiter } from "./rate-limit.js";
+import { createMemoryReader } from "./memory.js";
 
 const config = readConfig();
 const app = createApp({
   authorize: createSupabaseAuthorizer(config),
   generate: createGeminiGenerator(config),
+  readMemories: createMemoryReader(config),
   allowedOrigins: config.allowedOrigins,
   checkRateLimit: createInMemoryRateLimiter({
     maxRequests: config.rateLimitRequests,

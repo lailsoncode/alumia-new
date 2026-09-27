@@ -15,6 +15,7 @@ import { Surface } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
 import { AddTaskSheet } from "@/components/shared/tasks/AddTaskSheet";
 import { AlumiaContextPreference } from "./AlumiaContextPreference";
+import { AlumiaMemory, MemorySuggestion } from "./AlumiaMemory";
 import { cn } from "@/lib/utils";
 import { confirmAlumiaAction, isAlumiaGenerativeEnabled, respondToAlumia } from "@/services/alumiaAIService";
 import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
@@ -74,6 +75,7 @@ export function AlumiaChat() {
           tone: result.tone,
           source: result.source,
           proposedAction: result.proposedAction,
+          memorySuggestion: result.memorySuggestion,
           navigation: result.navigation,
         },
       ]);
@@ -193,10 +195,13 @@ export function AlumiaChat() {
             <AlumiaIcon icon={SparklesIcon} size="sm" className="module-text" />
             Conversa deste momento
           </div>
+          <div className="flex items-center gap-1">
+          {isAlumiaGenerativeEnabled() && <AlumiaMemory />}
           <Button type="button" variant="ghost" size="sm" onClick={clearConversation} aria-label="Limpar conversa atual">
             <AlumiaIcon icon={Delete02Icon} size="sm" />
             <span className="hidden sm:inline">Limpar</span>
           </Button>
+          </div>
         </div>
 
         {isAlumiaGenerativeEnabled() && <AlumiaContextPreference />}
@@ -227,6 +232,7 @@ export function AlumiaChat() {
                   </p>
                 )}
                 <p className="whitespace-pre-line">{message.text}</p>
+                {message.memorySuggestion && <MemorySuggestion content={message.memorySuggestion.content} />}
 
                 {message.tone === "safety" && (
                   <div className="mt-3 flex flex-wrap gap-2" aria-label="Contatos de apoio">

@@ -15,7 +15,7 @@ for (const [name, rows, expected] of [
       assert.ok(url.includes("user_id=eq.user-1"));
       return Response.json(rows);
     } });
-    assert.deepEqual(await authorize("session"), { id: "user-1", contextEnabled: expected });
+    assert.deepEqual(await authorize("session"), { id: "user-1", contextEnabled: expected, memoryEnabled: false });
   });
 }
 test("falha da preferência não autoriza contexto", async () => {
@@ -24,4 +24,12 @@ test("falha da preferência não autoriza contexto", async () => {
     throw new Error("offline");
   } });
   assert.equal((await authorize("session")).contextEnabled, false);
+});
+
+test("memória tem autorização independente do contexto", async () => {
+  const authorize = createSupabaseAuthorizer({ supabaseUrl: "https://example.test", supabaseAnonKey: "public", fetchImpl: async (url) => {
+    if (url.endsWith("/auth/v1/user")) return Response.json({ id: "user-1" });
+    return Response.json([{ conversation_context: false, consent_version: 1, memory_enabled: true, memory_consent_version: 1 }]);
+  } });
+  assert.deepEqual(await authorize("session"), { id: "user-1", contextEnabled: false, memoryEnabled: true });
 });

@@ -23,6 +23,7 @@ export interface AlumiaAssistantResult {
   tone: "default" | "safety";
   source: "editorial" | "generative";
   proposedAction?: AlumiaProposedAction;
+  memorySuggestion?: { content: string };
   navigation?: AlumiaNavigation;
 }
 
@@ -33,5 +34,6 @@ export interface AlumiaConversationMessage {
   tone?: AlumiaAssistantResult["tone"];
   source?: AlumiaAssistantResult["source"];
   proposedAction?: AlumiaProposedAction;
+  memorySuggestion?: { content: string };
   navigation?: AlumiaNavigation;
 }
