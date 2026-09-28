@@ -3,8 +3,10 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   AiBrain01Icon,
   AlertCircleIcon,
+  Cancel01Icon,
   CheckmarkCircle02Icon,
   Delete02Icon,
+  HelpCircleIcon,
   LockIcon,
   Mic01Icon,
   SentIcon,
@@ -21,6 +23,7 @@ import { AddTaskSheet } from "@/components/shared/tasks/AddTaskSheet";
 import { AlumiaContextPreference } from "./AlumiaContextPreference";
 import { AlumiaMemory } from "./AlumiaMemory";
 import { AlumiaLearningOnboarding } from "./AlumiaLearningOnboarding";
+import { AlumiaLiveVoice } from "./AlumiaLiveVoice";
 import { cn } from "@/lib/utils";
 import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
 import {
@@ -30,6 +33,7 @@ import {
   synthesizeAlumiaSpeech,
   transcribeAlumiaAudio,
 } from "@/services/alumiaAIService";
+import { isAlumiaLiveEnabled } from "@/services/alumiaLiveService";
 import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
 
 type ActionState = "pending" | "saving" | "done" | "cancelled" | "error";
@@ -45,6 +49,7 @@ const FIRST_MESSAGE: AlumiaConversationMessage = {
 
 const MAX_RECORDING_MS = 60_000;
 const AUDIO_TYPES = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
+const INTRO_DISMISSED_KEY = "alumia-chat-intro-dismissed-v1";
 
 function messageId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -68,6 +73,8 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [editingAction, setEditingAction] = useState<AlumiaProposedAction | null>(null);
+  const [showIntro, setShowIntro] = useState(true);
+  const [liveVoiceOpen, setLiveVoiceOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const initialMessageHandled = useRef(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -79,6 +86,23 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const speechRequestRef = useRef(0);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(INTRO_DISMISSED_KEY) === "true") setShowIntro(false);
+    } catch {
+      // Storage may be unavailable in private or restricted browser contexts.
+    }
+  }, []);
+
+  const dismissIntro = useCallback(() => {
+    setShowIntro(false);
+    try {
+      window.localStorage.setItem(INTRO_DISMISSED_KEY, "true");
+    } catch {
+      // The current session can still hide the introduction without persistence.
+    }
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -125,6 +149,7 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
     const text = rawMessage.trim();
     if (!text || responding) return;
 
+    dismissIntro();
     setMessages((current) => [...current, { id: messageId(), role: "user", text }]);
     setInput("");
     setResponding(true);
@@ -162,7 +187,7 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
     } finally {
       setResponding(false);
     }
-  }, [messages, responding, speakMessage]);
+  }, [dismissIntro, messages, responding, speakMessage]);
 
   const clearRecordingTimers = useCallback(() => {
     if (recordingIntervalRef.current !== null) window.clearInterval(recordingIntervalRef.current);
@@ -228,10 +253,17 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
       setRecording(true);
       recordingIntervalRef.current = window.setInterval(() => setRecordingSeconds(Math.min(60, Math.floor((Date.now() - startedAt) / 1000))), 250);
       recordingTimeoutRef.current = window.setTimeout(() => stopRecording(), MAX_RECORDING_MS);
-    } catch {
+    } catch (error) {
       recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
       recordingStreamRef.current = null;
-      setVoiceError("Precisamos da permissão do microfone para receber uma mensagem de voz.");
+      const errorName = error instanceof DOMException ? error.name : "";
+      if (errorName === "NotFoundError" || errorName === "DevicesNotFoundError") {
+        setVoiceError("Não encontrei um microfone disponível neste dispositivo.");
+      } else if (errorName === "NotReadableError" || errorName === "TrackStartError") {
+        setVoiceError("O microfone está sendo usado por outro aplicativo. Feche-o e tente novamente.");
+      } else {
+        setVoiceError("A permissão do microfone está bloqueada. Libere Microfone nas configurações da Alumia e tente novamente.");
+      }
     }
   }, [clearRecordingTimers, recording, responding, sendMessage, stopRecording, transcribing]);
 
@@ -317,30 +349,56 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
   return (
     <div className="mx-auto max-w-4xl space-y-3">
       {isAlumiaGenerativeEnabled() && <AlumiaLearningOnboarding />}
-      <AlumiaModuleIntro
-        image={ALUMIA_AVATAR_IMAGES.assistant}
-        imageAlt="Retrato da Alumia segurando uma flor iluminada"
-        icon={AiBrain01Icon}
-        title="Converse com a Alum.IA"
-        description="Uma assistente pessoal para compreender o momento e ajudar quando você quiser agir."
-      />
+      {showIntro && !liveVoiceOpen && (
+        <section aria-label="Como funciona a Alum.IA" className="space-y-3">
+          <div className="relative">
+            <AlumiaModuleIntro
+              image={ALUMIA_AVATAR_IMAGES.assistant}
+              imageAlt="Retrato da Alumia segurando uma flor iluminada"
+              icon={AiBrain01Icon}
+              title="Converse com a Alum.IA"
+              description="Uma assistente pessoal para compreender o momento e ajudar quando você quiser agir."
+              className="pr-12"
+            />
+            <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-2" onClick={dismissIntro} aria-label="Ocultar introdução">
+              <AlumiaIcon icon={Cancel01Icon} size="sm" />
+            </Button>
+          </div>
 
-      <Surface variant="subtle" className="flex items-start gap-2.5 p-3 text-sm leading-relaxed">
-        <AlumiaIcon icon={LockIcon} size="sm" className="module-text mt-0.5" />
-        <p>
-          {isAlumiaGenerativeEnabled()
-            ? "Você decide o que compartilhar. A conversa fica só nesta tela, e qualquer ação precisa da sua confirmação."
-            : "Nesta etapa, suas mensagens não são salvas nem enviadas a um modelo de IA. A Alum.IA consulta apenas Tarefas e Mindfulness quando você pede."}
-        </p>
-      </Surface>
+          <Surface variant="subtle" className="flex items-start gap-2.5 p-3 text-sm leading-relaxed">
+            <AlumiaIcon icon={LockIcon} size="sm" className="module-text mt-0.5" />
+            <p>
+              {isAlumiaGenerativeEnabled()
+                ? "Você decide o que compartilhar. A conversa fica só nesta tela, e qualquer ação precisa da sua confirmação."
+                : "Nesta etapa, suas mensagens não são salvas nem enviadas a um modelo de IA. A Alum.IA consulta apenas Tarefas e Mindfulness quando você pede."}
+            </p>
+          </Surface>
+        </section>
+      )}
 
-      <Surface className="overflow-hidden">
+      {isAlumiaLiveEnabled() && liveVoiceOpen && (
+        <AlumiaLiveVoice open={liveVoiceOpen} onClose={() => setLiveVoiceOpen(false)} />
+      )}
+
+      <Surface className={cn("overflow-hidden", liveVoiceOpen && "hidden")}>
         <div className="flex items-center justify-between gap-3 border-b border-border/70 px-3 py-2.5 sm:px-4">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <AlumiaIcon icon={SparklesIcon} size="sm" className="module-text" />
             Conversa deste momento
           </div>
           <div className="flex items-center gap-1">
+          {isAlumiaLiveEnabled() && (
+            <Button type="button" variant="outline" size="sm" onClick={() => { stopSpeaking(); setLiveVoiceOpen(true); }} aria-label="Abrir conversa ao vivo">
+              <AlumiaIcon icon={Mic01Icon} size="sm" />
+              <span className="hidden sm:inline">Ao vivo</span>
+            </Button>
+          )}
+          {!showIntro && (
+            <Button type="button" variant="ghost" size="sm" onClick={() => setShowIntro(true)} aria-label="Mostrar como funciona">
+              <AlumiaIcon icon={HelpCircleIcon} size="sm" />
+              <span className="hidden sm:inline">Como funciona</span>
+            </Button>
+          )}
           {isAlumiaGenerativeEnabled() && <AlumiaMemory />}
           <Button type="button" variant="ghost" size="sm" onClick={clearConversation} aria-label="Limpar conversa atual">
             <AlumiaIcon icon={Delete02Icon} size="sm" />

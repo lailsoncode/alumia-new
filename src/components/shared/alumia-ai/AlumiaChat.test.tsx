@@ -23,6 +23,7 @@ const mockedConfirm = vi.mocked(confirmAlumiaAction);
 describe("Alum.IA chat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.localStorage.clear();
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
   });
 
@@ -31,6 +32,38 @@ describe("Alum.IA chat", () => {
 
     expect(screen.getByText(/mensagens não são salvas nem enviadas/i)).toBeInTheDocument();
     expect(screen.getByText(/nenhuma ação acontece sem você confirmar/i)).toBeInTheDocument();
+  });
+
+  it("permite dispensar e reabrir a introdução compactamente", () => {
+    render(<AlumiaChat />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Ocultar introdução" }));
+    expect(screen.queryByText(/mensagens não são salvas nem enviadas/i)).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("alumia-chat-intro-dismissed-v1")).toBe("true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Mostrar como funciona" }));
+    expect(screen.getByText(/mensagens não são salvas nem enviadas/i)).toBeInTheDocument();
+  });
+
+  it("mantém a introdução recolhida nas próximas visitas ao dispositivo", async () => {
+    window.localStorage.setItem("alumia-chat-intro-dismissed-v1", "true");
+
+    render(<AlumiaChat />);
+
+    await waitFor(() => expect(screen.queryByText(/mensagens não são salvas nem enviadas/i)).not.toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Mostrar como funciona" })).toBeInTheDocument();
+  });
+
+  it("oculta a introdução automaticamente depois da primeira mensagem", async () => {
+    mockedRespond.mockResolvedValue({ text: "Estou aqui.", tone: "default", source: "editorial" });
+    render(<AlumiaChat />);
+
+    fireEvent.change(screen.getByLabelText("Mensagem para a Alum.IA"), { target: { value: "Oi" } });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar mensagem" }));
+
+    expect(screen.queryByText(/mensagens não são salvas nem enviadas/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mostrar como funciona" })).toBeInTheDocument();
+    expect(await screen.findByText("Estou aqui.")).toBeInTheDocument();
   });
 
   it("exige confirmação antes de executar uma tarefa proposta", async () => {

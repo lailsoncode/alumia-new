@@ -1,6 +1,10 @@
 import { Capacitor } from "@capacitor/core";
 import type { Task, TaskReminder } from "@/types";
-import { ensureHighPriorityNotificationChannel, HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } from "@/services/notificationChannelService";
+import {
+  ALARM_NOTIFICATION_SOUND,
+  ensureHighPriorityNotificationChannel,
+  HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID,
+} from "@/services/notificationChannelService";
 
 export function getTaskReminderRoute(task: Pick<Task, "moduleKey" | "module_key">) {
   const moduleKey = task.moduleKey ?? task.module_key;
@@ -76,10 +80,12 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
       title: "Um cuidado te espera",
       body: task.title,
       schedule: { at: scheduledDate, allowWhileIdle: true },
-      sound: "default",
+      sound: ALARM_NOTIFICATION_SOUND,
       autoCancel: true,
       foreground: true,
+      interruptionLevel: "active" as const,
       isExactNotification: true,
+      isExactMandatory: false,
       ...(hasHighPriorityChannel ? { channelId: HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } : {}),
       extra: { taskId: task.id, route: reminderRoute },
     });
@@ -91,17 +97,22 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
       title: "Daqui a pouco, no seu tempo",
       body: task.title,
       schedule: { at: reminderDate, allowWhileIdle: true },
-      sound: "default",
+      sound: ALARM_NOTIFICATION_SOUND,
       autoCancel: true,
       foreground: true,
+      interruptionLevel: "active" as const,
       isExactNotification: true,
+      isExactMandatory: false,
       ...(hasHighPriorityChannel ? { channelId: HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } : {}),
       extra: { taskId: task.id, route: reminderRoute },
     });
   }
 
   if (!notifications.length) return false;
-  await LocalNotifications.schedule({ notifications });
+  const result = await LocalNotifications.schedule({ notifications });
+  if (result.warning) {
+    console.warn("O Android agendou o lembrete de forma aproximada porque alarmes exatos não estão autorizados.", result.warning);
+  }
   return true;
 }
 

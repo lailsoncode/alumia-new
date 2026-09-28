@@ -71,22 +71,29 @@ O certificado público usado para registrar ou redefinir a chave de upload fica 
 
 ## Comportamento dos lembretes
 
-Toda tarefa com data e horário recebe uma notificação local no momento marcado quando a permissão já está ativa. Se o usuário escolher um lembrete, o aplicativo pede a permissão do sistema e cria também um aviso antecipado de 5, 15 ou 30 minutos; a opção **Na hora** reaproveita a notificação do próprio horário. Concluir, editar ou excluir a tarefa atualiza ou remove os avisos correspondentes. Ao tocar na notificação, o aplicativo abre a página de tarefas.
+Toda tarefa com data e horário recebe uma notificação local no momento marcado quando a permissão já está ativa. Se o usuário escolher um lembrete, o aplicativo pede a permissão do sistema e cria também um aviso antecipado de 5, 15 ou 30 minutos; a opção **Na hora** reaproveita a notificação do próprio horário. Os lembretes usam o som próprio `alumia_alarm.wav`, vibração e o canal Android de importância máxima `alumia_alarms_v2`. Concluir, editar ou excluir a tarefa atualiza ou remove os avisos correspondentes. Ao tocar na notificação, o aplicativo abre a página de tarefas.
 
-No Android 12 ou superior, o sistema pode pedir também a permissão de alarmes exatos. Se ela não for concedida, o Capacitor agenda o lembrete de forma aproximada. No iOS, a entrega depende da permissão de notificações concedida ao aplicativo.
+No Android 12 ou superior, o sistema pode pedir também a permissão de alarmes exatos. Se ela não for concedida, o Capacitor agenda o lembrete de forma aproximada. O som, a vibração, o modo Não Perturbe e a exibição na tela continuam sujeitos às preferências do canal definidas pela pessoa no Android.
+
+No iOS, a entrega depende da permissão de notificações concedida ao aplicativo. O lembrete apresenta banner, som e vibração quando permitidos pelo sistema, mas respeita o modo silencioso e os modos Foco. Romper essas barreiras como um despertador exige o entitlement **Critical Alerts**, concedido pela Apple apenas a categorias elegíveis; a Alumia não declara essa capacidade.
 
 ## Push remoto
 
 O switch em **Ajustes → Notificações** usa o SDK adequado para cada ambiente. Na Web ele controla o OneSignal Web Push; nos aplicativos instalados controla a inscrição nativa vinculada ao mesmo usuário do Supabase.
 
-No Android, o aplicativo cria o canal `alumia_alerts_v1` com importância alta, som, vibração e exibição na tela. Em instalações novas ele também cria com importância alta o fallback usado pelos pushes sem categoria. O painel do OneSignal possui ainda o canal **Alertas e lembretes**, com ID `93edee85-4570-407c-ab7d-b70cfe353291`, importância **Urgent**, som e vibração padrão. Para garantir a correção em aparelhos onde o canal antigo já foi congelado pelo Android, configure o envio de uma destas formas:
+No Android, o aplicativo cria o canal `alumia_alarms_v2` com importância alta, som próprio, vibração e exibição na tela. O novo ID evita herdar configurações congeladas do canal anterior. Em instalações novas ele também cria com importância alta o fallback usado pelos pushes sem categoria. O painel do OneSignal possui ainda o canal **Alertas e lembretes**, com ID `93edee85-4570-407c-ab7d-b70cfe353291`, importância **Urgent**, som e vibração padrão. Para garantir a correção em aparelhos onde o canal antigo já foi congelado pelo Android, configure o envio de uma destas formas:
 
 - no compositor do Dashboard, em **Android → Category**, selecione **Alertas e lembretes**;
 - pela API, envie `android_channel_id: "93edee85-4570-407c-ab7d-b70cfe353291"` e `priority: 10`;
-- alternativamente, use o canal criado pelo aplicativo com `existing_android_channel_id: "alumia_alerts_v1"` e `priority: 10`.
+- alternativamente, use o canal criado pelo aplicativo com `existing_android_channel_id: "alumia_alarms_v2"` e `priority: 10`.
 
 Se a categoria for criada no próprio Dashboard do OneSignal, use importância **Urgent**. A opção **High** do OneSignal equivale a `IMPORTANCE_DEFAULT` no Android e normalmente apenas deixa a notificação na barra; **Urgent** equivale a `IMPORTANCE_HIGH` e permite o banner heads-up. Categorias já recebidas têm importância, som e vibração congelados pelo Android. Para mudar esses atributos em aparelhos existentes, crie uma categoria com outro ID (ou reinstale/limpe os dados somente durante testes).
 
 No iOS, pushes realmente urgentes podem usar `ios_interruption_level: "time_sensitive"`, desde que o capability correspondente esteja habilitado no projeto Apple. Notificações comuns devem continuar com o nível padrão para não perder relevância perante o sistema.
 
 O projeto iOS está preparado para notificações comuns. Imagens e alteração de conteúdo antes da entrega exigirão um `Notification Service Extension`, que pode ser incluído quando esse formato entrar no produto.
+# Conversa ao vivo interna
+
+Para incluir o modo de voz contínua no APK de teste, o build web precisa ter `VITE_ENABLE_ALUMIA_LIVE_VOICE=true` e `VITE_ALUMIA_AI_URL` apontando para a revisão do Cloud Run com `ALUMIA_LIVE_ENABLED=true`. A permissão de microfone já é compartilhada com a gravação de mensagens do chat.
+
+O modo **Ao vivo** mantém uma conexão WebSocket durante a conversa. Antes de gerar o APK, confirme que o timeout do serviço Cloud Run é superior aos cinco minutos da sessão e teste em aparelho físico com Wi-Fi e rede móvel. O chat escrito e a gravação curta continuam disponíveis se o Live API estiver indisponível.

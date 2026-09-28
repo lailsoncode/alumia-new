@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import { createApp } from "./app.js";
 import { createSupabaseAuthorizer } from "./auth.js";
 import { readConfig } from "./config.js";
@@ -6,6 +7,8 @@ import { createInMemoryRateLimiter } from "./rate-limit.js";
 import { createMemoryReader, createMemoryWriter } from "./memory.js";
 import { createSpeechTranscriber } from "./speech.js";
 import { createSpeechSynthesizer } from "./text-to-speech.js";
+import { createGeminiLiveConnector } from "./live.js";
+import { attachLiveWebSocketServer } from "./live-websocket.js";
 
 const config = readConfig();
 const app = createApp({
@@ -26,6 +29,24 @@ const app = createApp({
   }),
 });
 
-app.listen(config.port, "0.0.0.0", () => {
-  console.info(JSON.stringify({ event: "alumia_ai_started", port: config.port, model: config.model, location: config.location }));
+const server = createServer(app);
+attachLiveWebSocketServer({
+  server,
+  authorize: createSupabaseAuthorizer(config),
+  connectLive: createGeminiLiveConnector(config),
+  allowedOrigins: config.allowedOrigins,
+  enabled: config.liveEnabled,
+  sessionMaxMs: config.liveSessionMaxMs,
+});
+
+server.listen(config.port, "0.0.0.0", () => {
+  console.info(JSON.stringify({
+    event: "alumia_ai_started",
+    port: config.port,
+    model: config.model,
+    location: config.location,
+    liveEnabled: config.liveEnabled,
+    liveModel: config.liveModel,
+    liveLocation: config.liveLocation,
+  }));
 });

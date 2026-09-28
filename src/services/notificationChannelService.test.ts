@@ -22,8 +22,9 @@ describe("ensureHighPriorityNotificationChannel", () => {
     await expect(ensureHighPriorityNotificationChannel()).resolves.toBe(true);
     expect(createChannel).toHaveBeenCalledTimes(2);
     expect(createChannel).toHaveBeenCalledWith(expect.objectContaining({
-      id: "alumia_alerts_v1",
+      id: "alumia_alarms_v2",
       importance: 4,
+      sound: "alumia_alarm.wav",
       vibration: true,
     }));
     expect(createChannel).toHaveBeenCalledWith(expect.objectContaining({

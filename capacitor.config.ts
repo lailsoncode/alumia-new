@@ -7,6 +7,12 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: "https",
   },
+  plugins: {
+    LocalNotifications: {
+      sound: "alumia_alarm.wav",
+      presentationOptions: ["badge", "sound", "banner", "list"],
+    },
+  },
 };
 
 export default config;

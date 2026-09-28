@@ -2,7 +2,8 @@ import { Capacitor } from "@capacitor/core";
 
 // Keep this ID versioned. Android does not allow an app to raise the importance
 // of a channel after it has been created on a device.
-export const HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID = "alumia_alerts_v1";
+export const HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID = "alumia_alarms_v2";
+export const ALARM_NOTIFICATION_SOUND = "alumia_alarm.wav";
 const ONESIGNAL_FALLBACK_NOTIFICATION_CHANNEL_ID = "fcm_fallback_notification_channel";
 
 let channelPromise: Promise<boolean> | null = null;
@@ -19,6 +20,7 @@ export function ensureHighPriorityNotificationChannel() {
         description: "Avisos importantes e lembretes da Alumia",
         importance: 4,
         visibility: 1,
+        sound: ALARM_NOTIFICATION_SOUND,
         vibration: true,
         lights: true,
         lightColor: "#8B5CF6",
