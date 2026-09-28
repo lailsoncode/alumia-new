@@ -1,10 +1,12 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { startMindfulnessAmbientSound } from "@/lib/mindfulnessAmbient";
 import { synthesizeAlumiaSpeech } from "@/services/alumiaAIService";
 import type { MindfulnessPractice } from "@/types";
 import { MindfulnessPlayer } from "./MindfulnessPlayer";
 
 vi.mock("@/services/alumiaAIService", () => ({ synthesizeAlumiaSpeech: vi.fn() }));
+vi.mock("@/lib/mindfulnessAmbient", () => ({ startMindfulnessAmbientSound: vi.fn() }));
 
 const practice: MindfulnessPractice = {
   id: "practice-1",
@@ -23,9 +25,11 @@ describe("MindfulnessPlayer", () => {
   const play = vi.fn().mockResolvedValue(undefined);
   const pause = vi.fn();
   const revokeObjectURL = vi.fn();
+  const ambientHandle = { pause: vi.fn(), resume: vi.fn(), setVolume: vi.fn(), stop: vi.fn() };
 
   beforeEach(() => {
     vi.mocked(synthesizeAlumiaSpeech).mockResolvedValue(new Blob(["audio"], { type: "audio/mpeg" }));
+    vi.mocked(startMindfulnessAmbientSound).mockReturnValue(ambientHandle);
     vi.stubGlobal("URL", { createObjectURL: vi.fn(() => "blob:mindfulness-audio"), revokeObjectURL });
     vi.stubGlobal("Audio", class {
       onended: (() => void) | null = null;
@@ -64,5 +68,28 @@ describe("MindfulnessPlayer", () => {
     expect(await screen.findByText(/não foi possível gerar a voz da Alumia/i)).toBeInTheDocument();
     expect(screen.getByText("Orientação atual")).toBeInTheDocument();
     expect(screen.getByText("Perceba os sons.")).toBeInTheDocument();
+  });
+
+  it("permite som ambiente sem ligar a narração", () => {
+    render(<MindfulnessPlayer practice={practice} initialFormat="text" onAlternative={() => undefined} onFinish={() => undefined} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Chuva suave" }));
+
+    expect(startMindfulnessAmbientSound).toHaveBeenCalledWith("rain", 0.35);
+    expect(synthesizeAlumiaSpeech).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /Narração da Alumia: desligada/i })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("slider", { name: "Volume do ambiente" })).toBeInTheDocument();
+  });
+
+  it("permite desligar a narração sem interromper o ambiente", async () => {
+    render(<MindfulnessPlayer practice={practice} initialFormat="audio" onAlternative={() => undefined} onFinish={() => undefined} />);
+    await waitFor(() => expect(play).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "Chuva suave" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /Narração da Alumia: ligada/i }));
+
+    expect(pause).toHaveBeenCalled();
+    expect(ambientHandle.stop).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /Narração da Alumia: desligada/i })).toHaveAttribute("aria-pressed", "false");
   });
 });
