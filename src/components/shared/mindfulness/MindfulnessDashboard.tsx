@@ -134,7 +134,7 @@ export function MindfulnessDashboard() {
               <p className="mt-3 text-sm leading-relaxed text-foreground/80">{recommended.description}</p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Button disabled={!recommended.formats.includes("audio")} onClick={() => startPractice(recommended, "audio")}><AlumiaIcon icon={HeadphonesIcon} size="sm" />Ouvir</Button>
-                <Button variant="outline" onClick={() => startPractice(recommended, "text")}><AlumiaIcon icon={TextIcon} size="sm" />Ler</Button>
+                <Button variant="outline" disabled={!recommended.formats.includes("text")} onClick={() => startPractice(recommended, "text")}><AlumiaIcon icon={TextIcon} size="sm" />Ler</Button>
               </div>
             </Surface>
 

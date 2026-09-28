@@ -1,10 +1,20 @@
-import { useEffect, useState } from "react";
-import { AddCircleIcon, AlertCircleIcon, BulbIcon, Clock01Icon, StarIcon } from "@hugeicons/core-free-icons";
+import { useEffect, useRef, useState } from "react";
+import { AddCircleIcon, AlertCircleIcon, BulbIcon, CheckmarkCircle01Icon, Clock01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { InlineFeedback, Surface } from "@/components/ui/surface";
-import { getLocalDateString } from "@/lib/utils";
-import { createTask, getTasks, updateTask } from "@/services/tasksService";
+import { getLocalDateString, isSameLocalDay } from "@/lib/utils";
+import { createTask, deleteTask, getTasks, updateTask } from "@/services/tasksService";
 import type { AddTaskData, Task } from "@/types";
 import tasksImage from "@/assets/tasks.webp";
 import { AddTaskSheet } from "./AddTaskSheet";
@@ -18,33 +28,73 @@ export function TasksView() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Task | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [recentlyCompletedIds, setRecentlyCompletedIds] = useState<Set<string>>(() => new Set());
+  const completionTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
-  const load = () => {
-    setLoading(true);
+  const load = (showLoading = true) => {
+    if (showLoading) setLoading(true);
     setError(null);
-    getTasks().then(setTasks).catch(() => setError("Não foi possível carregar suas tarefas.")).finally(() => setLoading(false));
+    getTasks().then(setTasks).catch(() => setError("Não foi possível carregar suas tarefas.")).finally(() => {
+      if (showLoading) setLoading(false);
+    });
   };
   useEffect(() => {
     load();
+    const timers = completionTimers.current;
     const receiveSynchronizedTasks = (event: Event) => {
       setTasks((event as CustomEvent<Task[]>).detail);
       setLoading(false);
     };
     window.addEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
-    return () => window.removeEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
+    return () => {
+      window.removeEventListener("alumia:tasks-synchronized", receiveSynchronizedTasks);
+      timers.forEach(clearTimeout);
+      timers.clear();
+    };
   }, []);
 
   const toggleDone = async (id: string) => {
     const current = tasks.find((task) => task.id === id);
     if (!current) return;
     const done = !current.done;
+    const isActiveRecurrence = Boolean(current.recurrence?.active);
+    const previousTimer = completionTimers.current.get(id);
+    if (previousTimer) clearTimeout(previousTimer);
+    completionTimers.current.delete(id);
+    setRecentlyCompletedIds((ids) => {
+      const next = new Set(ids);
+      if (done && !isActiveRecurrence) next.add(id);
+      else next.delete(id);
+      return next;
+    });
     setTasks((items) => items.map((task) => task.id === id ? { ...task, done } : task));
     try {
-      await updateTask(id, { done });
-      if (done && current.recurrence?.active) load();
+      const updated = await updateTask(id, { done });
+      setTasks((items) => items.map((task) => task.id === id ? { ...task, ...updated, recurrence: task.recurrence } : task));
+      if (done && isActiveRecurrence) {
+        load(false);
+      } else if (done) {
+        const timer = setTimeout(() => {
+          setRecentlyCompletedIds((ids) => {
+            const next = new Set(ids);
+            next.delete(id);
+            return next;
+          });
+          completionTimers.current.delete(id);
+        }, 1800);
+        completionTimers.current.set(id, timer);
+      }
     }
     catch {
       setTasks((items) => items.map((task) => task.id === id ? current : task));
+      setRecentlyCompletedIds((ids) => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
       setError("A alteração não foi salva. Tente novamente.");
     }
   };
@@ -57,12 +107,53 @@ export function TasksView() {
     catch (createError) { setError("Não foi possível adicionar essa tarefa."); throw createError; }
   };
 
+  const edit = async (data: AddTaskData) => {
+    if (!editingTask) return;
+    try {
+      const updated = await updateTask(editingTask.id, {
+        title: data.title,
+        description: data.description,
+        date: data.date ?? null,
+        time: data.time ?? null,
+        priority: data.priority,
+        reminder: data.reminder,
+        moduleKey: editingTask.moduleKey ?? editingTask.module_key,
+        recurrence: data.recurrence ?? null,
+      });
+      setTasks((items) => items.map((task) => task.id === editingTask.id ? { ...task, ...updated } : task));
+      setEditingTask(null);
+    } catch (editError) {
+      setError("Não foi possível editar essa tarefa.");
+      throw editError;
+    }
+  };
+
+  const remove = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      await deleteTask(pendingDelete.id);
+      const timer = completionTimers.current.get(pendingDelete.id);
+      if (timer) clearTimeout(timer);
+      completionTimers.current.delete(pendingDelete.id);
+      setTasks((items) => items.filter((task) => task.id !== pendingDelete.id));
+      setPendingDelete(null);
+    } catch {
+      setError("Não foi possível excluir essa tarefa.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const today = getLocalDateString();
   const byTime = (first: Task, second: Task) => (first.time || "23:59").localeCompare(second.time || "23:59");
-  const important = tasks.filter((task) => task.priority === "alta" && task.date && ((!task.done && task.date === today) || (task.done && task.date === today))).sort(byTime);
-  const scheduled = tasks.filter((task) => task.priority !== "alta" && task.date && ((!task.done && task.date === today) || (task.done && task.date === today))).sort(byTime);
-  const backlog = tasks.filter((task) => !task.date && !task.done);
+  const isPendingOrFinishing = (task: Task) => !task.done || recentlyCompletedIds.has(task.id);
+  const important = tasks.filter((task) => task.priority === "alta" && task.date === today && isPendingOrFinishing(task)).sort(byTime);
+  const scheduled = tasks.filter((task) => task.priority !== "alta" && task.date === today && isPendingOrFinishing(task)).sort(byTime);
+  const backlog = tasks.filter((task) => !task.date && isPendingOrFinishing(task));
   const upcoming = tasks.filter((task) => task.date && task.date > today && !task.done).sort((first, second) => `${first.date} ${first.time || "23:59"}`.localeCompare(`${second.date} ${second.time || "23:59"}`));
+  const completedToday = tasks.filter((task) => task.done && !recentlyCompletedIds.has(task.id) && (task.completed_at ? isSameLocalDay(task.completed_at) : task.date === today));
   const sections = [
     {
       title: "Importa hoje",
@@ -104,7 +195,7 @@ export function TasksView() {
         </div>
       </Surface>
 
-      {error && <div className="mt-3"><InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback></div>}
+      {error && <div className="mt-3"><InlineFeedback tone="danger">{error} <button type="button" onClick={() => load()} className="font-semibold underline">Tentar novamente</button></InlineFeedback></div>}
 
       <div className="mt-3 grid grid-cols-2 border-b border-border" role="tablist" aria-label="Período das tarefas">
         {(["hoje", "em_breve"] as const).map((value) => (
@@ -124,7 +215,7 @@ export function TasksView() {
               {section.title}
             </h3>
             {section.tasks.length ? (
-              <ul className="space-y-1">{section.tasks.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} />)}</ul>
+              <ul className="space-y-1">{section.tasks.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} onEdit={setEditingTask} onDelete={setPendingDelete} />)}</ul>
             ) : (
               <Surface variant="subtle" className="px-3 py-2.5 shadow-none">
                 <p className="max-w-md text-sm leading-snug text-muted-foreground">{section.empty}</p>
@@ -138,8 +229,20 @@ export function TasksView() {
             <AlumiaIcon icon={Clock01Icon} size="sm" className="module-text" />
             Próximos cuidados
           </h3>
-          {upcoming.length ? <ul className="space-y-1">{upcoming.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} />)}</ul> : <Surface variant="subtle" className="px-3 py-3 text-center shadow-none"><p className="font-display text-base font-semibold">Nada marcado adiante.</p><p className="mt-0.5 text-sm text-muted-foreground">Quando você agendar algo, ele aparece aqui.</p></Surface>}
+          {upcoming.length ? <ul className="space-y-1">{upcoming.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} onEdit={setEditingTask} onDelete={setPendingDelete} />)}</ul> : <Surface variant="subtle" className="px-3 py-3 text-center shadow-none"><p className="font-display text-base font-semibold">Nada marcado adiante.</p><p className="mt-0.5 text-sm text-muted-foreground">Quando você agendar algo, ele aparece aqui.</p></Surface>}
         </section>
+      )}
+
+      {completedToday.length > 0 && (
+        <details className="mt-3 rounded-xl border border-border bg-surface-subtle px-3 py-2">
+          <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-muted-foreground marker:hidden">
+            <AlumiaIcon icon={CheckmarkCircle01Icon} size="sm" className="text-primary" />
+            Realizadas hoje · {completedToday.length}
+          </summary>
+          <ul className="mt-1 space-y-1 border-t border-border pt-2">
+            {completedToday.map((task) => <TaskItem key={task.id} task={task} onToggle={toggleDone} onDelete={setPendingDelete} />)}
+          </ul>
+        </details>
       )}
 
       <Button
@@ -151,6 +254,40 @@ export function TasksView() {
         <AlumiaIcon icon={AddCircleIcon} size="md" />
       </Button>
       <AddTaskSheet open={sheetOpen} onClose={() => setSheetOpen(false)} onSave={create} />
+      {editingTask && (
+        <AddTaskSheet
+          key={editingTask.id}
+          open
+          title="Editar tarefa"
+          submitLabel="Salvar alterações"
+          onClose={() => setEditingTask(null)}
+          onSave={edit}
+          initialTitle={editingTask.title}
+          initialDescription={editingTask.description ?? ""}
+          initialDate={editingTask.date}
+          initialTime={editingTask.time}
+          initialPriority={editingTask.priority}
+          initialReminder={editingTask.reminder}
+          initialRecurrence={editingTask.recurrence ? { frequency: editingTask.recurrence.frequency, weekdays: editingTask.recurrence.weekdays } : null}
+          moduleKey={editingTask.moduleKey ?? editingTask.module_key}
+        />
+      )}
+      <AlertDialog open={Boolean(pendingDelete)} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent className="mx-4 max-w-sm rounded-2xl p-5">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir esta tarefa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDelete?.recurrence?.active ? "A tarefa e sua repetição serão removidas. " : ""}Essa ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Manter tarefa</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={deleting} onClick={(event) => { event.preventDefault(); void remove(); }}>
+              {deleting ? "Excluindo…" : "Excluir tarefa"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

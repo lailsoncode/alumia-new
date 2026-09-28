@@ -1,13 +1,14 @@
 import { supabase } from "../lib/supabaseClient";
 import { getLocalDateString } from "../lib/utils";
 import { getIsoWeekday, getNextRecurrenceDate } from "../lib/tasks";
-import type { Task, AddTaskData, TaskRecurrence } from "../types";
+import type { Task, AddTaskData, TaskRecurrence, TaskRecurrenceInput } from "../types";
 import { cancelTaskReminder, scheduleTaskReminder } from "./taskReminderService";
 import { notifyAchievementActivity } from "./achievementService";
 
-type TaskUpdates = Omit<Partial<Task>, "date" | "time"> & {
+type TaskUpdates = Omit<Partial<Task>, "date" | "time" | "recurrence"> & {
   date?: string | null;
   time?: string | null;
+  recurrence?: TaskRecurrenceInput | null;
 };
 
 /**
@@ -148,6 +149,15 @@ export async function updateTask(taskId: string, updates: TaskUpdates): Promise<
     notifyAchievementActivity();
     return completed;
   }
+  if (updates.reminder && (!updates.date || !updates.time)) {
+    throw new Error("Lembretes precisam de data e horário.");
+  }
+  if (updates.recurrence && !updates.date) {
+    throw new Error("Recorrências precisam de uma data inicial.");
+  }
+  if (updates.recurrence?.frequency === "weekly" && !updates.recurrence.weekdays?.length) {
+    throw new Error("Escolha pelo menos um dia para a recorrência semanal.");
+  }
   const { data, error } = await supabase
     .from("tasks")
     .update({
@@ -166,10 +176,47 @@ export async function updateTask(taskId: string, updates: TaskUpdates): Promise<
     .single();
 
   if (error) throw error;
+  let recurrence: TaskRecurrence | null | undefined;
+  if (updates.recurrence !== undefined) {
+    if (updates.recurrence === null) {
+      const { error: recurrenceError } = await supabase.from("task_recurrence_rules").delete().eq("task_id", taskId);
+      if (recurrenceError) throw recurrenceError;
+      recurrence = null;
+    } else {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      const user = sessionData.session?.user;
+      if (!user) throw new Error("Usuário não autenticado.");
+      const recurrencePayload = {
+        task_id: taskId,
+        user_id: user.id,
+        frequency: updates.recurrence.frequency,
+        weekdays: updates.recurrence.frequency === "weekly" ? updates.recurrence.weekdays : null,
+        starts_on: updates.date,
+        timezone: updates.recurrence.timezone,
+        active: true,
+        deactivated_at: null,
+      };
+      const { data: recurrenceData, error: recurrenceError } = await supabase
+        .from("task_recurrence_rules")
+        .upsert(recurrencePayload, { onConflict: "task_id" })
+        .select()
+        .single();
+      if (recurrenceError) throw recurrenceError;
+      recurrence = {
+        id: recurrenceData.id,
+        frequency: recurrenceData.frequency,
+        weekdays: recurrenceData.weekdays ?? undefined,
+        startsOn: recurrenceData.starts_on,
+        timezone: recurrenceData.timezone,
+        active: recurrenceData.active,
+      };
+    }
+  }
   await scheduleTaskReminder(data).catch((scheduleError) => {
     console.error("Não foi possível atualizar o lembrete local:", scheduleError);
   });
-  return data;
+  return recurrence === undefined ? data : { ...data, recurrence };
 }
 
 /**

@@ -17,7 +17,7 @@ A pessoa escolhe uma prática curta em áudio ou texto, pode pausar ou encerrar 
 - filtros por duração, formato e categoria;
 - prática guiada com contador baseado em instante-alvo;
 - transcrição sempre disponível;
-- narração local opcional por síntese de voz do dispositivo;
+- narração opcional pela mesma voz configurada do módulo Alumia AI, com texto como fallback;
 - alternativa sensorial quando observar a respiração não for confortável;
 - reflexão opcional após a prática;
 - lembrete opcional integrado ao módulo Tarefas;

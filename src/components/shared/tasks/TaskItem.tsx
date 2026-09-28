@@ -1,11 +1,16 @@
-import { ArrowReloadHorizontalIcon, BellIcon, Calendar01Icon, Clock01Icon, Flag01Icon, RepeatIcon } from "@hugeicons/core-free-icons";
+import { ArrowReloadHorizontalIcon, BellIcon, Calendar01Icon, Clock01Icon, Delete02Icon, Flag01Icon, PencilEdit01Icon, RepeatIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { MODULE_THEMES, resolveModuleKey } from "@/lib/module-themes";
 import { getLocalDateString } from "@/lib/utils";
 import { formatRecurrence } from "@/lib/tasks";
 import type { Task } from "@/types";
 
-interface TaskItemProps { task: Task; onToggle?: (id: string) => void; }
+interface TaskItemProps {
+  task: Task;
+  onToggle?: (id: string) => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (task: Task) => void;
+}
 
 function formatTaskDate(dateString?: string) {
   if (!dateString) return "";
@@ -23,15 +28,15 @@ function formatOriginalDate(dateString?: string | null) {
   return new Date(year, month - 1, day).toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
 }
 
-export function TaskItem({ task, onToggle }: TaskItemProps) {
+export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
   const priorityTone = task.priority === "alta" ? "text-destructive" : task.priority === "media" ? "text-warning-foreground" : "text-info-foreground";
   const moduleKey = resolveModuleKey(task.moduleKey ?? task.module_key);
   const moduleTheme = MODULE_THEMES[moduleKey];
-  const showModuleIdentity = moduleKey !== "tasks" && moduleKey !== "alumia_ai";
   const isPastRecurringOccurrence = Boolean(task.done && task.recurrence && !task.recurrence.active);
+  const toggleDisabled = !onToggle || isPastRecurringOccurrence;
   return (
     <li data-module={moduleKey} className={`${moduleTheme.themeClass} module-whisper flex min-h-14 items-center gap-1.5 rounded-xl border px-1.5 py-1 shadow-none transition-transform hover:-translate-y-0.5 ${task.done ? "opacity-65" : ""}`}>
-      <button type="button" disabled={isPastRecurringOccurrence} aria-label={isPastRecurringOccurrence ? `${task.title}, ocorrência recorrente concluída` : task.done ? `Marcar ${task.title} como pendente` : `Concluir ${task.title}`} onClick={() => onToggle?.(task.id)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-muted disabled:cursor-default">
+      <button type="button" disabled={toggleDisabled} aria-label={isPastRecurringOccurrence ? `${task.title}, ocorrência recorrente concluída` : task.done ? `Marcar ${task.title} como pendente` : `Concluir ${task.title}`} onClick={() => onToggle?.(task.id)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-muted disabled:cursor-default">
         <span className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${task.done ? "border-primary bg-primary" : "border-primary/55"}`}>{task.done && <span className="h-2 w-2 rounded-full bg-primary-foreground" />}</span>
       </button>
       <div className="min-w-0 flex-1">
@@ -42,7 +47,6 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
           </p>
         )}
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0 text-xs leading-tight text-muted-foreground">
-          {showModuleIdentity && <span className="module-text inline-flex items-center gap-1 font-medium"><AlumiaIcon icon={moduleTheme.icon} size="xs" />{moduleTheme.label}</span>}
           {task.date && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={Calendar01Icon} size="xs" />{formatTaskDate(task.date)}</span>}
           {task.time && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={Clock01Icon} size="xs" />{task.time}</span>}
           {(task.reminder || task.hasBell) && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={BellIcon} size="xs" />Lembrete</span>}
@@ -50,6 +54,12 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
           {task.recurrence && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={RepeatIcon} size="xs" />{formatRecurrence(task.recurrence)}</span>}
         </div>
       </div>
+      {(onEdit || onDelete) && (
+        <div className="flex shrink-0 items-center">
+          {onEdit && <button type="button" onClick={() => onEdit(task)} className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground" aria-label={`Editar ${task.title}`}><AlumiaIcon icon={PencilEdit01Icon} size="sm" /></button>}
+          {onDelete && <button type="button" onClick={() => onDelete(task)} className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={`Excluir ${task.title}`}><AlumiaIcon icon={Delete02Icon} size="sm" /></button>}
+        </div>
+      )}
     </li>
   );
 }

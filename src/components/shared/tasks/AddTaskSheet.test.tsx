@@ -52,4 +52,20 @@ describe("AddTaskSheet", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Seu rascunho continua aqui");
     expect(screen.getByLabelText("Título")).toHaveValue("Respirar");
   });
+
+  it("preenche os dados existentes ao editar uma tarefa recorrente", () => {
+    render(
+      <AddTaskSheet
+        open
+        title="Editar tarefa"
+        initialTitle="Alongar"
+        initialRecurrence={{ frequency: "daily" }}
+        onClose={() => undefined}
+      />,
+    );
+
+    expect(screen.getByRole("dialog", { name: "Editar tarefa" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Título")).toHaveValue("Alongar");
+    expect(screen.getByText("Todos os dias")).toBeInTheDocument();
+  });
 });

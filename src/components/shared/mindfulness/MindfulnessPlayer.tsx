@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Cancel01Icon,
   EarIcon,
@@ -13,6 +13,7 @@ import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { InlineFeedback } from "@/components/ui/surface";
 import { formatMindfulnessTime } from "@/lib/mindfulness";
+import { synthesizeAlumiaSpeech } from "@/services/alumiaAIService";
 import type { MindfulnessFormat, MindfulnessPractice } from "@/types";
 
 interface MindfulnessPlayerProps {
@@ -26,11 +27,17 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
   const plannedSeconds = practice.durationMinutes * 60;
   const [remainingSeconds, setRemainingSeconds] = useState(plannedSeconds);
   const [running, setRunning] = useState(true);
-  const [format, setFormat] = useState<MindfulnessFormat>(practice.formats.includes(initialFormat) ? initialFormat : "text");
+  const [format, setFormat] = useState<MindfulnessFormat>(() => (
+    practice.formats.includes(initialFormat) ? initialFormat : practice.formats[0] ?? "text"
+  ));
   const [audioError, setAudioError] = useState<string | null>(null);
+  const [narrationState, setNarrationState] = useState<"idle" | "loading" | "playing">("idle");
   const deadlineRef = useRef(Date.now() + plannedSeconds * 1000);
   const startedAtRef = useRef(new Date().toISOString());
   const finishedRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const narrationRequestRef = useRef(0);
 
   const elapsedSeconds = plannedSeconds - remainingSeconds;
   const stepIndex = Math.min(
@@ -38,11 +45,20 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
     Math.floor((elapsedSeconds / Math.max(1, plannedSeconds)) * practice.instructions.length),
   );
   const currentInstruction = practice.instructions[Math.max(0, stepIndex)];
-  const speechAvailable = typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 
-  const stopNarration = () => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-  };
+  const stopNarration = useCallback(() => {
+    narrationRequestRef.current += 1;
+    if (audioRef.current) {
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+  }, []);
 
   const finish = (endedEarly = remainingSeconds > 0) => {
     if (finishedRef.current) return;
@@ -65,28 +81,62 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
     const interval = window.setInterval(update, 250);
     update();
     return () => window.clearInterval(interval);
-  }, [format, onFinish, plannedSeconds, running]);
+  }, [format, onFinish, plannedSeconds, running, stopNarration]);
 
-  useEffect(() => () => stopNarration(), []);
+  useEffect(() => () => stopNarration(), [stopNarration]);
 
-  const speakCurrentInstruction = () => {
-    if (!speechAvailable || !currentInstruction) {
-      setAudioError("A narração não está disponível neste dispositivo. A orientação em texto continua aqui para você.");
-      setFormat("text");
+  const speakCurrentInstruction = useCallback(async () => {
+    if (!currentInstruction) {
+      setAudioError("Esta orientação não possui texto para narração.");
+      if (practice.formats.includes("text")) setFormat("text");
       return;
     }
+    stopNarration();
+    const requestId = ++narrationRequestRef.current;
     setAudioError(null);
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(currentInstruction);
-    utterance.lang = "pt-BR";
-    utterance.rate = 0.88;
-    window.speechSynthesis.speak(utterance);
-  };
+    setNarrationState("loading");
+    try {
+      const blob = await synthesizeAlumiaSpeech(currentInstruction);
+      if (narrationRequestRef.current !== requestId) return;
+
+      const audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audioUrlRef.current = audioUrl;
+      audio.onended = () => {
+        if (narrationRequestRef.current !== requestId) return;
+        audioRef.current = null;
+        audioUrlRef.current = null;
+        URL.revokeObjectURL(audioUrl);
+        setNarrationState("idle");
+      };
+      audio.onerror = () => {
+        if (narrationRequestRef.current !== requestId) return;
+        stopNarration();
+        setNarrationState("idle");
+        setAudioError("Não foi possível reproduzir a voz da Alumia agora. A orientação em texto continua disponível.");
+        if (practice.formats.includes("text")) setFormat("text");
+      };
+      await audio.play();
+      if (narrationRequestRef.current === requestId) setNarrationState("playing");
+    } catch {
+      if (narrationRequestRef.current !== requestId) return;
+      stopNarration();
+      setNarrationState("idle");
+      setAudioError("Não foi possível gerar a voz da Alumia agora. A orientação em texto continua disponível.");
+      if (practice.formats.includes("text")) setFormat("text");
+    }
+  }, [currentInstruction, practice.formats, stopNarration]);
+
+  useEffect(() => {
+    if (format === "audio" && running) void speakCurrentInstruction();
+  }, [format, running, speakCurrentInstruction]);
 
   const toggleRunning = () => {
     if (running) {
       setRunning(false);
       stopNarration();
+      setNarrationState("idle");
     } else {
       deadlineRef.current = Date.now() + remainingSeconds * 1000;
       setRunning(true);
@@ -96,6 +146,7 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
   const switchFormat = (next: MindfulnessFormat) => {
     if (!practice.formats.includes(next)) return;
     stopNarration();
+    setNarrationState("idle");
     setAudioError(null);
     setFormat(next);
   };
@@ -109,7 +160,7 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
         <div className="flex items-center justify-between gap-3">
           <Button variant="ghost" size="icon" onClick={() => finish()} aria-label="Encerrar prática"><AlumiaIcon icon={Cancel01Icon} size="md" /></Button>
           <p className="font-display text-lg font-medium text-muted-foreground">Prática guiada</p>
-          <Button variant="ghost" size="icon" onClick={speakCurrentInstruction} aria-label="Ouvir orientação"><AlumiaIcon icon={VolumeHighIcon} size="md" /></Button>
+          <Button variant="ghost" size="icon" disabled={narrationState === "loading"} onClick={() => void speakCurrentInstruction()} aria-label="Ouvir orientação com a voz da Alumia"><AlumiaIcon icon={VolumeHighIcon} size="md" /></Button>
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center py-7 text-center">
@@ -122,7 +173,10 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
             </div>
           </div>
 
-          <p aria-live="polite" className="mt-5 max-w-xl text-base leading-relaxed text-foreground/80 sm:text-lg">{currentInstruction}</p>
+          <div className="mt-5 max-w-xl">
+            <p className="text-sm font-semibold text-primary">{format === "audio" ? narrationState === "loading" ? "Preparando a voz da Alumia…" : "Narração com a voz da Alumia" : "Orientação atual"}</p>
+            <p aria-live="polite" className="mt-1 text-base leading-relaxed text-foreground/80 sm:text-lg">{currentInstruction}</p>
+          </div>
           <p className="mt-4 flex items-center gap-2 font-medium text-muted-foreground"><span className="font-display text-xl tabular-nums text-primary">{formatMindfulnessTime(remainingSeconds)}</span> restantes</p>
 
           {audioError && <div className="mt-4 w-full"><InlineFeedback>{audioError}</InlineFeedback></div>}
@@ -149,6 +203,23 @@ export function MindfulnessPlayer({ practice, initialFormat, onAlternative, onFi
                 </button>
               );
             })}
+          </div>
+
+          <div className="mt-5 w-full max-w-xl rounded-2xl border border-border bg-surface p-4 text-left">
+            <h3 className="font-display text-lg font-semibold">Roteiro da prática</h3>
+            <p className="mt-1 text-sm text-muted-foreground">A transcrição fica disponível durante toda a pausa.</p>
+            <ol className="mt-3 space-y-2">
+              {practice.instructions.map((instruction, index) => (
+                <li
+                  key={`${practice.id}-${index}`}
+                  aria-current={index === stepIndex ? "step" : undefined}
+                  className={`flex gap-3 rounded-xl p-3 text-sm leading-relaxed ${index === stepIndex ? "bg-primary/10 text-foreground" : "text-muted-foreground"}`}
+                >
+                  <span aria-hidden="true" className="font-semibold text-primary">{index + 1}</span>
+                  <span>{instruction}</span>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </div>

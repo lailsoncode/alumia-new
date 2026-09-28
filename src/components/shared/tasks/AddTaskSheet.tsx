@@ -18,7 +18,9 @@ interface AddTaskSheetProps {
   initialTime?: string;
   initialPriority?: TaskPriority;
   initialReminder?: TaskReminder;
+  initialRecurrence?: TaskRecurrenceDraft | null;
   submitLabel?: string;
+  title?: string;
   moduleKey?: AddTaskData["moduleKey"];
 }
 
@@ -32,7 +34,9 @@ export function AddTaskSheet({
   initialTime,
   initialPriority = null,
   initialReminder = null,
+  initialRecurrence = null,
   submitLabel = "Salvar tarefa",
+  title: sheetTitle = "Adicionar tarefa",
   moduleKey,
 }: AddTaskSheetProps) {
   const [title, setTitle] = useState(initialTitle);
@@ -42,7 +46,7 @@ export function AddTaskSheet({
   const [reminder, setReminder] = useState<TaskReminder>(initialReminder);
   const [date, setDate] = useState<Date | null>(() => initialDate ? new Date(`${initialDate}T12:00:00`) : null);
   const [time, setTime] = useState<string | null>(initialTime ?? null);
-  const [recurrence, setRecurrence] = useState<TaskRecurrenceDraft | null>(null);
+  const [recurrence, setRecurrence] = useState<TaskRecurrenceDraft | null>(initialRecurrence);
   const [dateOpen, setDateOpen] = useState(false);
   const [openReminderAfterDate, setOpenReminderAfterDate] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -98,7 +102,7 @@ export function AddTaskSheet({
       <section role="dialog" aria-modal="true" aria-labelledby="add-task-title" className="alumia-elevated fixed inset-x-0 bottom-0 z-50 max-h-[92svh] overflow-y-auto rounded-t-3xl p-3 sm:left-1/2 sm:bottom-5 sm:max-w-2xl sm:-translate-x-1/2 sm:rounded-3xl sm:p-4">
         <div className="mx-auto mb-2 h-1 w-12 rounded-full bg-muted-foreground/30 sm:hidden" />
         <div className="flex items-center justify-between gap-2">
-          <h2 id="add-task-title" className="text-lg font-bold">Adicionar tarefa</h2>
+          <h2 id="add-task-title" className="text-lg font-bold">{sheetTitle}</h2>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fechar"><AlumiaIcon icon={Cancel01Icon} size="sm" /></Button>
         </div>
 
