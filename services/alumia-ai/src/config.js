@@ -11,7 +11,7 @@ export function readConfig() {
     model: process.env.ALUMIA_AI_MODEL?.trim() || "gemini-3.5-flash-lite",
     speechLocation: process.env.GOOGLE_CLOUD_SPEECH_LOCATION?.trim() || "global",
     ttsModel: process.env.ALUMIA_TTS_MODEL?.trim() || "gemini-2.5-flash-tts",
-    ttsVoice: process.env.ALUMIA_TTS_VOICE?.trim() || "Aoede",
+    ttsVoice: process.env.ALUMIA_TTS_VOICE?.trim() || "Achernar",
     ttsPrompt: process.env.ALUMIA_TTS_PROMPT?.trim() || "Directions only; speak only the text. Warm Brazilian woman, subtle Recife accent, natural brisk pace, short pauses, clear diction, never drawl.",
     supabaseUrl: required("SUPABASE_URL").replace(/\/$/, ""),
     supabaseAnonKey: required("SUPABASE_ANON_KEY"),
