@@ -48,13 +48,13 @@ Configuração implantada em 27 de setembro de 2026:
 - serviço `alumia-ai`;
 - região `southamerica-east1`;
 - modelo em `global`;
-- service account dedicada com `roles/aiplatform.user`; a funcionalidade de voz também requer `roles/speech.client`;
+- service account dedicada com `roles/aiplatform.user` e `roles/speech.client`;
 - conta `alumia-ai-runtime@alumia-app.iam.gserviceaccount.com`, sem chave JSON;
 - `SUPABASE_ANON_KEY` fornecida por Secret Manager;
 - acesso HTTP público, mas toda chamada de chat exige JWT Supabase válido;
 - mínimo de instâncias zero, timeout de 60 segundos e limite inicial de três instâncias;
 - limite defensivo inicial de 12 gerações por minuto por usuário e por instância;
-- revisão atual `alumia-ai-00009-szl`, servindo 100% do tráfego;
+- revisão atual `alumia-ai-00011-wdv`, servindo 100% do tráfego, com transcrição e síntese de voz habilitadas;
 - URL estável `https://alumia-ai-696823006824.southamerica-east1.run.app`.
 
 O frontend possui integração autenticada, mas ela permanece desligada por padrão por `VITE_ENABLE_ALUMIA_AI_GENERATIVE=false`. A ativação pública depende dos gates restantes do [ADR-011](../../docs/sdd/adrs/011-alumia-ai-hybrid-cloud.md).

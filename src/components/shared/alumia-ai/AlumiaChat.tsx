@@ -323,11 +323,6 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
         icon={AiBrain01Icon}
         title="Converse com a Alum.IA"
         description="Uma assistente pessoal para compreender o momento e ajudar quando você quiser agir."
-        badge={(
-          <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[0.6875rem] font-semibold text-muted-foreground">
-            {isAlumiaGenerativeEnabled() ? "Prévia com IA" : "Prévia segura"}
-          </span>
-        )}
       />
 
       <Surface variant="subtle" className="flex items-start gap-2.5 p-3 text-sm leading-relaxed">
@@ -467,40 +462,42 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
 
         <div className="border-t border-border/70 p-3 sm:p-4">
           {voiceError && <p role="alert" className="mb-2 text-sm text-destructive">{voiceError}</p>}
-          <form onSubmit={handleSubmit} className="flex items-end gap-2">
-            <div className="min-w-0 flex-1">
-              <label htmlFor="alumia-message" className="sr-only">Mensagem para a Alum.IA</label>
-              <Textarea
-                id="alumia-message"
-                value={input}
-                onChange={(event) => setInput(event.target.value.slice(0, 500))}
-                onKeyDown={handleKeyDown}
-                placeholder="Escreva o que faria diferença agora…"
-                rows={2}
-                disabled={responding || transcribing || recording}
-                className="max-h-36 min-h-14 resize-none rounded-xl bg-surface"
-              />
-              <p className="mt-1 text-xs text-muted-foreground">Enter envia · Shift + Enter quebra a linha · {input.length}/500</p>
-            </div>
-            {isAlumiaGenerativeEnabled() && (
-              <Button
-                type="button"
-                size="icon-lg"
-                variant={recording ? "destructive" : "outline"}
-                disabled={responding || transcribing}
-                onClick={() => recording ? stopRecording() : void startRecording()}
-                aria-label={recording ? "Parar e enviar gravação" : "Gravar mensagem de voz"}
-              >
-                <AlumiaIcon icon={recording ? StopIcon : Mic01Icon} size="md" />
-                <span className="sr-only">{recording ? `${recordingSeconds} segundos gravados` : "Gravar mensagem de voz"}</span>
+          <form onSubmit={handleSubmit} className="space-y-1">
+            <div className="flex items-end gap-2">
+              <div className="min-w-0 flex-1">
+                <label htmlFor="alumia-message" className="sr-only">Mensagem para a Alum.IA</label>
+                <Textarea
+                  id="alumia-message"
+                  value={input}
+                  onChange={(event) => setInput(event.target.value.slice(0, 500))}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Escreva o que faria diferença agora…"
+                  rows={2}
+                  disabled={responding || transcribing || recording}
+                  className="max-h-36 min-h-14 resize-none rounded-xl bg-surface"
+                />
+              </div>
+              {isAlumiaGenerativeEnabled() && (
+                <Button
+                  type="button"
+                  size="icon-lg"
+                  variant={recording ? "destructive" : "outline"}
+                  className="shrink-0"
+                  disabled={responding || transcribing}
+                  onClick={() => recording ? stopRecording() : void startRecording()}
+                  aria-label={recording ? "Parar e enviar gravação" : "Gravar mensagem de voz"}
+                >
+                  <AlumiaIcon icon={recording ? StopIcon : Mic01Icon} size="md" />
+                  <span className="sr-only">{recording ? `${recordingSeconds} segundos gravados` : "Gravar mensagem de voz"}</span>
+                </Button>
+              )}
+              <Button className="shrink-0" type="submit" size="icon-lg" disabled={responding || transcribing || recording || !input.trim()} aria-label="Enviar mensagem">
+                <AlumiaIcon icon={SentIcon} size="md" />
               </Button>
-            )}
-            <Button type="submit" size="icon-lg" disabled={responding || transcribing || recording || !input.trim()} aria-label="Enviar mensagem">
-              <AlumiaIcon icon={SentIcon} size="md" />
-            </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Enter envia · Shift + Enter quebra a linha · {input.length}/500</p>
           </form>
           {recording && <p role="status" className="mt-2 text-sm font-medium text-destructive">Gravando… {recordingSeconds}s de 60s · toque em parar para enviar</p>}
-          {isAlumiaGenerativeEnabled() && <p className="mt-2 text-xs text-muted-foreground">O áudio é processado para transcrição e não é armazenado. Respostas de áudio usam a voz sintetizada da Alumia.</p>}
         </div>
       </Surface>
       {editingAction && (
