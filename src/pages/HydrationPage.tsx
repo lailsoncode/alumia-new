@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   ArrowReloadHorizontalIcon,
+  BellIcon,
+  CalculatorIcon,
   Calendar01Icon,
   Cancel01Icon,
   CupSodaIcon,
@@ -13,6 +15,7 @@ import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { InlineFeedback, SectionHeader, Surface } from "@/components/ui/surface";
 import { getLocalDateString } from "@/lib/utils";
+import { calculateHydrationEstimate, type HydrationClimate, type HydrationProfile } from "@/lib/hydration";
 import {
   getPastWeekHydration,
   getTodayHydration,
@@ -20,8 +23,18 @@ import {
   undoLastWaterLog,
 } from "@/services/hydrationService";
 import hydrationImage from "@/assets/hidratacao.webp";
+import {
+  DEFAULT_HYDRATION_REMINDERS,
+  getHydrationReminderTimes,
+  getStoredHydrationReminders,
+  isHydrationReminderSupported,
+  saveHydrationReminders,
+  type HydrationReminderPreferences,
+} from "@/services/hydrationReminderService";
 
 const DEFAULT_GOAL = 2000;
+const PROFILE_STORAGE_KEY = "alumia_hydration_profile";
+const DEFAULT_PROFILE: HydrationProfile = { age: 30, heightCm: 170, weightKg: 70, climate: "mild", activityMinutes: 0 };
 
 interface HydrationHistoryItem {
   dayName: string;
@@ -57,6 +70,11 @@ export function HydrationPage() {
   const [customAmount, setCustomAmount] = useState("");
   const [goalOpen, setGoalOpen] = useState(false);
   const [goalInput, setGoalInput] = useState(String(DEFAULT_GOAL));
+  const [profile, setProfile] = useState<HydrationProfile>(DEFAULT_PROFILE);
+  const [estimateDetail, setEstimateDetail] = useState<ReturnType<typeof calculateHydrationEstimate> | null>(null);
+  const [reminders, setReminders] = useState<HydrationReminderPreferences>(DEFAULT_HYDRATION_REMINDERS);
+  const [reminderSaving, setReminderSaving] = useState(false);
+  const [reminderMessage, setReminderMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const savedGoal = window.localStorage.getItem("alumia_hydration_goal");
@@ -64,6 +82,13 @@ export function HydrationPage() {
       setGoal(Number(savedGoal));
       setGoalInput(savedGoal);
     }
+    try {
+      const storedProfile = JSON.parse(window.localStorage.getItem(PROFILE_STORAGE_KEY) ?? "null") as HydrationProfile | null;
+      if (storedProfile) setProfile(storedProfile);
+    } catch {
+      // Keep safe defaults when an older local value cannot be read.
+    }
+    setReminders(getStoredHydrationReminders());
   }, []);
 
   const load = async () => {
@@ -118,6 +143,42 @@ export function HydrationPage() {
     setGoal(amount);
     window.localStorage.setItem("alumia_hydration_goal", String(amount));
     setGoalOpen(false);
+  };
+
+  const calculateGoal = (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      const estimate = calculateHydrationEstimate(profile);
+      setEstimateDetail(estimate);
+      setGoal(estimate.totalMl);
+      setGoalInput(String(estimate.totalMl));
+      window.localStorage.setItem("alumia_hydration_goal", String(estimate.totalMl));
+      window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    } catch {
+      setEstimateDetail(null);
+    }
+  };
+
+  const updateProfileNumber = (key: "age" | "heightCm" | "weightKg" | "activityMinutes", value: string) => {
+    setProfile((current) => ({ ...current, [key]: Number(value) }));
+  };
+
+  const saveReminders = async (next: HydrationReminderPreferences) => {
+    setReminderSaving(true);
+    setReminderMessage(null);
+    try {
+      const saved = await saveHydrationReminders(next);
+      if (!saved) {
+        setReminderMessage(isHydrationReminderSupported() ? "Permissão de notificação não concedida." : "Os lembretes automáticos estão disponíveis no app para Android e iOS.");
+        return;
+      }
+      setReminders(next);
+      setReminderMessage(next.enabled ? "Lembretes programados neste dispositivo." : "Lembretes desativados neste dispositivo.");
+    } catch {
+      setReminderMessage("Não conseguimos atualizar os lembretes agora.");
+    } finally {
+      setReminderSaving(false);
+    }
   };
 
   const saveCustomAmount = (event: React.FormEvent) => {
@@ -254,6 +315,66 @@ export function HydrationPage() {
 
           <Surface className="p-3 sm:p-4 lg:col-span-2">
             <SectionHeader
+              icon={BellIcon}
+              iconClassName="module-text"
+              title="Lembretes para beber água"
+              description="Escolha uma janela do dia. Os avisos ficam agendados somente neste dispositivo."
+            />
+            <div className="mt-3 grid gap-3 sm:grid-cols-[auto_1fr_1fr_1fr_auto] sm:items-end">
+              <label className="flex min-h-11 items-center gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={reminders.enabled}
+                  onChange={(event) => setReminders((current) => ({ ...current, enabled: event.target.checked }))}
+                  className="h-5 w-5 accent-primary"
+                />
+                Ativar
+              </label>
+              <label className="text-xs font-semibold text-muted-foreground">
+                Começar às
+                <select
+                  value={reminders.startHour}
+                  onChange={(event) => setReminders((current) => ({ ...current, startHour: Number(event.target.value) }))}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground"
+                >
+                  {[6, 7, 8, 9, 10, 11, 12].map((hour) => <option key={hour} value={hour}>{String(hour).padStart(2, "0")}:00</option>)}
+                </select>
+              </label>
+              <label className="text-xs font-semibold text-muted-foreground">
+                Encerrar às
+                <select
+                  value={reminders.endHour}
+                  onChange={(event) => setReminders((current) => ({ ...current, endHour: Number(event.target.value) }))}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground"
+                >
+                  {[17, 18, 19, 20, 21, 22, 23].map((hour) => <option key={hour} value={hour}>{String(hour).padStart(2, "0")}:00</option>)}
+                </select>
+              </label>
+              <label className="text-xs font-semibold text-muted-foreground">
+                A cada
+                <select
+                  value={reminders.intervalHours}
+                  onChange={(event) => setReminders((current) => ({ ...current, intervalHours: Number(event.target.value) }))}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground"
+                >
+                  <option value={2}>2 horas</option>
+                  <option value={3}>3 horas</option>
+                  <option value={4}>4 horas</option>
+                </select>
+              </label>
+              <Button onClick={() => saveReminders(reminders)} disabled={reminderSaving || reminders.startHour > reminders.endHour}>
+                {reminderSaving ? "Salvando…" : "Salvar lembretes"}
+              </Button>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              {reminderMessage ?? (reminders.enabled
+                ? `Avisos às ${getHydrationReminderTimes(reminders).map((hour) => `${String(hour).padStart(2, "0")}:00`).join(", ")}.`
+                : "Ative quando quiser receber lembretes gentis ao longo do dia.")}
+            </p>
+          </Surface>
+
+          <Surface className="p-3 sm:p-4 lg:col-span-2">
+            <SectionHeader
               icon={Calendar01Icon}
               iconClassName="module-text"
               title="Seu consumo nos últimos 7 dias"
@@ -291,41 +412,70 @@ export function HydrationPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="goal-title"
-            className="alumia-elevated fixed left-1/2 top-1/2 z-50 w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl p-5"
+            className="alumia-elevated fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh_-_2rem)] w-[calc(100%_-_2rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl p-5"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 id="goal-title" className="text-xl font-bold">Sua referência diária</h2>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Escolha um valor pessoal entre 250 e 10.000 ml.
+                  Faça uma estimativa pelo seu contexto ou informe uma orientação que já recebeu.
                 </p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setGoalOpen(false)} aria-label="Fechar">
                 <AlumiaIcon icon={Cancel01Icon} size="sm" />
               </Button>
             </div>
-            <form onSubmit={saveGoal} className="mt-4">
-              <label htmlFor="goal-value" className="text-sm font-semibold">
-                Quantidade em ml
-                <input
-                  id="goal-value"
-                  type="number"
-                  min="250"
-                  max="10000"
-                  step="50"
-                  value={goalInput}
-                  onChange={(event) => setGoalInput(event.target.value)}
-                  className="mt-2 min-h-12 w-full rounded-xl border border-input bg-background px-4 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
-                />
-              </label>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Use uma orientação profissional quando ela existir para você.
-              </p>
-              <div className="mt-4 flex justify-end gap-2.5">
-                <Button type="button" variant="ghost" onClick={() => setGoalOpen(false)}>Cancelar</Button>
-                <Button type="submit">Salvar referência</Button>
+            <form onSubmit={calculateGoal} className="mt-4 rounded-2xl border border-border p-4">
+              <div className="flex items-start gap-2">
+                <AlumiaIcon icon={CalculatorIcon} size="sm" className="module-text mt-0.5 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-semibold">Calcular uma estimativa</h3>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">Para pessoas a partir de 14 anos. O resultado é arredondado em passos de 50 ml.</p>
+                </div>
               </div>
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <label className="text-xs font-semibold">Idade
+                  <input type="number" required min="14" max="100" value={profile.age} onChange={(event) => updateProfileNumber("age", event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm" />
+                </label>
+                <label className="text-xs font-semibold">Altura (cm)
+                  <input type="number" required min="120" max="230" value={profile.heightCm} onChange={(event) => updateProfileNumber("heightCm", event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm" />
+                </label>
+                <label className="text-xs font-semibold">Peso (kg)
+                  <input type="number" required min="35" max="300" step="0.1" value={profile.weightKg} onChange={(event) => updateProfileNumber("weightKg", event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm" />
+                </label>
+                <label className="text-xs font-semibold">Clima habitual
+                  <select value={profile.climate} onChange={(event) => setProfile((current) => ({ ...current, climate: event.target.value as HydrationClimate }))} className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm">
+                    <option value="cold">Frio</option>
+                    <option value="mild">Ameno</option>
+                    <option value="hot">Quente</option>
+                  </select>
+                </label>
+                <label className="col-span-2 text-xs font-semibold sm:col-span-2">Atividade física por dia (minutos)
+                  <input type="number" required min="0" max="240" step="10" value={profile.activityMinutes} onChange={(event) => updateProfileNumber("activityMinutes", event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm" />
+                </label>
+              </div>
+              <Button type="submit" className="mt-3 w-full">Calcular referência</Button>
+              {estimateDetail && (
+                <div className="module-surface mt-3 rounded-xl border p-3 text-sm">
+                  <p className="font-semibold">Estimativa: {estimateDetail.totalMl} ml por dia</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Base corporal {estimateDetail.baseMl} ml + clima {estimateDetail.climateMl} ml + atividade {estimateDetail.activityMl} ml.
+                    {estimateDetail.weightWasAdjusted ? ` A altura limitou o peso usado na conta a ${estimateDetail.calculationWeightKg} kg para evitar extrapolação.` : ""}
+                  </p>
+                  <Button type="button" size="sm" className="mt-2" onClick={() => setGoalOpen(false)}>Usar esta referência</Button>
+                </div>
+              )}
             </form>
+
+            <form onSubmit={saveGoal} className="mt-3 rounded-2xl bg-surface-subtle p-4">
+              <label htmlFor="goal-value" className="text-sm font-semibold">Definir manualmente (ml)
+                <input id="goal-value" type="number" min="250" max="10000" step="50" value={goalInput} onChange={(event) => setGoalInput(event.target.value)} className="mt-2 min-h-11 w-full rounded-xl border border-input bg-background px-4 text-base" />
+              </label>
+              <Button type="submit" variant="outline" size="sm" className="mt-2">Salvar valor manual</Button>
+            </form>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+              Esta é uma referência de bem-estar, não uma prescrição. Líquidos e alimentos também contribuem para a hidratação. Se você está grávida, amamenta, tem doença renal ou cardíaca, usa diuréticos ou recebeu limite de líquidos, siga a orientação profissional em vez desta estimativa.
+            </p>
           </section>
         </>
       )}

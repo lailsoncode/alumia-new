@@ -7,22 +7,27 @@ import { Surface } from "@/components/ui/surface";
 import { getLocalDateString } from "@/lib/utils";
 import { getTodayHydration, logWaterIntake, undoLastWaterLog } from "@/services/hydrationService";
 
-const GOAL = 2000;
+const DEFAULT_GOAL = 2000;
 
 export function HydrationCard() {
   const navigate = useNavigate();
   const [intake, setIntake] = useState(0);
+  const [goal, setGoal] = useState(DEFAULT_GOAL);
   const [loading, setLoading] = useState(true);
-  const progress = Math.min(100, (intake / GOAL) * 100);
+  const progress = Math.min(100, (intake / goal) * 100);
 
   const load = async () => {
     try { setIntake(await getTodayHydration(getLocalDateString())); }
     finally { setLoading(false); }
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const savedGoal = Number(window.localStorage.getItem("alumia_hydration_goal"));
+    if (savedGoal > 0) setGoal(savedGoal);
+    load();
+  }, []);
 
   const add = async (amount: number) => {
-    setIntake((value) => Math.min(GOAL, value + amount));
+    setIntake((value) => value + amount);
     await logWaterIntake(amount, getLocalDateString());
     await load();
   };
@@ -45,7 +50,7 @@ export function HydrationCard() {
         {intake > 0 && <Button variant="ghost" size="icon" aria-label="Desfazer último registro" onClick={undo}><AlumiaIcon icon={ArrowReloadHorizontalIcon} size="sm" /></Button>}
       </div>
       <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={GOAL} aria-valuenow={intake} />
+        <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} role="progressbar" aria-label="Progresso de hidratação" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={intake} />
       </div>
       <div className="mt-2.5 grid grid-cols-2 gap-2">
         <Button variant="outline" size="sm" onClick={() => add(200)} disabled={loading}><AlumiaIcon icon={CupSodaIcon} size="xs" />Copo 200 ml</Button>

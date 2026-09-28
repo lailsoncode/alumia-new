@@ -43,6 +43,48 @@ export interface FinanceDashboardData {
   goals: FinanceGoal[];
 }
 
+export interface FinanceCategoryTotal {
+  category: string;
+  amount: number;
+  share: number;
+}
+
+export interface FinanceSummary {
+  period: string;
+  income: number;
+  expenses: number;
+  balance: number;
+  savingsRate: number | null;
+  previousBalance: number;
+  expenseChangePercent: number | null;
+  averageDailyExpenses: number;
+  projectedExpenses: number;
+  projectedBalance: number;
+  pendingCount: number;
+  pendingAmount: number;
+  availableAfterPending: number;
+  overdueCount: number;
+  dueSoonCount: number;
+  activeGoalsAmount: number;
+  activeGoalsTarget: number;
+  topCategories: FinanceCategoryTotal[];
+  hasEnoughProjectionData: boolean;
+}
+
+export interface FinanceAIContext {
+  period: string;
+  currency: string;
+  income: number;
+  expenses: number;
+  balance: number;
+  savingsRate: number | null;
+  projectedExpenses: number | null;
+  projectedBalance: number | null;
+  pendingObligations: { count: number; amount: number; overdueCount: number; dueSoonCount: number };
+  goals: { activeCount: number; savedAmount: number; targetAmount: number };
+  topExpenseCategories: Array<{ category: string; amount: number }>;
+}
+
 export interface CreateFinanceTransactionInput {
   title: string;
   category?: string;

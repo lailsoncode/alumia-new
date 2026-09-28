@@ -40,7 +40,36 @@ function parseChatBody(body) {
   if (typeof localDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(localDate)) return null;
   if (typeof timeZone !== "string" || !/^[A-Za-z0-9_+\-/]{1,64}$/.test(timeZone)) return null;
 
-  return { message, history, context: { localDate, timeZone } };
+  const finance = parseFinanceContext(body.context?.finance);
+  if (body.context?.finance !== undefined && !finance) return null;
+
+  return { message, history, context: { localDate, timeZone, ...(finance ? { finance } : {}) } };
+}
+
+function finiteMoney(value) {
+  return typeof value === "number" && Number.isFinite(value) && Math.abs(value) <= 1_000_000_000;
+}
+
+function parseFinanceContext(value) {
+  if (value === undefined) return undefined;
+  if (!value || typeof value !== "object" || !/^\d{4}-\d{2}$/.test(value.period) || value.currency !== "BRL") return null;
+  const numeric = [value.income, value.expenses, value.balance];
+  if (!numeric.every(finiteMoney)) return null;
+  if (value.savingsRate !== null && (!finiteMoney(value.savingsRate) || Math.abs(value.savingsRate) > 10_000)) return null;
+  for (const projection of [value.projectedExpenses, value.projectedBalance]) {
+    if (projection !== null && !finiteMoney(projection)) return null;
+  }
+  const pending = value.pendingObligations;
+  const goals = value.goals;
+  if (!pending || !goals || ![pending.count, pending.overdueCount, pending.dueSoonCount, goals.activeCount].every((item) => Number.isInteger(item) && item >= 0 && item <= 10_000)) return null;
+  if (![pending.amount, goals.savedAmount, goals.targetAmount].every(finiteMoney)) return null;
+  if (!Array.isArray(value.topExpenseCategories) || value.topExpenseCategories.length > 3) return null;
+  const topExpenseCategories = [];
+  for (const item of value.topExpenseCategories) {
+    if (!item || typeof item.category !== "string" || !item.category.trim() || item.category.length > 60 || !finiteMoney(item.amount) || item.amount < 0) return null;
+    topExpenseCategories.push({ category: item.category.trim(), amount: item.amount });
+  }
+  return { ...value, topExpenseCategories };
 }
 
 export function createApp({
@@ -198,6 +227,7 @@ export function createApp({
 
       // The authenticated preference is authoritative, never a client-supplied flag.
       if (user.contextEnabled !== true) input.history = [];
+      if (user.financeContextEnabled !== true) delete input.context.finance;
       input.memoryEnabled = user.memoryEnabled === true;
       input.memories = input.memoryEnabled ? await readMemories({ token, userId: user.id }) : [];
       const result = await generate(input);

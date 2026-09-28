@@ -1,10 +1,12 @@
 import { classifyAlumiaIntent, extractTaskTitle } from "@/lib/alumia-ai";
+import { createFinanceAIContext } from "@/lib/finance-insights";
 import { supabase } from "@/lib/supabaseClient";
 import { getLocalDateString } from "@/lib/utils";
 import type { AlumiaAssistantResult, AlumiaConversationMessage, AlumiaProposedAction, MindfulnessPractice, Task } from "@/types";
 import { getMindfulnessPractices } from "./mindfulnessService";
+import { getFinanceDashboardData } from "./financeService";
 import { createTask, getTasks } from "./tasksService";
-import { getAlumiaContextPreference } from "./alumiaPreferencesService";
+import { getAlumiaContextPreference, getAlumiaFinanceContextPreference } from "./alumiaPreferencesService";
 
 const CRISIS_RESPONSE =
   "Sinto muito que este momento esteja tão difícil. Eu não consigo oferecer o apoio humano que uma situação assim merece. Se puder, procure agora alguém de confiança para ficar com você. No Brasil, o CVV atende gratuitamente pelo 188. Se houver perigo imediato ou uma emergência, ligue para o SAMU no 192 ou procure o serviço de emergência da sua região.";
@@ -106,11 +108,17 @@ async function requestGenerativeResponse(message: string, history: AlumiaConvers
 
   const accessToken = await getAlumiaAccessToken();
 
-  const contextAllowed = await getAlumiaContextPreference().catch(() => false);
+  const [contextAllowed, financeAllowed] = await Promise.all([
+    getAlumiaContextPreference().catch(() => false),
+    getAlumiaFinanceContextPreference().catch(() => false),
+  ]);
   const safeHistory = (contextAllowed === true ? history : [])
     .filter((item) => item.role === "user" || item.source === "generative")
     .slice(-8)
     .map(({ role, text }) => ({ role, text }));
+  const finance = financeAllowed === true
+    ? await getFinanceDashboardData().then((data) => createFinanceAIContext(data)).catch(() => undefined)
+    : undefined;
 
   const response = await fetch(`${serviceUrl}/v1/chat`, {
     method: "POST",
@@ -124,6 +132,7 @@ async function requestGenerativeResponse(message: string, history: AlumiaConvers
       context: {
         localDate: getLocalDateString(),
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+        ...(finance ? { finance } : {}),
       },
     }),
     signal: AbortSignal.timeout(15_000),

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
-  Add01Icon, ArrowDown01Icon, ArrowRight01Icon, ArrowUp01Icon, BanknoteIcon,
+  Add01Icon, AiBrain01Icon, ArrowDown01Icon, ArrowRight01Icon, ArrowUp01Icon, BanknoteIcon,
   Calendar01Icon, Chart01Icon, CheckmarkCircle02Icon, CreditCardIcon, EyeIcon,
   EyeOffIcon, Home01Icon, Invoice02Icon, MoneySavingJarIcon, PiggyBankIcon,
   ShoppingBasket02Icon, Target02Icon, Wallet02Icon,
@@ -15,11 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { InlineFeedback, SectionHeader, Surface } from "@/components/ui/surface";
 import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
+import { calculateFinanceSummary } from "@/lib/finance-insights";
 import { cn } from "@/lib/utils";
 import {
   addFinanceGoalContribution, createFinanceGoal, createFinanceObligation,
   createFinanceTransaction, getFinanceDashboardData, payFinanceObligation,
 } from "@/services/financeService";
+import { getAlumiaFinanceContextPreference, setAlumiaFinanceContextPreference } from "@/services/alumiaPreferencesService";
 import type {
   CreateFinanceGoalInput, CreateFinanceObligationInput, CreateFinanceTransactionInput,
   FinanceDashboardData, FinanceGoal, FinanceObligation, FinanceTransaction,
@@ -93,7 +95,7 @@ export function FinanceDashboard() {
     finally { setPayingId(null); }
   };
   const currentMonth = useMemo(() => data.transactions.filter((item) => isCurrentMonth(item.occurredAt)), [data.transactions]);
-  const totals = useMemo(() => currentMonth.reduce((result, item) => { result[item.kind] += item.amount; return result; }, { income: 0, expense: 0 }), [currentMonth]);
+  const summary = useMemo(() => calculateFinanceSummary(data), [data]);
 
   return <section className="mx-auto max-w-6xl space-y-3">
     <div className="flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2.5"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary"><AlumiaIcon icon={Wallet02Icon} size="md" /></span><div className="min-w-0"><h2 className="font-display text-xl font-semibold sm:text-2xl">Financeiro</h2><p className="truncate text-sm text-muted-foreground">Clareza para escolher, sem cobranças.</p></div></div><Button size="sm" aria-label="Novo lançamento" onClick={() => setTransactionOpen(true)}><AlumiaIcon icon={Add01Icon} size="sm" /><span className="hidden min-[430px]:inline">Novo lançamento</span><span className="min-[430px]:hidden">Adicionar</span></Button></div>
@@ -102,7 +104,7 @@ export function FinanceDashboard() {
     {feedback && <InlineFeedback tone="success">{feedback}</InlineFeedback>}
     <div className="overflow-x-auto pb-0.5" aria-label="Áreas do módulo financeiro"><div className="grid min-w-[34rem] grid-cols-4 gap-1 rounded-2xl border bg-surface p-1 shadow-[var(--shadow-card)]" role="tablist">{tabs.map((tab) => <button key={tab.id} type="button" role="tab" aria-label={tab.label} aria-selected={view === tab.id} onClick={() => setView(tab.id)} className={cn("min-h-10 rounded-xl px-3 text-sm font-semibold transition-colors", view === tab.id ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground")}><span className="sm:hidden">{tab.shortLabel || tab.label}</span><span className="hidden sm:inline">{tab.label}</span></button>)}</div></div>
     {loading ? <div className="space-y-3" aria-label="Carregando dados financeiros"><div className="h-52 animate-pulse rounded-2xl bg-muted" /><div className="h-36 animate-pulse rounded-2xl bg-muted" /></div> : <>
-      {view === "overview" && <Overview transactions={currentMonth} obligations={data.obligations} goals={data.goals} income={totals.income} expenses={totals.expense} showValues={showValues} onToggleValues={() => setShowValues((value) => !value)} onViewChange={setView} onAddTransaction={() => setTransactionOpen(true)} />}
+      {view === "overview" && <Overview transactions={currentMonth} obligations={data.obligations} goals={data.goals} summary={summary} showValues={showValues} onToggleValues={() => setShowValues((value) => !value)} onViewChange={setView} onAddTransaction={() => setTransactionOpen(true)} />}
       {view === "activity" && <Activity transactions={data.transactions} showValues={showValues} onAdd={() => setTransactionOpen(true)} />}
       {view === "bills" && <Bills obligations={data.obligations} payingId={payingId} onPay={pay} onAdd={() => setObligationOpen(true)} />}
       {view === "goals" && <Goals goals={data.goals} onAdd={() => setGoalOpen(true)} onContribute={setContributionGoal} />}
@@ -114,17 +116,50 @@ export function FinanceDashboard() {
   </section>;
 }
 
-function Overview({ transactions, obligations, goals, income, expenses, showValues, onToggleValues, onViewChange, onAddTransaction }: { transactions: FinanceTransaction[]; obligations: FinanceObligation[]; goals: FinanceGoal[]; income: number; expenses: number; showValues: boolean; onToggleValues: () => void; onViewChange: (view: FinanceView) => void; onAddTransaction: () => void }) {
+function Overview({ transactions, obligations, goals, summary, showValues, onToggleValues, onViewChange, onAddTransaction }: { transactions: FinanceTransaction[]; obligations: FinanceObligation[]; goals: FinanceGoal[]; summary: import("@/types").FinanceSummary; showValues: boolean; onToggleValues: () => void; onViewChange: (view: FinanceView) => void; onAddTransaction: () => void }) {
   const open = obligations.filter((item) => item.status === "pending");
   const activeGoal = goals.find((item) => item.status === "active");
-  const categories = Array.from(transactions.filter((item) => item.kind === "expense").reduce((map, item) => { const key = item.category || "Sem categoria"; map.set(key, (map.get(key) ?? 0) + item.amount); return map; }, new Map<string, number>()).entries()).sort((a, b) => b[1] - a[1]);
+  const categories = summary.topCategories.map((item) => [item.category, item.amount] as const);
   const maxCategory = categories[0]?.[1] ?? 1;
   return <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]"><div className="space-y-3">
-    <Surface className="module-surface relative overflow-hidden p-4 sm:p-5"><div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-primary/10" /><div className="relative flex items-start justify-between gap-3"><div><p className="text-sm font-semibold module-text">Seu mês, sem julgamento</p><p className="mt-3 text-sm text-muted-foreground">Saldo registrado</p><Money value={income - expenses} hidden={!showValues} className="mt-0.5 block font-display text-3xl font-bold tracking-tight sm:text-4xl" /></div><button type="button" onClick={onToggleValues} className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface/75 text-muted-foreground hover:text-foreground" aria-label={showValues ? "Ocultar valores" : "Mostrar valores"}><AlumiaIcon icon={showValues ? EyeOffIcon : EyeIcon} size="sm" /></button></div><div className="relative mt-5 grid grid-cols-2 gap-2"><div className="rounded-xl bg-surface/75 p-3"><div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><AlumiaIcon icon={ArrowDown01Icon} size="xs" className="text-success-foreground" />Entradas</div><Money value={income} hidden={!showValues} className="mt-1 block text-base font-bold" /></div><div className="rounded-xl bg-surface/75 p-3"><div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><AlumiaIcon icon={ArrowUp01Icon} size="xs" className="text-tone-rose-fg" />Saídas</div><Money value={expenses} hidden={!showValues} className="mt-1 block text-base font-bold" /></div></div>{!transactions.length && <p className="relative mt-3 text-sm text-foreground/80">Ainda não há movimentos neste mês. Comece quando fizer sentido para você.</p>}</Surface>
+    <Surface className="module-surface relative overflow-hidden p-4 sm:p-5"><div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-primary/10" /><div className="relative flex items-start justify-between gap-3"><div><p className="text-sm font-semibold module-text">Seu mês, sem julgamento</p><p className="mt-3 text-sm text-muted-foreground">Saldo registrado</p><Money value={summary.balance} hidden={!showValues} className="mt-0.5 block font-display text-3xl font-bold tracking-tight sm:text-4xl" /></div><button type="button" onClick={onToggleValues} className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface/75 text-muted-foreground hover:text-foreground" aria-label={showValues ? "Ocultar valores" : "Mostrar valores"}><AlumiaIcon icon={showValues ? EyeOffIcon : EyeIcon} size="sm" /></button></div><div className="relative mt-5 grid grid-cols-2 gap-2"><div className="rounded-xl bg-surface/75 p-3"><div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><AlumiaIcon icon={ArrowDown01Icon} size="xs" className="text-success-foreground" />Entradas</div><Money value={summary.income} hidden={!showValues} className="mt-1 block text-base font-bold" /></div><div className="rounded-xl bg-surface/75 p-3"><div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><AlumiaIcon icon={ArrowUp01Icon} size="xs" className="text-tone-rose-fg" />Saídas</div><Money value={summary.expenses} hidden={!showValues} className="mt-1 block text-base font-bold" /></div></div>{!transactions.length && <p className="relative mt-3 text-sm text-foreground/80">Ainda não há movimentos neste mês. Comece quando fizer sentido para você.</p>}</Surface>
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <Metric label="Livre após contas" value={<Money value={summary.availableAfterPending} hidden={!showValues} />} hint={`${summary.pendingCount} neste ciclo`} />
+      <Metric label="Taxa de economia" value={summary.savingsRate === null ? "—" : `${Math.round(summary.savingsRate)}%`} hint="do que entrou" />
+      <Metric label="Média por dia" value={<Money value={summary.averageDailyExpenses} hidden={!showValues} />} hint="saídas no mês" />
+      <Metric label="Gasto previsto" value={summary.hasEnoughProjectionData ? <Money value={summary.projectedExpenses} hidden={!showValues} /> : "Calculando"} hint={summary.hasEnoughProjectionData ? "até o fim do mês" : "após mais registros"} />
+    </div>
+    {summary.hasEnoughProjectionData && <Surface className="p-4"><div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><AlumiaIcon icon={Chart01Icon} size="sm" /></span><div><p className="text-sm font-semibold">Ritmo deste mês</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Mantendo o ritmo registrado, as saídas podem chegar a <Money value={summary.projectedExpenses} hidden={!showValues} className="font-semibold text-foreground" /> e o saldo projetado fica em <Money value={summary.projectedBalance} hidden={!showValues} className="font-semibold text-foreground" />. É uma estimativa, não uma certeza.</p></div></div></Surface>}
     <Surface className="p-4"><SectionHeader icon={Chart01Icon} iconClassName="module-text" title="Para onde o dinheiro foi" description="Uma visão simples das suas saídas neste mês." />{categories.length ? <div className="mt-4 space-y-3">{categories.map(([label, amount]) => <div key={label} className="grid grid-cols-[5.5rem_1fr_auto] items-center gap-2 text-sm"><span className="truncate font-medium">{label}</span><div className="h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${Math.round(amount / maxCategory * 100)}%` }} /></div><Money value={amount} className="w-20 text-right text-xs font-semibold text-muted-foreground" /></div>)}</div> : <div className="mt-4"><EmptyHint action={<Button size="sm" variant="outline" onClick={onAddTransaction}>Registrar primeiro movimento</Button>}>As categorias aparecerão aqui conforme você registrar suas saídas.</EmptyHint></div>}</Surface>
   </div><aside className="space-y-3"><Surface className="p-4"><SectionHeader icon={Calendar01Icon} iconClassName="module-text" title="Próximos compromissos" description="O que merece atenção primeiro." action={<button type="button" onClick={() => onViewChange("bills")} className="text-xs font-semibold text-primary hover:underline">Ver todos</button>} />{open.length ? <ul className="mt-3 divide-y divide-border">{open.slice(0, 3).map((item) => <li key={item.id} className="flex items-center gap-3 py-3 first:pt-1 last:pb-0"><span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", isUrgent(item) ? "bg-warning text-warning-foreground" : "bg-muted text-muted-foreground")}><AlumiaIcon icon={Invoice02Icon} size="sm" /></span><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{item.title}</p><p className="text-xs text-muted-foreground">{obligationDetail(item)}</p></div><Money value={item.amount} className="text-sm font-bold" /></li>)}</ul> : <div className="mt-3"><EmptyHint>Nenhuma conta pendente cadastrada.</EmptyHint></div>}</Surface>
+    <FinanceAIConnection />
     {activeGoal ? <button type="button" onClick={() => onViewChange("goals")} className="w-full text-left"><Surface variant="interactive" className="module-whisper p-4"><div className="flex items-center gap-3"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary"><AlumiaIcon icon={MoneySavingJarIcon} size="lg" /></span><div className="min-w-0 flex-1"><p className="text-xs font-semibold uppercase tracking-wide module-text">Seu cofrinho</p><h3 className="truncate font-display text-lg font-semibold">{activeGoal.title}</h3></div><AlumiaIcon icon={ArrowRight01Icon} size="sm" className="text-muted-foreground" /></div><div className="mt-3 flex justify-between text-xs"><span className="font-semibold"><Money value={activeGoal.currentAmount} /> guardados</span><span className="text-muted-foreground">{Math.min(100, Math.round(activeGoal.currentAmount / activeGoal.targetAmount * 100))}%</span></div><Progress value={Math.min(100, activeGoal.currentAmount / activeGoal.targetAmount * 100)} className="mt-2" /></Surface></button> : <Surface className="p-4"><EmptyHint>Quando você criar um cofrinho, o progresso aparecerá aqui.</EmptyHint></Surface>}
   </aside></div>;
+}
+
+function Metric({ label, value, hint }: { label: string; value: ReactNode; hint: string }) {
+  return <Surface className="p-3"><p className="text-xs font-medium text-muted-foreground">{label}</p><div className="mt-1 text-base font-bold">{value}</div><p className="mt-0.5 text-[0.7rem] text-muted-foreground">{hint}</p></Surface>;
+}
+
+function FinanceAIConnection() {
+  const [enabled, setEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    let active = true;
+    getAlumiaFinanceContextPreference().then((value) => { if (active) setEnabled(value); })
+      .catch(() => { if (active) setError(true); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+  const toggle = async () => {
+    setSaving(true); setError(false);
+    try { await setAlumiaFinanceContextPreference(!enabled); setEnabled((value) => !value); }
+    catch { setError(true); }
+    finally { setSaving(false); }
+  };
+  return <Surface className="p-4"><div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><AlumiaIcon icon={AiBrain01Icon} size="sm" /></span><div className="min-w-0 flex-1"><p className="text-sm font-semibold">Alum.IA financeira</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{enabled ? "Conectada a um resumo atualizado dos seus números." : "Permita que a IA use um resumo financeiro para orientar melhor."}</p></div><button type="button" role="switch" aria-checked={enabled} aria-label="Compartilhar resumo financeiro com a Alum.IA" disabled={loading || saving} onClick={() => void toggle()} className={cn("relative flex h-8 w-12 shrink-0 items-center rounded-full p-1 transition-colors disabled:opacity-50", enabled ? "bg-primary" : "bg-muted")}><span className={cn("h-6 w-6 rounded-full bg-surface shadow-sm transition-transform", enabled && "translate-x-4")} /></button></div><p className="mt-2 text-[0.7rem] leading-relaxed text-muted-foreground">Envia totais e categorias agregadas quando você conversar com a Alum.IA. Não vira memória e pode ser desligado a qualquer momento.</p>{error && <p className="mt-2 text-xs text-destructive">Não foi possível atualizar essa permissão.</p>}</Surface>;
 }
 
 function Activity({ transactions, showValues, onAdd }: { transactions: FinanceTransaction[]; showValues: boolean; onAdd: () => void }) {

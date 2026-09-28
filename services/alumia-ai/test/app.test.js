@@ -255,6 +255,42 @@ test("recusa contexto temporal ausente ou inválido", async () => {
   });
 });
 
+test("só entrega o resumo financeiro ao modelo com autorização validada", async () => {
+  const finance = {
+    period: "2026-09", currency: "BRL", income: 5000, expenses: 1200, balance: 3800,
+    savingsRate: 76, projectedExpenses: 1500, projectedBalance: 3500,
+    pendingObligations: { count: 2, amount: 400, overdueCount: 0, dueSoonCount: 1 },
+    goals: { activeCount: 1, savedAmount: 700, targetAmount: 3000 },
+    topExpenseCategories: [{ category: "Casa", amount: 600 }],
+  };
+  for (const enabled of [false, true]) {
+    await withServer({
+      authorize: async () => ({ id: "user-1", financeContextEnabled: enabled }),
+      generate: async (input) => {
+        assert.deepEqual(input.context.finance, enabled ? finance : undefined);
+        return { kind: "message", text: "Resumo analisado" };
+      },
+      allowedOrigins: new Set(),
+    }, async (baseUrl) => {
+      const body = JSON.parse(chatBody("Como estão minhas finanças?"));
+      body.context.finance = finance;
+      const response = await fetch(`${baseUrl}/v1/chat`, {
+        method: "POST", headers: { authorization: "Bearer valid", "content-type": "application/json" }, body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 200);
+    });
+  }
+});
+
+test("recusa resumo financeiro malformado", async () => {
+  await withServer({ authorize: async () => ({ id: "user-1", financeContextEnabled: true }), generate: async () => ({ kind: "message", text: "não" }), allowedOrigins: new Set() }, async (baseUrl) => {
+    const body = JSON.parse(chatBody("Finanças"));
+    body.context.finance = { period: "agora", income: "muito" };
+    const response = await fetch(`${baseUrl}/v1/chat`, { method: "POST", headers: { authorization: "Bearer valid", "content-type": "application/json" }, body: JSON.stringify(body) });
+    assert.equal(response.status, 400);
+  });
+});
+
 test("transcreve áudio autenticado sem persistir conteúdo no serviço", async () => {
   let received;
   await withServer({

@@ -7,6 +7,11 @@ import {
 } from "@/services/financeService";
 import { FinanceDashboard } from "./FinanceDashboard";
 
+vi.mock("@/services/alumiaPreferencesService", () => ({
+  getAlumiaFinanceContextPreference: vi.fn().mockResolvedValue(false),
+  setAlumiaFinanceContextPreference: vi.fn(),
+}));
+
 vi.mock("@/services/financeService", () => ({
   addFinanceGoalContribution: vi.fn(),
   createFinanceGoal: vi.fn(),

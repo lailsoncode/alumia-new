@@ -2,9 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { confirmAlumiaAction, respondToAlumia, synthesizeAlumiaSpeech, transcribeAlumiaAudio } from "./alumiaAIService";
 import { createTask, getTasks } from "./tasksService";
 import { getMindfulnessPractices } from "./mindfulnessService";
+import { getFinanceDashboardData } from "./financeService";
 import { supabase } from "@/lib/supabaseClient";
-import { getAlumiaContextPreference } from "./alumiaPreferencesService";
-vi.mock("./alumiaPreferencesService", () => ({ getAlumiaContextPreference: vi.fn() }));
+import { getAlumiaContextPreference, getAlumiaFinanceContextPreference } from "./alumiaPreferencesService";
+vi.mock("./alumiaPreferencesService", () => ({ getAlumiaContextPreference: vi.fn(), getAlumiaFinanceContextPreference: vi.fn() }));
 
 vi.mock("./tasksService", () => ({
   createTask: vi.fn(),
@@ -14,6 +15,8 @@ vi.mock("./tasksService", () => ({
 vi.mock("./mindfulnessService", () => ({
   getMindfulnessPractices: vi.fn(),
 }));
+
+vi.mock("./financeService", () => ({ getFinanceDashboardData: vi.fn() }));
 
 vi.mock("@/lib/supabaseClient", () => ({
   supabase: { auth: { getSession: vi.fn() } },
@@ -29,6 +32,7 @@ describe("Alum.IA editorial provider", () => {
     vi.clearAllMocks();
     vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "false");
     vi.mocked(getAlumiaContextPreference).mockResolvedValue(false);
+    vi.mocked(getAlumiaFinanceContextPreference).mockResolvedValue(false);
   });
 
   afterEach(() => {
@@ -168,6 +172,30 @@ describe("Alum.IA editorial provider", () => {
       priority: "alta",
     });
     expect(mockedCreateTask).not.toHaveBeenCalled();
+  });
+
+  it("envia somente o resumo financeiro agregado quando há consentimento", async () => {
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
+    vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
+    vi.mocked(getAlumiaFinanceContextPreference).mockResolvedValue(true);
+    vi.mocked(getFinanceDashboardData).mockResolvedValue({
+      transactions: [
+        { id: "1", title: "Salário confidencial", category: "Trabalho", amount: 5000, currency: "BRL", kind: "income", occurredAt: new Date().toISOString(), source: "manual" },
+        { id: "2", title: "Loja confidencial", category: "Casa", amount: 500, currency: "BRL", kind: "expense", occurredAt: new Date().toISOString(), source: "manual" },
+      ],
+      obligations: [],
+      goals: [],
+    });
+    mockedGetSession.mockResolvedValue({ data: { session: { access_token: "jwt-valid" } }, error: null } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ mode: "generative", message: "Seu saldo está positivo." })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await respondToAlumia("Como estão minhas finanças?");
+
+    const body = JSON.parse(String(fetchMock.mock.calls[0][1].body));
+    expect(body.context.finance).toMatchObject({ income: 5000, expenses: 500, balance: 4500 });
+    expect(JSON.stringify(body.context.finance)).not.toContain("Salário confidencial");
+    expect(JSON.stringify(body.context.finance)).not.toContain("Loja confidencial");
   });
 
   it("apresenta discretamente uma lembrança já gravada pelo serviço autorizado", async () => {
