@@ -34,7 +34,7 @@ O serviço também expõe dois endpoints autenticados, sem persistência do áud
 - `POST /v1/transcriptions`, com o áudio bruto no corpo e seu MIME type em `Content-Type`, transcreve até 2 MB em português brasileiro;
 - `POST /v1/speech`, com `{ "text": "..." }`, devolve `audio/mpeg` usando Gemini TTS.
 
-A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Achernar`, velocidade `1.08` e uma direção compacta para preservar o sotaque nordestino leve inspirado em Recife. O Flash-Lite foi rejeitado por truncar respostas em testes, e o Chirp 3 HD fica como alternativa de menor latência quando a direção regional não for necessária. Modelo e speaker podem ser alterados por `ALUMIA_TTS_MODEL` e `ALUMIA_TTS_VOICE`; `ALUMIA_TTS_PROMPT` é usado apenas quando o modelo configurado começa com `gemini-`.
+A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Achernar`, velocidade `1.08` e uma direção compacta para preservar o sotaque nordestino leve inspirado em Recife. Antes da síntese, a grafia da marca é convertida somente no texto falado para `Alúmia`, fixando a tonicidade correta sem mudar o texto exibido. A transcrição usa adaptação de vocabulário para reconhecer `Alumia` e padroniza variações inequívocas do nome. O Flash-Lite foi rejeitado por truncar respostas em testes, e o Chirp 3 HD fica como alternativa de menor latência quando a direção regional não for necessária. Modelo e speaker podem ser alterados por `ALUMIA_TTS_MODEL` e `ALUMIA_TTS_VOICE`; `ALUMIA_TTS_PROMPT` é usado apenas quando o modelo configurado começa com `gemini-`.
 
 Para implantar a voz, habilite `speech.googleapis.com` e `texttospeech.googleapis.com`. Além de `roles/aiplatform.user`, usado pelo Gemini e pelo Gemini TTS, conceda `roles/speech.client` à service account do runtime para reconhecimento de fala.
 
@@ -54,7 +54,7 @@ Configuração implantada em 27 de setembro de 2026:
 - acesso HTTP público, mas toda chamada de chat exige JWT Supabase válido;
 - mínimo de instâncias zero, timeout de 60 segundos e limite inicial de três instâncias;
 - limite defensivo inicial de 12 gerações por minuto por usuário e por instância;
-- revisão atual `alumia-ai-00016-xmn`, servindo 100% do tráfego, com transcrição e síntese de voz habilitadas;
+- revisão atual `alumia-ai-00018-bb5`, servindo 100% do tráfego, com adaptação do nome na transcrição e síntese de voz habilitadas;
 - URL estável `https://alumia-ai-696823006824.southamerica-east1.run.app`.
 
 O frontend possui integração autenticada, mas ela permanece desligada por padrão por `VITE_ENABLE_ALUMIA_AI_GENERATIVE=false`. A ativação pública depende dos gates restantes do [ADR-011](../../docs/sdd/adrs/011-alumia-ai-hybrid-cloud.md).
