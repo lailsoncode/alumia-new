@@ -113,4 +113,17 @@ describe("Alum.IA chat", () => {
       "Escreva o que faria diferença agora…",
     );
   });
+
+  it("continua automaticamente uma mensagem iniciada no balão flutuante", async () => {
+    mockedRespond.mockResolvedValue({ text: "Vamos cuidar disso juntas.", tone: "default", source: "editorial" });
+
+    render(<AlumiaChat initialMessage="Crie uma tarefa para beber água" />);
+
+    expect(await screen.findByText("Crie uma tarefa para beber água")).toBeInTheDocument();
+    await waitFor(() => expect(mockedRespond).toHaveBeenCalledWith(
+      "Crie uma tarefa para beber água",
+      expect.any(Array),
+    ));
+    expect(await screen.findByText("Vamos cuidar disso juntas.")).toBeInTheDocument();
+  });
 });

@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { AlumiaChat } from "@/components/shared/alumia-ai";
 import { Surface } from "@/components/ui/surface";
+import { consumeAlumiaPendingMessage } from "@/lib/alumia-presence";
 
 export function AlumiaAIPage() {
   const previewEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ALUMIA_AI_PREVIEW === "true";
+  const [initialMessage] = useState(() => previewEnabled ? consumeAlumiaPendingMessage() : null);
 
   if (!previewEnabled) {
     return (
@@ -15,5 +18,5 @@ export function AlumiaAIPage() {
     );
   }
 
-  return <AlumiaChat />;
+  return <AlumiaChat initialMessage={initialMessage} />;
 }

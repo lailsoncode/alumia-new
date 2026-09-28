@@ -1,5 +1,6 @@
 export const ALUMIA_PRESENCE_STORAGE_KEY = "alumia_floating_avatar";
 export const ALUMIA_PRESENCE_CHANGE_EVENT = "alumia:presence-change";
+export const ALUMIA_PENDING_MESSAGE_STORAGE_KEY = "alumia:pending-message";
 
 interface PresenceAction {
   label: string;
@@ -98,4 +99,18 @@ export function setAlumiaPresenceEnabled(enabled: boolean) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(ALUMIA_PRESENCE_STORAGE_KEY, String(enabled));
   window.dispatchEvent(new CustomEvent(ALUMIA_PRESENCE_CHANGE_EVENT, { detail: { enabled } }));
+}
+
+export function setAlumiaPendingMessage(message: string) {
+  if (typeof window === "undefined") return;
+  const normalizedMessage = message.trim().slice(0, 500);
+  if (!normalizedMessage) return;
+  window.sessionStorage.setItem(ALUMIA_PENDING_MESSAGE_STORAGE_KEY, normalizedMessage);
+}
+
+export function consumeAlumiaPendingMessage() {
+  if (typeof window === "undefined") return null;
+  const message = window.sessionStorage.getItem(ALUMIA_PENDING_MESSAGE_STORAGE_KEY);
+  window.sessionStorage.removeItem(ALUMIA_PENDING_MESSAGE_STORAGE_KEY);
+  return message;
 }

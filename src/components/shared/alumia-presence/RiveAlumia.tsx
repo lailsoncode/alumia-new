@@ -21,11 +21,14 @@ export function RiveAlumia({ className, alt = "Alumia" }: RiveAlumiaProps) {
     artboard: "Alumia · busto fiel",
     stateMachine: "AlumiaPresence",
     autoplay: true,
+    // A interação pertence ao botão que envolve a personagem. Desativar os
+    // listeners do canvas evita que WebViews móveis capturem o toque antes dele.
+    shouldDisableRiveListeners: true,
     onRiveReady: () => setRiveReady(true),
   });
 
   return (
-    <span className={`relative block ${className ?? ""}`} role="img" aria-label={alt}>
+    <span className={`pointer-events-none relative block select-none ${className ?? ""}`} role="img" aria-label={alt}>
       {!riveReady && (
         <img
           src={fallbackImage}
@@ -34,9 +37,7 @@ export function RiveAlumia({ className, alt = "Alumia" }: RiveAlumiaProps) {
           className="absolute inset-0 h-full w-full object-contain object-bottom"
         />
       )}
-      <RiveComponent
-        className="relative z-[1] block h-full w-full"
-      />
+      <RiveComponent className="pointer-events-none relative z-[1] block h-full w-full" />
     </span>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AiBrain01Icon,
@@ -40,7 +40,11 @@ function messageId() {
     : `alumia-message-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-export function AlumiaChat() {
+type AlumiaChatProps = {
+  initialMessage?: string | null;
+};
+
+export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<AlumiaConversationMessage[]>([FIRST_MESSAGE]);
   const [actionStates, setActionStates] = useState<Record<string, ActionState>>({});
@@ -48,12 +52,13 @@ export function AlumiaChat() {
   const [responding, setResponding] = useState(false);
   const [editingAction, setEditingAction] = useState<AlumiaProposedAction | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const initialMessageHandled = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [messages, actionStates, responding]);
 
-  async function sendMessage(rawMessage: string) {
+  const sendMessage = useCallback(async (rawMessage: string) => {
     const text = rawMessage.trim();
     if (!text || responding) return;
 
@@ -92,7 +97,13 @@ export function AlumiaChat() {
     } finally {
       setResponding(false);
     }
-  }
+  }, [messages, responding]);
+
+  useEffect(() => {
+    if (!initialMessage || initialMessageHandled.current) return;
+    initialMessageHandled.current = true;
+    void sendMessage(initialMessage);
+  }, [initialMessage, sendMessage]);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();

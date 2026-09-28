@@ -1,13 +1,18 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   ALUMIA_PRESENCE_CHANGE_EVENT,
+  consumeAlumiaPendingMessage,
   getAlumiaPresenceContext,
   getAlumiaPresenceEnabled,
+  setAlumiaPendingMessage,
   setAlumiaPresenceEnabled,
 } from "./alumia-presence";
 
 describe("alumia presence", () => {
-  beforeEach(() => window.localStorage.clear());
+  beforeEach(() => {
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+  });
 
   it("uses non-punitive contextual copy for each module", () => {
     expect(getAlumiaPresenceContext("/tarefas").title).toBe("Um passo de cada vez.");
@@ -29,5 +34,12 @@ describe("alumia presence", () => {
 
     setAlumiaPresenceEnabled(false);
     expect(enabled).toBe(false);
+  });
+
+  it("hands a floating message to the full chat only once", () => {
+    setAlumiaPendingMessage("  Crie uma tarefa para comprar pão  ");
+
+    expect(consumeAlumiaPendingMessage()).toBe("Crie uma tarefa para comprar pão");
+    expect(consumeAlumiaPendingMessage()).toBeNull();
   });
 });
