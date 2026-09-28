@@ -351,3 +351,22 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@keyframes alumia-presence-float {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50% { transform: translateY(-4px) rotate(0.5deg); }
+}
+
+@keyframes alumia-presence-glow {
+  0%, 100% { opacity: 0.45; transform: translateX(-50%) scale(0.92); }
+  50% { opacity: 0.75; transform: translateX(-50%) scale(1.08); }
+}
+
+.alumia-presence-idle {
+  animation: alumia-presence-float 4.8s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+.alumia-presence-halo {
+  animation: alumia-presence-glow 3.8s ease-in-out infinite;
+}

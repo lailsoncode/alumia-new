@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabaseClient";
+import { notifyAchievementActivity } from "./achievementService";
 
 /**
  * @file hydrationService.ts
@@ -53,6 +54,7 @@ export async function logWaterIntake(amountMl: number, dateStr: string): Promise
     ]);
 
   if (error) throw error;
+  notifyAchievementActivity();
 }
 
 /**
@@ -131,4 +133,3 @@ export async function getPastWeekHydration(): Promise<{ date: string; total: num
       total: totalsMap[date],
     }));
 }
-

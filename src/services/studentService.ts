@@ -10,6 +10,7 @@ import type {
   Task,
 } from "@/types";
 import { scheduleTaskReminder } from "./taskReminderService";
+import { notifyAchievementActivity } from "./achievementService";
 
 interface StudentDetailsRow {
   academic_type: AcademicType;
@@ -132,6 +133,7 @@ export async function completeStudySession(input: CompleteStudySessionInput) {
     ended_at: new Date().toISOString(),
   });
   if (error) throw error;
+  notifyAchievementActivity();
 }
 
 export async function createStudyReview(source: StudentCommitment, date: string) {

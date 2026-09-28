@@ -23,6 +23,7 @@ import {
   Wallet02Icon,
 } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { AlumiaModuleIntro } from "@/components/shared/AlumiaModuleIntro";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,6 +38,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { SectionHeader, Surface } from "@/components/ui/surface";
 import { cn } from "@/lib/utils";
+import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
 
 type FinanceView = "overview" | "activity" | "bills" | "goals";
 type TransactionKind = "income" | "expense";
@@ -156,6 +158,14 @@ export function FinanceDashboard() {
           <span className="min-[430px]:hidden">Adicionar</span>
         </Button>
       </div>
+
+      <AlumiaModuleIntro
+        image={ALUMIA_AVATAR_IMAGES.finance}
+        imageAlt="Alumia cuidando da organização da casa"
+        icon={Home01Icon}
+        title="Cuidar das contas também é autocuidado"
+        description="A Alumia ajuda você a olhar entradas, gastos e planos com clareza — sem culpa e sem sustos."
+      />
 
       <div className="overflow-x-auto pb-0.5" aria-label="Áreas do módulo financeiro">
         <div className="grid min-w-[34rem] grid-cols-4 gap-1 rounded-2xl border bg-surface p-1 shadow-[var(--shadow-card)]" role="tablist">

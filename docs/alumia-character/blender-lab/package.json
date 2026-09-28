@@ -1,0 +1,8 @@
+{
+  "name": "alumia-3d-comparison-lab",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite --host 127.0.0.1 --port 8093", "build": "vite build", "check": "node verify-glb.mjs" },
+  "dependencies": { "three": "0.180.0" },
+  "devDependencies": { "vite": "7.3.6" }
+}

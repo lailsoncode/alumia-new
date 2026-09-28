@@ -10,9 +10,11 @@ import {
   Yoga01Icon,
 } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { AlumiaModuleIntro } from "@/components/shared/AlumiaModuleIntro";
 import { Button } from "@/components/ui/button";
 import { InlineFeedback, SectionHeader, Surface } from "@/components/ui/surface";
 import { findClosestPractice, mindfulnessCategoryLabels } from "@/lib/mindfulness";
+import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
 import { completeMindfulnessSession, getMindfulnessPractices, scheduleMindfulnessReminder } from "@/services/mindfulnessService";
 import type { MindfulnessCategory, MindfulnessFormat, MindfulnessPractice, MindfulnessReflection as Reflection, MindfulnessReminderChoice } from "@/types";
 import { MindfulnessPlayer } from "./MindfulnessPlayer";
@@ -107,6 +109,14 @@ export function MindfulnessDashboard() {
         <AlumiaIcon icon={Yoga01Icon} size="md" className="module-text" />
         <div><h2 className="font-display text-xl font-semibold sm:text-2xl">Mindfulness</h2><p className="text-sm text-muted-foreground">Pequenas pausas para um presente mais gentil.</p></div>
       </div>
+
+      <AlumiaModuleIntro
+        image={ALUMIA_AVATAR_IMAGES.mindfulness}
+        imageAlt="Alumia meditando com serenidade entre plantas"
+        icon={Yoga01Icon}
+        title="A Alumia faz esta pausa com você"
+        description="Respire, perceba o presente e pare quando quiser. Aqui, poucos minutos já são cuidado."
+      />
 
       {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
       {feedback && <InlineFeedback tone="success">{feedback}</InlineFeedback>}

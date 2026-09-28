@@ -26,6 +26,8 @@ const appShellHeaders = {
   "/financeiro": "Cuidar do seu dinheiro também pode ser leve. Vamos olhar juntos?",
   "/alumia": "Vamos encontrar um próximo passo possível, com você no controle.",
   "/ajustes": "Sua conta, suas preferências e sua privacidade.",
+  "/perfil": "Sua história, seus cuidados e tudo o que faz sentido guardar.",
+  "/conquistas": "Sua coleção cresce com carinho, sem pressa e sem cobrança.",
 } as const;
 
 const protectedPaths = new Set([...Object.keys(appShellHeaders), "/completar-perfil"]);

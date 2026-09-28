@@ -10,6 +10,7 @@ import {
   MoodSummaryCard,
   NeedPicker,
 } from "@/components/shared/checkin";
+import { AlumiaModuleIntro } from "@/components/shared/AlumiaModuleIntro";
 import { AddTaskSheet } from "@/components/shared/tasks/AddTaskSheet";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { InlineFeedback, Surface } from "@/components/ui/surface";
 import { createCareCheckin, getCareCheckinHistory, getCheckinCatalogs } from "@/services/checkinService";
 import { createTask } from "@/services/tasksService";
 import { isSameLocalDay } from "@/lib/utils";
+import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
 import type { CareCheckinHistoryItem, CheckinEmotion, CheckinNeed, CreateCareCheckinResult } from "@/types";
 
 function newIdempotencyKey() {
@@ -105,15 +107,13 @@ export function CheckinPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-3">
-      <Surface className="module-surface flex items-start gap-2.5 p-3 shadow-none">
-        <AlumiaIcon icon={SmileIcon} size="md" className="module-text mt-0.5" />
-        <div>
-          <h2 className="text-base font-semibold sm:text-lg">Check-in emocional da Alumia</h2>
-          <p className="mt-0.5 text-sm leading-snug text-foreground/80">
-            Um espaço breve para reconhecer o que você sente e escolher o cuidado que faz sentido agora.
-          </p>
-        </div>
-      </Surface>
+      <AlumiaModuleIntro
+        image={ALUMIA_AVATAR_IMAGES.checkin}
+        imageAlt="Alumia recebendo você com carinho"
+        icon={SmileIcon}
+        title="Check-in emocional da Alumia"
+        description="Um espaço breve para reconhecer o que você sente e escolher o cuidado que faz sentido agora."
+      />
 
       {loadError && (
         <InlineFeedback tone="danger">

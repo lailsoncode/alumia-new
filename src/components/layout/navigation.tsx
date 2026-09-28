@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { CheckListIcon, Grid2X2Icon, Home01Icon, Settings01Icon } from "@hugeicons/core-free-icons";
+import { CheckListIcon, Grid2X2Icon, Home01Icon, Settings01Icon, UserIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import alumiaChibi from "@/assets/alumia/alumia-chibi-idle-v1.png";
 import { cn } from "@/lib/utils";
 import { isItemActive } from "./navigation-utils";
 
@@ -8,14 +9,15 @@ const items = [
   { to: "/", label: "Início", icon: Home01Icon, matches: ["/"] },
   { to: "/tarefas", label: "Tarefas", icon: CheckListIcon, matches: ["/tarefas"] },
   { to: "/modulos", label: "Cuidados", icon: Grid2X2Icon, matches: ["/modulos", "/hidratacao", "/check-in", "/estudante", "/mindfulness", "/financeiro", "/alumia"] },
-  { to: "/ajustes", label: "Ajustes", icon: Settings01Icon, matches: ["/ajustes", "/completar-perfil"] },
+  { to: "/perfil", label: "Meu perfil", icon: UserIcon, matches: ["/perfil", "/completar-perfil", "/conquistas"] },
+  { to: "/ajustes", label: "Ajustes", icon: Settings01Icon, matches: ["/ajustes"] },
 ] as const;
 
 export function BottomNavigation() {
   const { pathname } = useLocation();
   return (
-    <nav aria-label="Navegação principal" className="alumia-floating fixed inset-x-4 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-lg rounded-[1.5rem] p-1 lg:hidden">
-      <ul className="grid grid-cols-4 gap-1">
+    <nav aria-label="Navegação principal" className="alumia-floating fixed inset-x-2 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-xl rounded-[1.5rem] p-1 lg:hidden sm:inset-x-4">
+      <ul className="grid grid-cols-5 gap-0.5 sm:gap-1">
         {items.map((item) => {
           const active = isItemActive(pathname, item.matches);
           return (
@@ -25,7 +27,7 @@ export function BottomNavigation() {
                 preload="render"
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-13 min-w-0 flex-col items-center justify-center gap-0.5 rounded-[1.125rem] px-1 text-xs font-semibold transition-colors",
+                  "flex min-h-13 min-w-0 flex-col items-center justify-center gap-0.5 rounded-[1.125rem] px-0.5 text-[0.68rem] font-semibold transition-colors sm:px-1 sm:text-xs",
                   active ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
@@ -81,9 +83,12 @@ export function SidebarNavigation() {
         </ul>
       </nav>
 
-      <div className="mt-auto rounded-[1.5rem] border border-primary/20 bg-primary/10 p-4 text-foreground shadow-[var(--shadow-card)]">
-        <p className="font-display text-sm font-semibold">Seu espaço continua aqui.</p>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Volte quando fizer sentido para você.</p>
+      <div className="mt-auto overflow-hidden rounded-[1.5rem] border border-primary/20 bg-primary/10 text-foreground shadow-[var(--shadow-card)]">
+        <div className="relative h-32 overflow-hidden bg-gradient-to-b from-primary/5 to-primary/15">
+          <span aria-hidden="true" className="absolute bottom-2 left-1/2 h-20 w-20 -translate-x-1/2 rounded-full bg-primary/15 blur-md" />
+          <img src={alumiaChibi} alt="Alumia acenando e segurando uma flor" className="relative mx-auto h-full w-28 object-contain object-bottom drop-shadow-md" />
+        </div>
+        <div className="p-4"><p className="font-display text-sm font-semibold">A Alumia segue por aqui.</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">Volte quando fizer sentido para você.</p></div>
       </div>
     </aside>
   );

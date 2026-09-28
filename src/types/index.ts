@@ -6,3 +6,4 @@ export * from "./hydration";
 export * from "./checkin";
 export * from "./student";
 export * from "./mindfulness";
+export * from "./achievements";

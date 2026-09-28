@@ -3,6 +3,8 @@ import { BottomNavigation, SidebarNavigation } from "./navigation";
 import { Greeting } from "@/components/shared/Greeting";
 import { cn } from "@/lib/utils";
 import { MODULE_THEMES, type ModuleKey } from "@/lib/module-themes";
+import { AchievementCelebration } from "@/components/shared/achievements";
+import { FloatingAlumia } from "@/components/shared/alumia-presence";
 
 interface AppShellProps {
   children: ReactNode;
@@ -24,7 +26,9 @@ export function AppShell({ children, className, contentClassName, headerRole, mo
           </div>
         </main>
       </div>
+      <FloatingAlumia />
       <BottomNavigation />
+      <AchievementCelebration />
     </div>
   );
 }

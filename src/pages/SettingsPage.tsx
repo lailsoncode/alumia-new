@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { AccessibilityIcon, BellIcon, ChevronRightIcon, GlobeIcon, LockIcon, Logout01Icon, Moon01Icon, Settings01Icon, Sun01Icon, UserIcon } from "@hugeicons/core-free-icons";
+import { AccessibilityIcon, BellIcon, ChevronRightIcon, GlobeIcon, LockIcon, Logout01Icon, Moon01Icon, Settings01Icon, SparklesIcon, Sun01Icon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
-import { Button } from "@/components/ui/button";
 import { SectionHeader, Surface } from "@/components/ui/surface";
-import { useAuth } from "@/hooks/use-auth";
 import { signOut } from "@/services/authService";
 import { disablePushNotifications, enablePushNotifications, getPushNotificationState, isOneSignalConfigured } from "@/services/oneSignalService";
 import { getTasks } from "@/services/tasksService";
@@ -12,6 +10,7 @@ import { synchronizeTaskReminders } from "@/services/taskReminderService";
 import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
 import { AlumiaContextPreference } from "@/components/shared/alumia-ai/AlumiaContextPreference";
 import { AlumiaMemory } from "@/components/shared/alumia-ai/AlumiaMemory";
+import { getAlumiaPresenceEnabled, setAlumiaPresenceEnabled } from "@/lib/alumia-presence";
 
 function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
   return (
@@ -23,19 +22,20 @@ function PreferenceSwitch({ checked, onChange, label, disabled = false }: { chec
 
 export function SettingsPage() {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState<"loading" | "ready" | "saving" | "denied" | "unsupported" | "unconfigured" | "error">(
     isOneSignalConfigured() ? "loading" : "unconfigured",
   );
   const [language, setLanguage] = useState("pt-BR");
+  const [alumiaPresence, setAlumiaPresence] = useState(true);
 
   useEffect(() => {
     const nextDark = getStoredTheme() === "dark";
     setDarkMode(nextDark);
     applyTheme(nextDark ? "dark" : "light");
     setLanguage(window.localStorage.getItem("language") || "pt-BR");
+    setAlumiaPresence(getAlumiaPresenceEnabled());
     return subscribeToThemeChanges((theme) => setDarkMode(theme === "dark"));
   }, []);
 
@@ -101,28 +101,20 @@ export function SettingsPage() {
     navigate({ to: "/login" });
   };
 
-  const name = profile?.firstName ? `${profile.firstName} ${profile.lastName}`.trim() : user?.email?.split("@")[0] || "Seu perfil";
-
   return (
     <div className="space-y-4">
-        <section>
-          <SectionHeader icon={UserIcon} iconClassName="text-primary" title="Perfil"/>
-          <Surface className="mt-2.5 p-3">
-            <div className="flex items-center gap-3">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary/10 text-lg font-bold text-primary">
-                {profile?.avatarUrl ? <img src={profile.avatarUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : name.slice(0, 1).toUpperCase()}
-              </span>
-              <div className="min-w-0 flex-1"><h2 className="truncate text-lg font-semibold">{name}</h2><p className="truncate text-xs text-muted-foreground">{user?.email}</p>{profile?.goals && <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-foreground">{profile.goals}</p>}</div>
-              <Button variant="outline" size="sm" className="shrink-0" aria-label="Editar perfil" onClick={() => navigate({ to: "/completar-perfil" })}><AlumiaIcon icon={UserIcon} size="xs" />Editar</Button>
-            </div>
-          </Surface>
-        </section>
-
         <section>
           <SectionHeader icon={Settings01Icon} iconClassName="text-primary" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
           <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
             <AlumiaContextPreference settings />
             <AlumiaMemory settings />
+            <div className="flex min-h-14 items-center gap-3 px-3 py-2">
+              <div className="flex min-w-0 flex-1 items-start gap-3">
+                <AlumiaIcon icon={SparklesIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
+                <div className="min-w-0"><p className="text-sm font-semibold">Alumia flutuante</p><p className="mt-0.5 text-xs text-muted-foreground">Mostra a personagem e seus atalhos contextuais no celular.</p></div>
+              </div>
+              <PreferenceSwitch checked={alumiaPresence} onChange={() => { const next = !alumiaPresence; setAlumiaPresence(next); setAlumiaPresenceEnabled(next); }} label="Mostrar Alumia flutuante" />
+            </div>
             <div className="flex min-h-14 items-center gap-3 px-3 py-2">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-primary" />

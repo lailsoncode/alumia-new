@@ -3,6 +3,7 @@ import { getLocalDateString } from "../lib/utils";
 import { getIsoWeekday, getNextRecurrenceDate } from "../lib/tasks";
 import type { Task, AddTaskData, TaskRecurrence } from "../types";
 import { cancelTaskReminder, scheduleTaskReminder } from "./taskReminderService";
+import { notifyAchievementActivity } from "./achievementService";
 
 type TaskUpdates = Omit<Partial<Task>, "date" | "time"> & {
   date?: string | null;
@@ -144,6 +145,7 @@ export async function updateTask(taskId: string, updates: TaskUpdates): Promise<
     await cancelTaskReminder(taskId).catch((scheduleError) => {
       console.error("Não foi possível remover o lembrete concluído:", scheduleError);
     });
+    notifyAchievementActivity();
     return completed;
   }
   const { data, error } = await supabase

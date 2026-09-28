@@ -9,11 +9,13 @@ import {
   PlayIcon,
 } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { AlumiaModuleIntro } from "@/components/shared/AlumiaModuleIntro";
 import { Button } from "@/components/ui/button";
 import { InlineFeedback, SectionHeader, Surface } from "@/components/ui/surface";
 import { DatePickerSheet } from "@/components/shared/tasks/DatePickerSheet";
 import { formatCommitmentDate, getReviewDate, getUpcomingCommitments } from "@/lib/student";
 import { getLocalDateString } from "@/lib/utils";
+import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
 import { createStudentCommitment, createStudyReview, completeStudySession, getStudentDashboardData } from "@/services/studentService";
 import { updateTask } from "@/services/tasksService";
 import type { CreateStudentCommitmentInput, StudentCommitment, StudentDashboardData, StudyOutcome } from "@/types";
@@ -101,6 +103,14 @@ export function StudentDashboard() {
         </div>
         <Button size="sm" onClick={() => setDialogOpen(true)}><AlumiaIcon icon={AddCircleIcon} size="sm" /><span className="hidden min-[420px]:inline">Novo compromisso</span><span className="min-[420px]:hidden">Adicionar</span></Button>
       </div>
+
+      <AlumiaModuleIntro
+        image={ALUMIA_AVATAR_IMAGES.student}
+        imageAlt="Alumia estudando com uma lista e um calendário"
+        icon={BulbIcon}
+        title="A Alumia estuda com você"
+        description="Escolha uma etapa pequena, foque pelo tempo possível e deixe a revisão para o momento certo."
+      />
 
       {error && <InlineFeedback tone="danger">{error} <button type="button" onClick={load} className="font-semibold underline">Tentar novamente</button></InlineFeedback>}
       {feedback && <InlineFeedback tone="success">{feedback}</InlineFeedback>}

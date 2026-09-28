@@ -7,6 +7,7 @@ import type {
   CreateCareCheckinResult,
   MoodCategory,
 } from "@/types";
+import { notifyAchievementActivity } from "./achievementService";
 
 interface HistoryEmotionRelation {
   emotion_code: string;
@@ -92,7 +93,7 @@ export async function createCareCheckin(input: CreateCareCheckinInput): Promise<
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) throw new Error("O check-in não retornou uma sugestão.");
 
-  return {
+  const result = {
     checkinId: row.checkin_id,
     occurredAt: row.occurred_at,
     moodCategory: row.mood_category as MoodCategory,
@@ -105,6 +106,8 @@ export async function createCareCheckin(input: CreateCareCheckinInput): Promise<
       actionCategory: row.suggestion_action_category,
     },
   };
+  notifyAchievementActivity();
+  return result;
 }
 
 export async function getCareCheckinHistory(page = 0, pageSize = 20): Promise<CareCheckinHistoryItem[]> {

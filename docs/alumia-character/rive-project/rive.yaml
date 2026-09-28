@@ -1,0 +1,7 @@
+name: alumia-bust-v2
+logs:
+  file: build/rive.log
+  problems: build/problems.log
+push:
+  projectId: 2003881
+  fileId: 2613335

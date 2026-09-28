@@ -14,6 +14,7 @@ import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as AlumiaRouteImport } from './routes/alumia'
 import { Route as CheckInRouteImport } from './routes/check-in'
 import { Route as CompletarPerfilRouteImport } from './routes/completar-perfil'
+import { Route as ConquistasRouteImport } from './routes/conquistas'
 import { Route as EstudanteRouteImport } from './routes/estudante'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as HidratacaoRouteImport } from './routes/hidratacao'
@@ -21,6 +22,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MindfulnessRouteImport } from './routes/mindfulness'
 import { Route as ModulosRouteImport } from './routes/modulos'
 import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
+import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as TarefasRouteImport } from './routes/tarefas'
 import { Route as CheckInHistoricoRouteImport } from './routes/check-in_.historico'
@@ -48,6 +50,11 @@ const CheckInRoute = CheckInRouteImport.update({
 const CompletarPerfilRoute = CompletarPerfilRouteImport.update({
   id: '/completar-perfil',
   path: '/completar-perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConquistasRoute = ConquistasRouteImport.update({
+  id: '/conquistas',
+  path: '/conquistas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EstudanteRoute = EstudanteRouteImport.update({
@@ -85,6 +92,11 @@ const NovaSenhaRoute = NovaSenhaRouteImport.update({
   path: '/nova-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegistroRoute = RegistroRouteImport.update({
   id: '/registro',
   path: '/registro',
@@ -107,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/alumia': typeof AlumiaRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/conquistas': typeof ConquistasRoute
   '/estudante': typeof EstudanteRoute
   '/financeiro': typeof FinanceiroRoute
   '/hidratacao': typeof HidratacaoRoute
@@ -114,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/mindfulness': typeof MindfulnessRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
+  '/perfil': typeof PerfilRoute
   '/registro': typeof RegistroRoute
   '/tarefas': typeof TarefasRoute
   '/check-in/historico': typeof CheckInHistoricoRoute
@@ -124,6 +138,7 @@ export interface FileRoutesByTo {
   '/alumia': typeof AlumiaRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/conquistas': typeof ConquistasRoute
   '/estudante': typeof EstudanteRoute
   '/financeiro': typeof FinanceiroRoute
   '/hidratacao': typeof HidratacaoRoute
@@ -131,6 +146,7 @@ export interface FileRoutesByTo {
   '/mindfulness': typeof MindfulnessRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
+  '/perfil': typeof PerfilRoute
   '/registro': typeof RegistroRoute
   '/tarefas': typeof TarefasRoute
   '/check-in/historico': typeof CheckInHistoricoRoute
@@ -142,6 +158,7 @@ export interface FileRoutesById {
   '/alumia': typeof AlumiaRoute
   '/check-in': typeof CheckInRoute
   '/completar-perfil': typeof CompletarPerfilRoute
+  '/conquistas': typeof ConquistasRoute
   '/estudante': typeof EstudanteRoute
   '/financeiro': typeof FinanceiroRoute
   '/hidratacao': typeof HidratacaoRoute
@@ -149,6 +166,7 @@ export interface FileRoutesById {
   '/mindfulness': typeof MindfulnessRoute
   '/modulos': typeof ModulosRoute
   '/nova-senha': typeof NovaSenhaRoute
+  '/perfil': typeof PerfilRoute
   '/registro': typeof RegistroRoute
   '/tarefas': typeof TarefasRoute
   '/check-in_/historico': typeof CheckInHistoricoRoute
@@ -161,6 +179,7 @@ export interface FileRouteTypes {
     | '/alumia'
     | '/check-in'
     | '/completar-perfil'
+    | '/conquistas'
     | '/estudante'
     | '/financeiro'
     | '/hidratacao'
@@ -168,6 +187,7 @@ export interface FileRouteTypes {
     | '/mindfulness'
     | '/modulos'
     | '/nova-senha'
+    | '/perfil'
     | '/registro'
     | '/tarefas'
     | '/check-in/historico'
@@ -178,6 +198,7 @@ export interface FileRouteTypes {
     | '/alumia'
     | '/check-in'
     | '/completar-perfil'
+    | '/conquistas'
     | '/estudante'
     | '/financeiro'
     | '/hidratacao'
@@ -185,6 +206,7 @@ export interface FileRouteTypes {
     | '/mindfulness'
     | '/modulos'
     | '/nova-senha'
+    | '/perfil'
     | '/registro'
     | '/tarefas'
     | '/check-in/historico'
@@ -195,6 +217,7 @@ export interface FileRouteTypes {
     | '/alumia'
     | '/check-in'
     | '/completar-perfil'
+    | '/conquistas'
     | '/estudante'
     | '/financeiro'
     | '/hidratacao'
@@ -202,6 +225,7 @@ export interface FileRouteTypes {
     | '/mindfulness'
     | '/modulos'
     | '/nova-senha'
+    | '/perfil'
     | '/registro'
     | '/tarefas'
     | '/check-in_/historico'
@@ -213,6 +237,7 @@ export interface RootRouteChildren {
   AlumiaRoute: typeof AlumiaRoute
   CheckInRoute: typeof CheckInRoute
   CompletarPerfilRoute: typeof CompletarPerfilRoute
+  ConquistasRoute: typeof ConquistasRoute
   EstudanteRoute: typeof EstudanteRoute
   FinanceiroRoute: typeof FinanceiroRoute
   HidratacaoRoute: typeof HidratacaoRoute
@@ -220,6 +245,7 @@ export interface RootRouteChildren {
   MindfulnessRoute: typeof MindfulnessRoute
   ModulosRoute: typeof ModulosRoute
   NovaSenhaRoute: typeof NovaSenhaRoute
+  PerfilRoute: typeof PerfilRoute
   RegistroRoute: typeof RegistroRoute
   TarefasRoute: typeof TarefasRoute
   CheckInHistoricoRoute: typeof CheckInHistoricoRoute
@@ -260,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/completar-perfil'
       fullPath: '/completar-perfil'
       preLoaderRoute: typeof CompletarPerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conquistas': {
+      id: '/conquistas'
+      path: '/conquistas'
+      fullPath: '/conquistas'
+      preLoaderRoute: typeof ConquistasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/estudante': {
@@ -311,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NovaSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/registro': {
       id: '/registro'
       path: '/registro'
@@ -341,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlumiaRoute: AlumiaRoute,
   CheckInRoute: CheckInRoute,
   CompletarPerfilRoute: CompletarPerfilRoute,
+  ConquistasRoute: ConquistasRoute,
   EstudanteRoute: EstudanteRoute,
   FinanceiroRoute: FinanceiroRoute,
   HidratacaoRoute: HidratacaoRoute,
@@ -348,6 +389,7 @@ const rootRouteChildren: RootRouteChildren = {
   MindfulnessRoute: MindfulnessRoute,
   ModulosRoute: ModulosRoute,
   NovaSenhaRoute: NovaSenhaRoute,
+  PerfilRoute: PerfilRoute,
   RegistroRoute: RegistroRoute,
   TarefasRoute: TarefasRoute,
   CheckInHistoricoRoute: CheckInHistoricoRoute,

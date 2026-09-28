@@ -69,7 +69,7 @@ export function CompleteProfilePage() {
     try {
       await updateUserProfile(user.id, { firstName, lastName, bio, goals, avatarUrl: avatarPreview || "" });
       await refreshProfile();
-      navigate({ to: "/" });
+      navigate({ to: "/perfil" });
     } catch (caught: unknown) {
       setSaveError(caught instanceof Error ? caught.message : "Não foi possível salvar seu perfil.");
     } finally {

@@ -10,6 +10,7 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
+import { AlumiaModuleIntro } from "@/components/shared/AlumiaModuleIntro";
 import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +19,7 @@ import { AlumiaContextPreference } from "./AlumiaContextPreference";
 import { AlumiaMemory } from "./AlumiaMemory";
 import { AlumiaLearningOnboarding } from "./AlumiaLearningOnboarding";
 import { cn } from "@/lib/utils";
+import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
 import { confirmAlumiaAction, isAlumiaGenerativeEnabled, respondToAlumia } from "@/services/alumiaAIService";
 import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
 
@@ -157,24 +159,18 @@ export function AlumiaChat() {
   return (
     <div className="mx-auto max-w-4xl space-y-3">
       {isAlumiaGenerativeEnabled() && <AlumiaLearningOnboarding />}
-      <Surface className="module-surface p-3 sm:p-4">
-        <div className="flex items-start gap-3">
-          <span className="module-whisper flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border module-text">
-            <AlumiaIcon icon={AiBrain01Icon} size="md" />
+      <AlumiaModuleIntro
+        image={ALUMIA_AVATAR_IMAGES.assistant}
+        imageAlt="Retrato da Alumia segurando uma flor iluminada"
+        icon={AiBrain01Icon}
+        title="Converse com a Alum.IA"
+        description="Uma assistente pessoal para compreender o momento e ajudar quando você quiser agir."
+        badge={(
+          <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[0.6875rem] font-semibold text-muted-foreground">
+            {isAlumiaGenerativeEnabled() ? "Prévia com IA" : "Prévia segura"}
           </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">Alum.IA</h1>
-              <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-semibold text-muted-foreground">
-                {isAlumiaGenerativeEnabled() ? "Prévia com IA" : "Prévia segura"}
-              </span>
-            </div>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Uma assistente pessoal para conversar, compreender o momento e ajudar quando você quiser agir.
-            </p>
-          </div>
-        </div>
-      </Surface>
+        )}
+      />
 
       <Surface variant="subtle" className="flex items-start gap-2.5 p-3 text-sm leading-relaxed">
         <AlumiaIcon icon={LockIcon} size="sm" className="module-text mt-0.5" />

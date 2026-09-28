@@ -6,6 +6,7 @@ import type {
   MindfulnessReminderChoice,
 } from "@/types";
 import { createTask } from "./tasksService";
+import { notifyAchievementActivity } from "./achievementService";
 
 interface MindfulnessPracticeRow {
   id: string;
@@ -63,6 +64,7 @@ export async function completeMindfulnessSession(input: CompleteMindfulnessSessi
     p_ended_early: input.endedEarly,
   });
   if (error) throw error;
+  notifyAchievementActivity();
   return data as string;
 }
 
