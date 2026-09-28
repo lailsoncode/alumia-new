@@ -191,8 +191,10 @@ function RuntimeIntegrations() {
 
 function ApplicationContent() {
   const { pathname } = useLocation();
-  const isProtected = protectedPaths.has(pathname);
-  const usesAppShell = Object.hasOwn(appShellHeaders, pathname);
+  const { user } = useAuth();
+  const isPublicHome = pathname === "/" && !user;
+  const isProtected = protectedPaths.has(pathname) && !isPublicHome;
+  const usesAppShell = Object.hasOwn(appShellHeaders, pathname) && !isPublicHome;
   const content = usesAppShell ? (
     <AppShell
       headerRole={appShellHeaders[pathname as keyof typeof appShellHeaders]}
