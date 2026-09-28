@@ -254,3 +254,69 @@ test("recusa contexto temporal ausente ou inválido", async () => {
     assert.equal(response.status, 400);
   });
 });
+
+test("transcreve áudio autenticado sem persistir conteúdo no serviço", async () => {
+  let received;
+  await withServer({
+    authorize: async () => ({ id: "user-voice" }),
+    generate: async () => ({ kind: "message", text: "resposta" }),
+    transcribe: async (input) => {
+      received = input;
+      return { transcript: "Quero conversar um pouco.", confidence: 0.93 };
+    },
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/transcriptions`, {
+      method: "POST",
+      headers: { authorization: "Bearer valid", "content-type": "audio/webm;codecs=opus" },
+      body: Buffer.from("synthetic-audio"),
+    });
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.transcript, "Quero conversar um pouco.");
+    assert.equal(body.confidence, 0.93);
+    assert.equal(received.mediaType, "audio/webm");
+    assert.deepEqual(received.audio, Buffer.from("synthetic-audio"));
+    assert.equal(response.headers.get("cache-control"), "no-store");
+  });
+});
+
+test("recusa mídia desconhecida antes de chamar a transcrição", async () => {
+  let called = false;
+  await withServer({
+    authorize: async () => ({ id: "user-voice" }),
+    generate: async () => ({ kind: "message", text: "resposta" }),
+    transcribe: async () => { called = true; },
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/transcriptions`, {
+      method: "POST",
+      headers: { authorization: "Bearer valid", "content-type": "text/plain" },
+      body: "not audio",
+    });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error, "INVALID_AUDIO");
+    assert.equal(called, false);
+  });
+});
+
+test("sintetiza somente texto autenticado e impede cache do áudio", async () => {
+  let received;
+  await withServer({
+    authorize: async () => ({ id: "user-voice" }),
+    generate: async () => ({ kind: "message", text: "resposta" }),
+    synthesize: async (input) => { received = input; return Buffer.from("synthetic-mp3"); },
+    allowedOrigins: new Set(),
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/v1/speech`, {
+      method: "POST",
+      headers: { authorization: "Bearer valid", "content-type": "application/json" },
+      body: JSON.stringify({ text: "Estou aqui com você." }),
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "audio/mpeg");
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.deepEqual(received, { text: "Estou aqui com você." });
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), Buffer.from("synthetic-mp3"));
+  });
+});

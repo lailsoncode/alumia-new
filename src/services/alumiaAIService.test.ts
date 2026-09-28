@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { confirmAlumiaAction, respondToAlumia } from "./alumiaAIService";
+import { confirmAlumiaAction, respondToAlumia, synthesizeAlumiaSpeech, transcribeAlumiaAudio } from "./alumiaAIService";
 import { createTask, getTasks } from "./tasksService";
 import { getMindfulnessPractices } from "./mindfulnessService";
 import { supabase } from "@/lib/supabaseClient";
@@ -200,5 +200,36 @@ describe("Alum.IA editorial provider", () => {
     expect(JSON.parse(String(fetchMock.mock.calls[0][1].body)).history).toEqual([]);
     expect(mockedGetTasks).not.toHaveBeenCalled();
     expect(mockedCreateTask).not.toHaveBeenCalled();
+  });
+
+  it("envia o áudio bruto autenticado para transcrição", async () => {
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
+    vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
+    mockedGetSession.mockResolvedValue({ data: { session: { access_token: "jwt-valid" } }, error: null } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ transcript: "Olá, Alumia." })));
+    vi.stubGlobal("fetch", fetchMock);
+    const audio = new Blob(["audio"], { type: "audio/webm" });
+
+    await expect(transcribeAlumiaAudio(audio)).resolves.toBe("Olá, Alumia.");
+    expect(fetchMock).toHaveBeenCalledWith("https://alumia-ai.example/v1/transcriptions", expect.objectContaining({
+      method: "POST",
+      body: audio,
+      headers: expect.objectContaining({ authorization: "Bearer jwt-valid", "content-type": "audio/webm" }),
+    }));
+  });
+
+  it("recebe a voz sintetizada da resposta como áudio", async () => {
+    vi.stubEnv("VITE_ENABLE_ALUMIA_AI_GENERATIVE", "true");
+    vi.stubEnv("VITE_ALUMIA_AI_URL", "https://alumia-ai.example");
+    mockedGetSession.mockResolvedValue({ data: { session: { access_token: "jwt-valid" } }, error: null } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    const fetchMock = vi.fn().mockResolvedValue(new Response("mp3", { headers: { "content-type": "audio/mpeg" } }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await synthesizeAlumiaSpeech("Estou aqui com você.");
+    expect(result.type).toBe("audio/mpeg");
+    expect(fetchMock).toHaveBeenCalledWith("https://alumia-ai.example/v1/speech", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ text: "Estou aqui com você." }),
+    }));
   });
 });

@@ -4,6 +4,8 @@ import { readConfig } from "./config.js";
 import { createGeminiGenerator } from "./gemini.js";
 import { createInMemoryRateLimiter } from "./rate-limit.js";
 import { createMemoryReader, createMemoryWriter } from "./memory.js";
+import { createSpeechTranscriber } from "./speech.js";
+import { createSpeechSynthesizer } from "./text-to-speech.js";
 
 const config = readConfig();
 const app = createApp({
@@ -14,6 +16,12 @@ const app = createApp({
   allowedOrigins: config.allowedOrigins,
   checkRateLimit: createInMemoryRateLimiter({
     maxRequests: config.rateLimitRequests,
+    windowMs: config.rateLimitWindowMs,
+  }),
+  transcribe: createSpeechTranscriber(config),
+  synthesize: createSpeechSynthesizer(config),
+  checkVoiceRateLimit: createInMemoryRateLimiter({
+    maxRequests: config.rateLimitVoiceRequests,
     windowMs: config.rateLimitWindowMs,
   }),
 });

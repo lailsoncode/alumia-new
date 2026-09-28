@@ -4,6 +4,16 @@ import { CRISIS_RESPONSE, hasPossibleCrisisSignal } from "./safety.js";
 
 const MAX_MESSAGE_LENGTH = 1_200;
 const MAX_HISTORY_ITEMS = 8;
+const MAX_AUDIO_BYTES = 2_000_000;
+const SUPPORTED_AUDIO_TYPES = new Set([
+  "audio/aac",
+  "audio/mp4",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/wav",
+  "audio/webm",
+  "audio/x-wav",
+]);
 
 function parseBearer(header) {
   const match = header?.match(/^Bearer\s+(.+)$/i);
@@ -33,7 +43,17 @@ function parseChatBody(body) {
   return { message, history, context: { localDate, timeZone } };
 }
 
-export function createApp({ authorize, generate, readMemories = async () => [], writeMemory = async () => {}, allowedOrigins = new Set(), checkRateLimit = () => ({ allowed: true }) }) {
+export function createApp({
+  authorize,
+  generate,
+  transcribe = async () => { throw new Error("TRANSCRIPTION_UNAVAILABLE"); },
+  synthesize = async () => { throw new Error("SPEECH_UNAVAILABLE"); },
+  readMemories = async () => [],
+  writeMemory = async () => {},
+  allowedOrigins = new Set(),
+  checkRateLimit = () => ({ allowed: true }),
+  checkVoiceRateLimit = () => ({ allowed: true }),
+}) {
   const app = express();
   app.disable("x-powered-by");
   app.use(express.json({ limit: "16kb" }));
@@ -57,6 +77,90 @@ export function createApp({ authorize, generate, readMemories = async () => [], 
 
   app.get("/health", (_request, response) => {
     response.json({ status: "ok", service: "alumia-ai" });
+  });
+
+  app.post("/v1/transcriptions", express.raw({ type: () => true, limit: MAX_AUDIO_BYTES }), async (request, response) => {
+    const requestId = crypto.randomUUID();
+    const startedAt = performance.now();
+    try {
+      const token = parseBearer(request.get("authorization"));
+      if (!token) {
+        response.status(401).json({ error: "UNAUTHENTICATED", requestId });
+        return;
+      }
+      const user = await authorize(token);
+      if (!user) {
+        response.status(401).json({ error: "INVALID_SESSION", requestId });
+        return;
+      }
+
+      const mediaType = request.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+      if (!mediaType || !SUPPORTED_AUDIO_TYPES.has(mediaType) || !Buffer.isBuffer(request.body) || request.body.length === 0) {
+        response.status(400).json({ error: "INVALID_AUDIO", requestId });
+        return;
+      }
+
+      const rateLimit = checkVoiceRateLimit(user.id);
+      if (!rateLimit.allowed) {
+        response.set("Retry-After", String(rateLimit.retryAfterSeconds));
+        response.status(429).json({ error: "RATE_LIMITED", requestId });
+        return;
+      }
+
+      const result = await transcribe({ audio: request.body, mediaType });
+      if (!result?.transcript?.trim()) {
+        response.status(422).json({ error: "SPEECH_NOT_RECOGNIZED", requestId });
+        return;
+      }
+      response.set("Cache-Control", "no-store");
+      response.json({ transcript: result.transcript.trim().slice(0, MAX_MESSAGE_LENGTH), confidence: result.confidence ?? null, requestId });
+    } catch {
+      response.status(503).json({ error: "TRANSCRIPTION_UNAVAILABLE", requestId });
+    } finally {
+      console.info(JSON.stringify({ event: "alumia_ai_transcription", requestId, status: response.statusCode, latencyMs: Math.round(performance.now() - startedAt) }));
+    }
+  });
+
+  app.post("/v1/speech", async (request, response) => {
+    const requestId = crypto.randomUUID();
+    const startedAt = performance.now();
+    try {
+      const token = parseBearer(request.get("authorization"));
+      if (!token) {
+        response.status(401).json({ error: "UNAUTHENTICATED", requestId });
+        return;
+      }
+      const user = await authorize(token);
+      if (!user) {
+        response.status(401).json({ error: "INVALID_SESSION", requestId });
+        return;
+      }
+
+      const text = typeof request.body?.text === "string" ? request.body.text.trim() : "";
+      if (!text || text.length > MAX_MESSAGE_LENGTH) {
+        response.status(400).json({ error: "INVALID_REQUEST", requestId });
+        return;
+      }
+
+      const rateLimit = checkVoiceRateLimit(user.id);
+      if (!rateLimit.allowed) {
+        response.set("Retry-After", String(rateLimit.retryAfterSeconds));
+        response.status(429).json({ error: "RATE_LIMITED", requestId });
+        return;
+      }
+
+      const audio = await synthesize({ text });
+      response.set({
+        "Cache-Control": "no-store",
+        "Content-Type": "audio/mpeg",
+        "Content-Length": String(audio.length),
+      });
+      response.send(audio);
+    } catch {
+      response.status(503).json({ error: "SPEECH_UNAVAILABLE", requestId });
+    } finally {
+      console.info(JSON.stringify({ event: "alumia_ai_speech", requestId, status: response.statusCode, latencyMs: Math.round(performance.now() - startedAt) }));
+    }
   });
 
   app.post("/v1/chat", async (request, response) => {
@@ -123,5 +227,12 @@ export function createApp({ authorize, generate, readMemories = async () => [], 
   });
 
   app.use((_request, response) => response.status(404).json({ error: "NOT_FOUND" }));
+  app.use((error, _request, response, _next) => {
+    if (error?.type === "entity.too.large") {
+      response.status(413).json({ error: "AUDIO_TOO_LARGE" });
+      return;
+    }
+    response.status(500).json({ error: "INTERNAL_ERROR" });
+  });
   return app;
 }

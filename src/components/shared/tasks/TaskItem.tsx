@@ -27,6 +27,7 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
   const priorityTone = task.priority === "alta" ? "text-destructive" : task.priority === "media" ? "text-warning-foreground" : "text-info-foreground";
   const moduleKey = resolveModuleKey(task.moduleKey ?? task.module_key);
   const moduleTheme = MODULE_THEMES[moduleKey];
+  const showModuleIdentity = moduleKey !== "tasks" && moduleKey !== "alumia_ai";
   const isPastRecurringOccurrence = Boolean(task.done && task.recurrence && !task.recurrence.active);
   return (
     <li data-module={moduleKey} className={`${moduleTheme.themeClass} module-whisper flex min-h-14 items-center gap-1.5 rounded-xl border px-1.5 py-1 shadow-none transition-transform hover:-translate-y-0.5 ${task.done ? "opacity-65" : ""}`}>
@@ -41,7 +42,7 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
           </p>
         )}
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0 text-xs leading-tight text-muted-foreground">
-          {moduleKey !== "tasks" && <span className="module-text inline-flex items-center gap-1 font-medium"><AlumiaIcon icon={moduleTheme.icon} size="xs" />{moduleTheme.label}</span>}
+          {showModuleIdentity && <span className="module-text inline-flex items-center gap-1 font-medium"><AlumiaIcon icon={moduleTheme.icon} size="xs" />{moduleTheme.label}</span>}
           {task.date && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={Calendar01Icon} size="xs" />{formatTaskDate(task.date)}</span>}
           {task.time && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={Clock01Icon} size="xs" />{task.time}</span>}
           {(task.reminder || task.hasBell) && <span className="inline-flex items-center gap-1"><AlumiaIcon icon={BellIcon} size="xs" />Lembrete</span>}

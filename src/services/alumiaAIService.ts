@@ -55,13 +55,56 @@ export function isAlumiaGenerativeEnabled() {
   return Boolean(generativeServiceUrl());
 }
 
+async function getAlumiaAccessToken() {
+  const { data, error } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (error || !accessToken) throw new Error("ALUMIA_SESSION_UNAVAILABLE");
+  return accessToken;
+}
+
+export async function transcribeAlumiaAudio(audio: Blob) {
+  const serviceUrl = generativeServiceUrl();
+  if (!serviceUrl) throw new Error("ALUMIA_GENERATIVE_DISABLED");
+  const accessToken = await getAlumiaAccessToken();
+  const response = await fetch(`${serviceUrl}/v1/transcriptions`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": audio.type || "audio/webm",
+    },
+    body: audio,
+    signal: AbortSignal.timeout(70_000),
+  });
+
+  if (!response.ok) throw new Error(`ALUMIA_TRANSCRIPTION_${response.status}`);
+  const payload = await response.json() as { transcript?: unknown };
+  if (typeof payload.transcript !== "string" || !payload.transcript.trim()) throw new Error("ALUMIA_EMPTY_TRANSCRIPTION");
+  return payload.transcript.trim();
+}
+
+export async function synthesizeAlumiaSpeech(text: string) {
+  const serviceUrl = generativeServiceUrl();
+  if (!serviceUrl) throw new Error("ALUMIA_GENERATIVE_DISABLED");
+  const accessToken = await getAlumiaAccessToken();
+  const response = await fetch(`${serviceUrl}/v1/speech`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ text }),
+    signal: AbortSignal.timeout(45_000),
+  });
+
+  if (!response.ok) throw new Error(`ALUMIA_SPEECH_${response.status}`);
+  return response.blob();
+}
+
 async function requestGenerativeResponse(message: string, history: AlumiaConversationMessage[]): Promise<AlumiaAssistantResult> {
   const serviceUrl = generativeServiceUrl();
   if (!serviceUrl) throw new Error("ALUMIA_GENERATIVE_DISABLED");
 
-  const { data, error } = await supabase.auth.getSession();
-  const accessToken = data.session?.access_token;
-  if (error || !accessToken) throw new Error("ALUMIA_SESSION_UNAVAILABLE");
+  const accessToken = await getAlumiaAccessToken();
 
   const contextAllowed = await getAlumiaContextPreference().catch(() => false);
   const safeHistory = (contextAllowed === true ? history : [])

@@ -13,6 +13,8 @@ vi.mock("@/services/alumiaAIService", () => ({
   confirmAlumiaAction: vi.fn(),
   isAlumiaGenerativeEnabled: vi.fn(() => false),
   respondToAlumia: vi.fn(),
+  synthesizeAlumiaSpeech: vi.fn(),
+  transcribeAlumiaAudio: vi.fn(),
 }));
 
 const mockedRespond = vi.mocked(respondToAlumia);
@@ -125,5 +127,25 @@ describe("Alum.IA chat", () => {
       expect.any(Array),
     ));
     expect(await screen.findByText("Vamos cuidar disso juntas.")).toBeInTheDocument();
+  });
+
+  it("acompanha o envio e a nova resposta até o fim da conversa", async () => {
+    let finishResponse!: (value: Awaited<ReturnType<typeof respondToAlumia>>) => void;
+    mockedRespond.mockImplementation(() => new Promise((resolve) => {
+      finishResponse = resolve;
+    }));
+    const scrollIntoView = vi.mocked(window.HTMLElement.prototype.scrollIntoView);
+    render(<AlumiaChat />);
+    scrollIntoView.mockClear();
+
+    fireEvent.change(screen.getByLabelText("Mensagem para a Alum.IA"), { target: { value: "Quero conversar" } });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar mensagem" }));
+
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "end" }));
+    const callsAfterSending = scrollIntoView.mock.calls.length;
+
+    finishResponse({ text: "Estou aqui com você.", tone: "default", source: "generative" });
+    expect(await screen.findByText("Estou aqui com você.")).toBeInTheDocument();
+    await waitFor(() => expect(scrollIntoView.mock.calls.length).toBeGreaterThan(callsAfterSending));
   });
 });

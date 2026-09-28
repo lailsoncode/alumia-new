@@ -27,6 +27,17 @@ Payload inicial:
 
 O histórico é opcional, limitado e usado somente durante a requisição. O contexto de data local e fuso horário é obrigatório para interpretar expressões como “amanhã”. Nada é salvo pelo serviço.
 
+## Voz
+
+O serviço também expõe dois endpoints autenticados, sem persistência do áudio:
+
+- `POST /v1/transcriptions`, com o áudio bruto no corpo e seu MIME type em `Content-Type`, transcreve até 2 MB em português brasileiro;
+- `POST /v1/speech`, com `{ "text": "..." }`, devolve `audio/mpeg` usando Gemini TTS.
+
+A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Aoede` e uma direção de voz acolhedora com sotaque nordestino leve inspirado em Recife. Modelo, speaker e direção podem ser alterados por `ALUMIA_TTS_MODEL`, `ALUMIA_TTS_VOICE` e `ALUMIA_TTS_PROMPT`, sem mudança de código. O prompt deve preservar naturalidade e evitar caricatura regional.
+
+Para implantar a voz, habilite `speech.googleapis.com` e `texttospeech.googleapis.com`. Além de `roles/aiplatform.user`, usado pelo Gemini e pelo Gemini TTS, conceda `roles/speech.client` à service account do runtime para reconhecimento de fala.
+
 O Gemini pode responder com texto ou chamar somente `propose_create_task`. Essa função gera uma proposta validada de título, descrição, data, horário, prioridade e lembrete; ela não escreve no banco. A confirmação e a criação idempotente acontecem no aplicativo, usando a sessão da pessoa e a RPC protegida pelo RLS.
 
 ## Cloud Run
@@ -37,7 +48,7 @@ Configuração implantada em 27 de setembro de 2026:
 - serviço `alumia-ai`;
 - região `southamerica-east1`;
 - modelo em `global`;
-- service account dedicada com `roles/aiplatform.user`;
+- service account dedicada com `roles/aiplatform.user`; a funcionalidade de voz também requer `roles/speech.client`;
 - conta `alumia-ai-runtime@alumia-app.iam.gserviceaccount.com`, sem chave JSON;
 - `SUPABASE_ANON_KEY` fornecida por Secret Manager;
 - acesso HTTP público, mas toda chamada de chat exige JWT Supabase válido;

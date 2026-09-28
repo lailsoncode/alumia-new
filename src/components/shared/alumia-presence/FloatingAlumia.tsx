@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { ArrowRight01Icon, Mic01Icon, SentIcon, SparklesIcon } from "@hugeicons/core-free-icons";
+import { AiBrain01Icon, ArrowRight01Icon, Mic01Icon, SentIcon, SparklesIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,6 +77,7 @@ export function FloatingAlumia() {
         align="start"
         sideOffset={-2}
         collisionPadding={12}
+        onOpenAutoFocus={(event) => event.preventDefault()}
         className="w-[min(22rem,calc(100vw-1.5rem))] overflow-visible rounded-[1.5rem] border-primary/20 bg-background p-0 shadow-[0_18px_50px_rgba(35,46,67,0.22)]"
       >
         <div className="rounded-t-[1.5rem] bg-primary/8 px-4 pb-3 pt-3.5">
@@ -88,7 +89,19 @@ export function FloatingAlumia() {
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{content.message}</p>
         </div>
 
+        <div className="grid gap-2 border-b border-border/70 p-3 sm:grid-cols-2" aria-label="Atalhos rápidos da Alumia">
+          <Button type="button" size="sm" onClick={() => goTo("/alumia")}>
+            <AlumiaIcon icon={AiBrain01Icon} size="sm" />
+            Conversar comigo
+          </Button>
+          <Button type="button" size="sm" variant="outline" onClick={() => goTo(content.secondaryAction.to)}>
+            {content.secondaryAction.label}
+            <AlumiaIcon icon={ArrowRight01Icon} size="sm" />
+          </Button>
+        </div>
+
         <form onSubmit={continueInChat} className="space-y-2.5 p-3">
+          <p className="text-xs font-semibold text-muted-foreground">Ou escreva uma mensagem</p>
           <label htmlFor="alumia-quick-message" className="sr-only">Mensagem para a Alumia</label>
           <Textarea
             id="alumia-quick-message"
@@ -118,13 +131,6 @@ export function FloatingAlumia() {
             </Button>
           </div>
         </form>
-
-        <div className="border-t border-border/70 px-3 py-2.5">
-          <Button type="button" variant="link" className="text-xs" onClick={() => goTo(content.secondaryAction.to)}>
-            {content.secondaryAction.label}
-            <AlumiaIcon icon={ArrowRight01Icon} size="xs" />
-          </Button>
-        </div>
 
         <span aria-hidden="true" className="absolute -bottom-2 left-8 h-4 w-4 rotate-45 border-b border-r border-primary/20 bg-background" />
       </PopoverContent>

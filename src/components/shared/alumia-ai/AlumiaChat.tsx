@@ -6,8 +6,11 @@ import {
   CheckmarkCircle02Icon,
   Delete02Icon,
   LockIcon,
+  Mic01Icon,
   SentIcon,
   SparklesIcon,
+  StopIcon,
+  VolumeHighIcon,
 } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { AlumiaModuleIntro } from "@/components/shared/AlumiaModuleIntro";
@@ -20,7 +23,13 @@ import { AlumiaMemory } from "./AlumiaMemory";
 import { AlumiaLearningOnboarding } from "./AlumiaLearningOnboarding";
 import { cn } from "@/lib/utils";
 import { ALUMIA_AVATAR_IMAGES } from "@/lib/alumia-avatar";
-import { confirmAlumiaAction, isAlumiaGenerativeEnabled, respondToAlumia } from "@/services/alumiaAIService";
+import {
+  confirmAlumiaAction,
+  isAlumiaGenerativeEnabled,
+  respondToAlumia,
+  synthesizeAlumiaSpeech,
+  transcribeAlumiaAudio,
+} from "@/services/alumiaAIService";
 import type { AddTaskData, AlumiaConversationMessage, AlumiaProposedAction } from "@/types";
 
 type ActionState = "pending" | "saving" | "done" | "cancelled" | "error";
@@ -33,6 +42,9 @@ const FIRST_MESSAGE: AlumiaConversationMessage = {
     : "Oi, eu sou a Alum.IA. Nesta prévia, posso ajudar com tarefas e pausas de Mindfulness usando respostas editoriais. A conversa fica somente nesta tela e nenhuma ação acontece sem você confirmar.",
   tone: "default",
 };
+
+const MAX_RECORDING_MS = 60_000;
+const AUDIO_TYPES = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
 
 function messageId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -50,15 +62,66 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
   const [actionStates, setActionStates] = useState<Record<string, ActionState>>({});
   const [input, setInput] = useState("");
   const [responding, setResponding] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [transcribing, setTranscribing] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const [editingAction, setEditingAction] = useState<AlumiaProposedAction | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const initialMessageHandled = useRef(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const recordingStreamRef = useRef<MediaStream | null>(null);
+  const recordingChunksRef = useRef<Blob[]>([]);
+  const recordingCancelledRef = useRef(false);
+  const recordingIntervalRef = useRef<number | null>(null);
+  const recordingTimeoutRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const speechRequestRef = useRef(0);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, actionStates, responding]);
 
-  const sendMessage = useCallback(async (rawMessage: string) => {
+  const stopSpeaking = useCallback(() => {
+    speechRequestRef.current += 1;
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = null;
+    setSpeakingMessageId(null);
+  }, []);
+
+  const speakMessage = useCallback(async (text: string, id: string) => {
+    if (speakingMessageId === id) {
+      stopSpeaking();
+      return;
+    }
+    stopSpeaking();
+    const requestId = ++speechRequestRef.current;
+    setVoiceError(null);
+    setSpeakingMessageId(id);
+    try {
+      const blob = await synthesizeAlumiaSpeech(text);
+      if (speechRequestRef.current !== requestId) return;
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audioUrlRef.current = url;
+      audio.onended = stopSpeaking;
+      audio.onerror = () => {
+        stopSpeaking();
+        setVoiceError("Não consegui reproduzir a voz da Alumia agora. A resposta continua disponível em texto.");
+      };
+      await audio.play();
+    } catch {
+      stopSpeaking();
+      setVoiceError("Não consegui gerar a voz da Alumia agora. A resposta continua disponível em texto.");
+    }
+  }, [speakingMessageId, stopSpeaking]);
+
+  const sendMessage = useCallback(async (rawMessage: string, options: { speakResponse?: boolean } = {}) => {
     const text = rawMessage.trim();
     if (!text || responding) return;
 
@@ -68,10 +131,11 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
 
     try {
       const result = await respondToAlumia(text, messages);
+      const assistantMessageId = messageId();
       setMessages((current) => [
         ...current,
         {
-          id: messageId(),
+          id: assistantMessageId,
           role: "assistant",
           text: result.text,
           tone: result.tone,
@@ -84,6 +148,7 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
       if (result.proposedAction) {
         setActionStates((current) => ({ ...current, [result.proposedAction!.id]: "pending" }));
       }
+      if (options.speakResponse && result.tone !== "safety") void speakMessage(result.text, assistantMessageId);
     } catch {
       setMessages((current) => [
         ...current,
@@ -97,7 +162,86 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
     } finally {
       setResponding(false);
     }
-  }, [messages, responding]);
+  }, [messages, responding, speakMessage]);
+
+  const clearRecordingTimers = useCallback(() => {
+    if (recordingIntervalRef.current !== null) window.clearInterval(recordingIntervalRef.current);
+    if (recordingTimeoutRef.current !== null) window.clearTimeout(recordingTimeoutRef.current);
+    recordingIntervalRef.current = null;
+    recordingTimeoutRef.current = null;
+  }, []);
+
+  const stopRecording = useCallback((cancelled = false) => {
+    recordingCancelledRef.current = cancelled;
+    clearRecordingTimers();
+    const recorder = recorderRef.current;
+    if (recorder?.state === "recording") recorder.stop();
+    setRecording(false);
+  }, [clearRecordingTimers]);
+
+  const startRecording = useCallback(async () => {
+    if (recording || transcribing || responding) return;
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setVoiceError("A gravação de voz não está disponível neste dispositivo.");
+      return;
+    }
+
+    setVoiceError(null);
+    recordingCancelledRef.current = false;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+      });
+      const mimeType = AUDIO_TYPES.find((type) => MediaRecorder.isTypeSupported(type));
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType, audioBitsPerSecond: 32_000 } : undefined);
+      recorderRef.current = recorder;
+      recordingStreamRef.current = stream;
+      recordingChunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) recordingChunksRef.current.push(event.data);
+      };
+      recorder.onstop = async () => {
+        clearRecordingTimers();
+        stream.getTracks().forEach((track) => track.stop());
+        recordingStreamRef.current = null;
+        recorderRef.current = null;
+        if (recordingCancelledRef.current) return;
+
+        const audio = new Blob(recordingChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        if (audio.size < 200) {
+          setVoiceError("Não consegui captar sua voz. Tente falar um pouco mais perto do microfone.");
+          return;
+        }
+        setTranscribing(true);
+        try {
+          const transcript = await transcribeAlumiaAudio(audio);
+          await sendMessage(transcript, { speakResponse: true });
+        } catch {
+          setVoiceError("Não consegui entender o áudio agora. Você pode tentar novamente ou escrever a mensagem.");
+        } finally {
+          setTranscribing(false);
+        }
+      };
+      recorder.start(250);
+      const startedAt = Date.now();
+      setRecordingSeconds(0);
+      setRecording(true);
+      recordingIntervalRef.current = window.setInterval(() => setRecordingSeconds(Math.min(60, Math.floor((Date.now() - startedAt) / 1000))), 250);
+      recordingTimeoutRef.current = window.setTimeout(() => stopRecording(), MAX_RECORDING_MS);
+    } catch {
+      recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
+      recordingStreamRef.current = null;
+      setVoiceError("Precisamos da permissão do microfone para receber uma mensagem de voz.");
+    }
+  }, [clearRecordingTimers, recording, responding, sendMessage, stopRecording, transcribing]);
+
+  useEffect(() => () => {
+    recordingCancelledRef.current = true;
+    clearRecordingTimers();
+    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+    recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
+    stopSpeaking();
+  }, [clearRecordingTimers, stopSpeaking]);
 
   useEffect(() => {
     if (!initialMessage || initialMessageHandled.current) return;
@@ -147,9 +291,12 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
   }
 
   function clearConversation() {
+    if (recording) stopRecording(true);
+    stopSpeaking();
     setMessages([FIRST_MESSAGE]);
     setActionStates({});
     setInput("");
+    setVoiceError(null);
     setEditingAction(null);
   }
 
@@ -235,6 +382,19 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
                   </p>
                 )}
                 <p className="whitespace-pre-line">{message.text}</p>
+                {message.role === "assistant" && isAlumiaGenerativeEnabled() && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="mt-2 -ml-2"
+                    onClick={() => void speakMessage(message.text, message.id)}
+                    aria-label={speakingMessageId === message.id ? "Parar voz da Alumia" : "Ouvir resposta da Alumia"}
+                  >
+                    <AlumiaIcon icon={speakingMessageId === message.id ? StopIcon : VolumeHighIcon} size="sm" />
+                    {speakingMessageId === message.id ? "Parar" : "Ouvir"}
+                  </Button>
+                )}
                 {message.learnedMemory && <p className="mt-2 text-xs text-muted-foreground">Aprendido com sua autorização · você pode corrigir ou apagar em Ajustes.</p>}
 
                 {message.tone === "safety" && (
@@ -296,16 +456,17 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
             );
           })}
 
-          {responding && (
+          {(responding || transcribing) && (
             <div role="status" className="mr-auto flex max-w-[80%] items-center gap-2 rounded-[1.125rem] border border-border module-whisper px-3.5 py-3 text-sm text-muted-foreground">
               <AlumiaIcon icon={SparklesIcon} size="sm" className="module-text" />
-              Cuidando da resposta…
+              {transcribing ? "Ouvindo com atenção…" : "Cuidando da resposta…"}
             </div>
           )}
           <div ref={endRef} />
         </div>
 
         <div className="border-t border-border/70 p-3 sm:p-4">
+          {voiceError && <p role="alert" className="mb-2 text-sm text-destructive">{voiceError}</p>}
           <form onSubmit={handleSubmit} className="flex items-end gap-2">
             <div className="min-w-0 flex-1">
               <label htmlFor="alumia-message" className="sr-only">Mensagem para a Alum.IA</label>
@@ -316,15 +477,30 @@ export function AlumiaChat({ initialMessage }: AlumiaChatProps) {
                 onKeyDown={handleKeyDown}
                 placeholder="Escreva o que faria diferença agora…"
                 rows={2}
-                disabled={responding}
+                disabled={responding || transcribing || recording}
                 className="max-h-36 min-h-14 resize-none rounded-xl bg-surface"
               />
               <p className="mt-1 text-xs text-muted-foreground">Enter envia · Shift + Enter quebra a linha · {input.length}/500</p>
             </div>
-            <Button type="submit" size="icon-lg" disabled={responding || !input.trim()} aria-label="Enviar mensagem">
+            {isAlumiaGenerativeEnabled() && (
+              <Button
+                type="button"
+                size="icon-lg"
+                variant={recording ? "destructive" : "outline"}
+                disabled={responding || transcribing}
+                onClick={() => recording ? stopRecording() : void startRecording()}
+                aria-label={recording ? "Parar e enviar gravação" : "Gravar mensagem de voz"}
+              >
+                <AlumiaIcon icon={recording ? StopIcon : Mic01Icon} size="md" />
+                <span className="sr-only">{recording ? `${recordingSeconds} segundos gravados` : "Gravar mensagem de voz"}</span>
+              </Button>
+            )}
+            <Button type="submit" size="icon-lg" disabled={responding || transcribing || recording || !input.trim()} aria-label="Enviar mensagem">
               <AlumiaIcon icon={SentIcon} size="md" />
             </Button>
           </form>
+          {recording && <p role="status" className="mt-2 text-sm font-medium text-destructive">Gravando… {recordingSeconds}s de 60s · toque em parar para enviar</p>}
+          {isAlumiaGenerativeEnabled() && <p className="mt-2 text-xs text-muted-foreground">O áudio é processado para transcrição e não é armazenado. Respostas de áudio usam a voz sintetizada da Alumia.</p>}
         </div>
       </Surface>
       {editingAction && (

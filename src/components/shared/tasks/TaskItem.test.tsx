@@ -26,4 +26,17 @@ describe("TaskItem", () => {
 
     expect(screen.getByText(/Reagendada de 26 de set\./)).toBeInTheDocument();
   });
+
+  it("usa apenas as cores da Alum.IA nas tarefas criadas pela conversa", () => {
+    render(
+      <ul>
+        <TaskItem task={{ id: "alumia-task", title: "Separar documentos", moduleKey: "alumia_ai" }} />
+      </ul>,
+    );
+
+    const item = screen.getByRole("listitem");
+    expect(item).toHaveAttribute("data-module", "alumia_ai");
+    expect(item).toHaveClass("module-theme-alumia-ai", "module-whisper");
+    expect(screen.queryByText("Alum.IA")).not.toBeInTheDocument();
+  });
 });
