@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import type { OneSignalPlugin } from "onesignal-cordova-plugin";
+import { ensureHighPriorityNotificationChannel } from "@/services/notificationChannelService";
 
 const ONE_SIGNAL_APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID?.trim();
 const ONE_SIGNAL_NATIVE_APP_ID = import.meta.env.VITE_ONESIGNAL_NATIVE_APP_ID?.trim() || ONE_SIGNAL_APP_ID;
@@ -67,7 +68,8 @@ async function loadNativeOneSignalSdk() {
   }
 
   if (!nativeSdkPromise) {
-    nativeSdkPromise = import("onesignal-cordova-plugin")
+    nativeSdkPromise = ensureHighPriorityNotificationChannel()
+      .then(() => import("onesignal-cordova-plugin"))
       .then(({ default: oneSignal }) => {
         oneSignal.initialize(ONE_SIGNAL_NATIVE_APP_ID!);
         return oneSignal;

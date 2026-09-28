@@ -79,4 +79,14 @@ No Android 12 ou superior, o sistema pode pedir também a permissão de alarmes 
 
 O switch em **Ajustes → Notificações** usa o SDK adequado para cada ambiente. Na Web ele controla o OneSignal Web Push; nos aplicativos instalados controla a inscrição nativa vinculada ao mesmo usuário do Supabase.
 
+No Android, o aplicativo cria o canal `alumia_alerts_v1` com importância alta, som, vibração e exibição na tela. Em instalações novas ele também cria com importância alta o fallback usado pelos pushes sem categoria. O painel do OneSignal possui ainda o canal **Alertas e lembretes**, com ID `93edee85-4570-407c-ab7d-b70cfe353291`, importância **Urgent**, som e vibração padrão. Para garantir a correção em aparelhos onde o canal antigo já foi congelado pelo Android, configure o envio de uma destas formas:
+
+- no compositor do Dashboard, em **Android → Category**, selecione **Alertas e lembretes**;
+- pela API, envie `android_channel_id: "93edee85-4570-407c-ab7d-b70cfe353291"` e `priority: 10`;
+- alternativamente, use o canal criado pelo aplicativo com `existing_android_channel_id: "alumia_alerts_v1"` e `priority: 10`.
+
+Se a categoria for criada no próprio Dashboard do OneSignal, use importância **Urgent**. A opção **High** do OneSignal equivale a `IMPORTANCE_DEFAULT` no Android e normalmente apenas deixa a notificação na barra; **Urgent** equivale a `IMPORTANCE_HIGH` e permite o banner heads-up. Categorias já recebidas têm importância, som e vibração congelados pelo Android. Para mudar esses atributos em aparelhos existentes, crie uma categoria com outro ID (ou reinstale/limpe os dados somente durante testes).
+
+No iOS, pushes realmente urgentes podem usar `ios_interruption_level: "time_sensitive"`, desde que o capability correspondente esteja habilitado no projeto Apple. Notificações comuns devem continuar com o nível padrão para não perder relevância perante o sistema.
+
 O projeto iOS está preparado para notificações comuns. Imagens e alteração de conteúdo antes da entrega exigirão um `Notification Service Extension`, que pode ser incluído quando esse formato entrar no produto.
