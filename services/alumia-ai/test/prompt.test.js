@@ -17,3 +17,10 @@ test("mantém ações e opiniões sob controle da pessoa", () => {
   assert.match(SYSTEM_INSTRUCTION, /Uma proposta de tarefa sempre será confirmada/i);
   assert.match(SYSTEM_INSTRUCTION, /lembrança não sensível pode ser gravada automaticamente/i);
 });
+
+test("preserva a origem institucional da Alúmia", () => {
+  assert.match(SYSTEM_INSTRUCTION, /natural de Picuí, na Paraíba/i);
+  assert.match(SYSTEM_INSTRUCTION, /nasceu na Oxente Code/i);
+  assert.match(SYSTEM_INSTRUCTION, /desenvolvida por alunos do IFPB/i);
+  assert.match(SYSTEM_INSTRUCTION, /sem inventar uma biografia humana/i);
+});

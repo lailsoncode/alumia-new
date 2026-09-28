@@ -86,6 +86,24 @@ describe("live voice websocket", () => {
     assert.deepEqual(close, { code: 4401, reason: "Invalid session" });
   });
 
+  it("uma nova conexão autenticada substitui a sessão anterior da mesma conta", { timeout: 3_000 }, async () => {
+    const { server } = await createTestServer();
+    const address = server.address();
+    const first = new WebSocket(`ws://127.0.0.1:${address.port}/v1/live`, { origin: "https://localhost" });
+    await new Promise((resolve) => first.once("open", resolve));
+    first.send(JSON.stringify({ type: "auth", token: "valid-token" }));
+    await new Promise((resolve) => first.once("message", resolve));
+
+    const firstClosed = new Promise((resolve) => first.once("close", (code) => resolve(code)));
+    const second = new WebSocket(`ws://127.0.0.1:${address.port}/v1/live`, { origin: "https://localhost" });
+    await new Promise((resolve) => second.once("open", resolve));
+    second.send(JSON.stringify({ type: "auth", token: "valid-token" }));
+
+    assert.equal(await firstClosed, 4001);
+    assert.equal(second.readyState, WebSocket.OPEN);
+    second.close();
+  });
+
   it("bloqueia origens não autorizadas antes do upgrade", { timeout: 3_000 }, async () => {
     const { server } = await createTestServer();
     const address = server.address();

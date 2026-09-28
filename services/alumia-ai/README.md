@@ -34,13 +34,13 @@ O serviço também expõe dois endpoints autenticados, sem persistência do áud
 - `POST /v1/transcriptions`, com o áudio bruto no corpo e seu MIME type em `Content-Type`, transcreve até 2 MB em português brasileiro;
 - `POST /v1/speech`, com `{ "text": "..." }`, devolve `audio/mpeg` usando Gemini TTS.
 
-A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Achernar`, velocidade `1.08` e uma direção compacta para preservar o sotaque nordestino leve inspirado em Recife. Antes da síntese, a grafia da marca é convertida somente no texto falado para `Alúmia`, fixando a tonicidade correta sem mudar o texto exibido. A transcrição usa adaptação de vocabulário para reconhecer `Alumia` e padroniza variações inequívocas do nome. O Flash-Lite foi rejeitado por truncar respostas em testes, e o Chirp 3 HD fica como alternativa de menor latência quando a direção regional não for necessária. Modelo e speaker podem ser alterados por `ALUMIA_TTS_MODEL` e `ALUMIA_TTS_VOICE`; `ALUMIA_TTS_PROMPT` é usado apenas quando o modelo configurado começa com `gemini-`.
+A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Achernar`, velocidade `1.08` e uma direção explícita para um sotaque do interior paraibano inspirado em Picuí, moderado e reconhecível, com cadência ágil e sem chiado artificial. Antes da síntese, a grafia da marca é convertida somente no texto falado para `Alúmia`, fixando a tonicidade correta sem mudar o texto exibido. A transcrição usa adaptação de vocabulário para reconhecer `Alumia` e padroniza variações inequívocas do nome. O Flash-Lite foi rejeitado por truncar respostas em testes, e o Chirp 3 HD fica como alternativa de menor latência quando a direção regional não for necessária. Modelo e speaker podem ser alterados por `ALUMIA_TTS_MODEL` e `ALUMIA_TTS_VOICE`; `ALUMIA_TTS_PROMPT` é usado apenas quando o modelo configurado começa com `gemini-`.
 
 ### Conversa ao vivo experimental
 
 Com `ALUMIA_LIVE_ENABLED=true`, o mesmo servidor aceita `WSS /v1/live`. A primeira mensagem precisa conter `{ "type": "auth", "token": "JWT_SUPABASE" }`; o token nunca vai na URL. Depois da validação, áudio PCM mono de 16 kHz é encaminhado ao Gemini Live e a resposta PCM de 24 kHz volta ao aplicativo. O áudio e as transcrições não são persistidos.
 
-O piloto usa `gemini-3.8-live` em `us-central1`, voz `Aoede`, compressão de contexto e limite de cinco minutos. Há somente uma sessão simultânea por usuário e nenhuma ferramenta de escrita é oferecida no modo ao vivo. Configure o frontend com `VITE_ENABLE_ALUMIA_LIVE_VOICE=true` para exibir o botão **Ao vivo**. Em produção, aumente o timeout do Cloud Run para pelo menos o limite configurado em `ALUMIA_LIVE_SESSION_MAX_MS`.
+O piloto usa `gemini-3.8-live` em `us-central1`, voz `Achernar` — a mesma do chat falado —, compressão de contexto e limite de cinco minutos. A direção de fala pede uma mulher adulta natural de Picuí, com sotaque do interior paraibano moderado, claramente perceptível até em respostas curtas, ritmo natural e ágil e sem sibilância excessiva, gírias forçadas ou caricatura. A identidade institucional informa que a Alúmia é natural de Picuí, nasceu na Oxente Code e foi desenvolvida por alunos do IFPB. Uma nova conexão autenticada da mesma conta substitui automaticamente uma sessão anterior que tenha ficado aberta. Nenhuma ferramenta de escrita é oferecida no modo ao vivo. Configure o frontend com `VITE_ENABLE_ALUMIA_LIVE_VOICE=true` para exibir o botão **Ao vivo**. Em produção, aumente o timeout do Cloud Run para pelo menos o limite configurado em `ALUMIA_LIVE_SESSION_MAX_MS`.
 
 Para implantar a voz, habilite `speech.googleapis.com` e `texttospeech.googleapis.com`. Além de `roles/aiplatform.user`, usado pelo Gemini e pelo Gemini TTS, conceda `roles/speech.client` à service account do runtime para reconhecimento de fala.
 
@@ -48,7 +48,7 @@ O Gemini pode responder com texto ou chamar somente `propose_create_task`. Essa 
 
 ## Cloud Run
 
-Configuração implantada em 27 de setembro de 2026:
+Configuração implantada em 28 de setembro de 2026:
 
 - projeto `alumia-app`;
 - serviço `alumia-ai`;
@@ -62,7 +62,7 @@ Configuração implantada em 27 de setembro de 2026:
   `https://localhost` (Android) e `capacitor://localhost` (iOS);
 - mínimo de instâncias zero, timeout de 600 segundos e limite inicial de três instâncias;
 - limite defensivo inicial de 12 gerações por minuto por usuário e por instância;
-- revisão atual `alumia-ai-00021-fzp`, servindo 100% do tráfego, com chat, transcrição, síntese de voz e conversa ao vivo habilitados;
+- revisão atual `alumia-ai-00026-dnd`, servindo 100% do tráfego, com chat, transcrição, síntese de voz e conversa ao vivo habilitados;
 - URL estável `https://alumia-ai-696823006824.southamerica-east1.run.app`.
 
 O frontend possui integração autenticada, mas ela permanece desligada por padrão por `VITE_ENABLE_ALUMIA_AI_GENERATIVE=false`. A ativação pública depende dos gates restantes do [ADR-011](../../docs/sdd/adrs/011-alumia-ai-hybrid-cloud.md).

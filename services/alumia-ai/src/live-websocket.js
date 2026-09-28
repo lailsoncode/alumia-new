@@ -107,9 +107,10 @@ export function attachLiveWebSocketServer({
           closeWith(socket, 4401, "Invalid session");
           return;
         }
-        if (activeUsers.has(user.id)) {
-          closeWith(socket, 4429, "Live session already active");
-          return;
+        const previousSocket = activeUsers.get(user.id);
+        if (previousSocket && previousSocket !== socket) {
+          send(previousSocket, { type: "error", code: "SESSION_REPLACED" });
+          closeWith(previousSocket, 4001, "Session opened on another connection");
         }
 
         userId = user.id;

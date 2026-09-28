@@ -110,7 +110,7 @@ export function LandingPage() {
         Pular para o conteúdo
       </a>
 
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/88 backdrop-blur-xl">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/88 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <a href="#inicio" className="flex items-center gap-2.5 rounded-xl" aria-label="Alumia — voltar ao início">
             <img
@@ -149,7 +149,7 @@ export function LandingPage() {
       </header>
 
       <main id="conteudo">
-        <section id="inicio" className="relative scroll-mt-20 px-4 pb-20 pt-30 sm:px-6 sm:pb-24 sm:pt-36 lg:px-8 lg:pb-30 lg:pt-40">
+        <section id="inicio" className="relative scroll-mt-20 px-4 pb-20 pt-[calc(7.5rem+env(safe-area-inset-top))] sm:px-6 sm:pb-24 sm:pt-[calc(9rem+env(safe-area-inset-top))] lg:px-8 lg:pb-30 lg:pt-[calc(10rem+env(safe-area-inset-top))]">
           <div aria-hidden="true" className="absolute -left-40 top-12 h-96 w-96 rounded-full bg-tone-aqua/55 blur-3xl" />
           <div aria-hidden="true" className="absolute -right-40 top-56 h-112 w-112 rounded-full bg-tone-lavender/45 blur-3xl" />
 

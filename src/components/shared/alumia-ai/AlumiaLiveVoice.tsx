@@ -178,8 +178,8 @@ export function AlumiaLiveVoice({ open, onClose }: AlumiaLiveVoiceProps) {
           cleanup(false);
           setStatus("idle");
           if (![1000, 4000].includes(event.code)) {
-            setError(event.code === 4429
-              ? "Já existe uma conversa ao vivo aberta nesta conta."
+            setError(event.code === 4001
+              ? "Esta conversa foi encerrada porque uma nova sessão foi aberta."
               : "A conexão ao vivo foi encerrada. Você pode tentar novamente.");
           }
         },
