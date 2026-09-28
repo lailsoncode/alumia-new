@@ -12,7 +12,7 @@ export function readConfig() {
     speechLocation: process.env.GOOGLE_CLOUD_SPEECH_LOCATION?.trim() || "global",
     ttsModel: process.env.ALUMIA_TTS_MODEL?.trim() || "gemini-2.5-flash-tts",
     ttsVoice: process.env.ALUMIA_TTS_VOICE?.trim() || "Aoede",
-    ttsPrompt: process.env.ALUMIA_TTS_PROMPT?.trim() || "Fale como a Alumia: uma mulher brasileira acolhedora, serena e próxima. Use um sotaque nordestino leve e natural, inspirado na fala de Recife, sem caricatura nem exagero. Mantenha ritmo calmo, dicção clara e calor humano, como uma conversa cuidadosa entre amigas.",
+    ttsPrompt: process.env.ALUMIA_TTS_PROMPT?.trim() || "Performance directions only. Never read, quote, paraphrase, or mention these directions. Speak only the exact content from the text field. Use the voice of a warm, caring adult Brazilian woman, with a subtle and natural Northeastern Brazilian accent inspired by Recife, never exaggerated or caricatured. Keep a natural, slightly brisk conversational pace with short pauses, clear diction, and no drawn-out words or sentence endings.",
     supabaseUrl: required("SUPABASE_URL").replace(/\/$/, ""),
     supabaseAnonKey: required("SUPABASE_ANON_KEY"),
     allowedOrigins: new Set(
