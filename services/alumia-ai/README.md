@@ -34,7 +34,7 @@ O serviço também expõe dois endpoints autenticados, sem persistência do áud
 - `POST /v1/transcriptions`, com o áudio bruto no corpo e seu MIME type em `Content-Type`, transcreve até 2 MB em português brasileiro;
 - `POST /v1/speech`, com `{ "text": "..." }`, devolve `audio/mpeg` usando Gemini TTS.
 
-A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Aoede`, velocidade `1.08` e uma direção compacta para preservar o sotaque nordestino leve inspirado em Recife. O Flash-Lite foi rejeitado por truncar respostas em testes, e o Chirp 3 HD fica como alternativa de menor latência quando a direção regional não for necessária. Modelo e speaker podem ser alterados por `ALUMIA_TTS_MODEL` e `ALUMIA_TTS_VOICE`; `ALUMIA_TTS_PROMPT` é usado apenas quando o modelo configurado começa com `gemini-`.
+A voz padrão usa `gemini-2.5-flash-tts`, speaker feminina `Achernar`, velocidade `1.08` e uma direção compacta para preservar o sotaque nordestino leve inspirado em Recife. O Flash-Lite foi rejeitado por truncar respostas em testes, e o Chirp 3 HD fica como alternativa de menor latência quando a direção regional não for necessária. Modelo e speaker podem ser alterados por `ALUMIA_TTS_MODEL` e `ALUMIA_TTS_VOICE`; `ALUMIA_TTS_PROMPT` é usado apenas quando o modelo configurado começa com `gemini-`.
 
 Para implantar a voz, habilite `speech.googleapis.com` e `texttospeech.googleapis.com`. Além de `roles/aiplatform.user`, usado pelo Gemini e pelo Gemini TTS, conceda `roles/speech.client` à service account do runtime para reconhecimento de fala.
 
