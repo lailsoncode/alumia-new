@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { ensureHighPriorityNotificationChannel, HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } from "@/services/notificationChannelService";
+import { ensureHighPriorityNotificationChannel, getLocalNotificationDelivery } from "@/services/notificationChannelService";
 
 export interface HydrationReminderPreferences {
   enabled: boolean;
@@ -74,7 +74,7 @@ export async function saveHydrationReminders(preferences: HydrationReminderPrefe
   if (permission.display !== "granted" && requestPermission) permission = await LocalNotifications.requestPermissions();
   if (permission.display !== "granted") return false;
 
-  const hasHighPriorityChannel = await ensureHighPriorityNotificationChannel();
+  const hasNotificationChannels = await ensureHighPriorityNotificationChannel();
   const notifications = getHydrationReminderTimes(preferences).map((hour, index) => ({
     id: NOTIFICATION_ID_BASE + index,
     title: "Uma pausa para você",
@@ -83,7 +83,7 @@ export async function saveHydrationReminders(preferences: HydrationReminderPrefe
     autoCancel: true,
     foreground: true,
     interruptionLevel: "active" as const,
-    ...(hasHighPriorityChannel ? { channelId: HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } : {}),
+    ...getLocalNotificationDelivery("reminder", hasNotificationChannels),
     extra: { route: "/hidratacao", kind: "hydration_reminder" },
   }));
   await LocalNotifications.schedule({ notifications });
@@ -91,3 +91,6 @@ export async function saveHydrationReminders(preferences: HydrationReminderPrefe
   return true;
 }
 
+export function synchronizeHydrationReminders() {
+  return saveHydrationReminders(getStoredHydrationReminders(), false);
+}

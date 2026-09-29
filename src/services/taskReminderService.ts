@@ -1,9 +1,8 @@
 import { Capacitor } from "@capacitor/core";
 import type { Task, TaskReminder } from "@/types";
 import {
-  ALARM_NOTIFICATION_SOUND,
   ensureHighPriorityNotificationChannel,
-  HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID,
+  getLocalNotificationDelivery,
 } from "@/services/notificationChannelService";
 
 export function getTaskReminderRoute(task: Pick<Task, "moduleKey" | "module_key">) {
@@ -61,7 +60,7 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
   const scheduledDate = getTaskScheduleDate(task);
   const reminderDate = getTaskReminderDate(task);
   const { LocalNotifications } = await import("@capacitor/local-notifications");
-  const hasHighPriorityChannel = await ensureHighPriorityNotificationChannel();
+  const hasNotificationChannels = await ensureHighPriorityNotificationChannel();
   await cancelTaskReminder(task.id);
 
   if (task.done || !scheduledDate) return false;
@@ -80,13 +79,12 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
       title: "Um cuidado te espera",
       body: task.title,
       schedule: { at: scheduledDate, allowWhileIdle: true },
-      sound: ALARM_NOTIFICATION_SOUND,
+      ...getLocalNotificationDelivery("notification", hasNotificationChannels),
       autoCancel: true,
       foreground: true,
       interruptionLevel: "active" as const,
       isExactNotification: true,
       isExactMandatory: false,
-      ...(hasHighPriorityChannel ? { channelId: HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } : {}),
       extra: { taskId: task.id, route: reminderRoute },
     });
   }
@@ -97,13 +95,12 @@ export async function scheduleTaskReminder(task: Task, requestPermission = false
       title: "Daqui a pouco, no seu tempo",
       body: task.title,
       schedule: { at: reminderDate, allowWhileIdle: true },
-      sound: ALARM_NOTIFICATION_SOUND,
+      ...getLocalNotificationDelivery("reminder", hasNotificationChannels),
       autoCancel: true,
       foreground: true,
       interruptionLevel: "active" as const,
       isExactNotification: true,
       isExactMandatory: false,
-      ...(hasHighPriorityChannel ? { channelId: HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID } : {}),
       extra: { taskId: task.id, route: reminderRoute },
     });
   }

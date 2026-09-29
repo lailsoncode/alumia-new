@@ -1,32 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { AccessibilityIcon, BellIcon, ChevronRightIcon, GlobeIcon, LockIcon, Logout01Icon, Moon01Icon, Settings01Icon, SparklesIcon, Sun01Icon } from "@hugeicons/core-free-icons";
+import {
+  AccessibilityIcon,
+  ChevronRightIcon,
+  GlobeIcon,
+  LockIcon,
+  Logout01Icon,
+  Moon01Icon,
+  Settings01Icon,
+  SparklesIcon,
+  Sun01Icon,
+} from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { SectionHeader, Surface } from "@/components/ui/surface";
-import { signOut } from "@/services/authService";
-import { disablePushNotifications, enablePushNotifications, getPushNotificationState, isOneSignalConfigured } from "@/services/oneSignalService";
-import { getTasks } from "@/services/tasksService";
-import { synchronizeTaskReminders } from "@/services/taskReminderService";
-import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
 import { AlumiaContextPreference } from "@/components/shared/alumia-ai/AlumiaContextPreference";
 import { AlumiaMemory } from "@/components/shared/alumia-ai/AlumiaMemory";
+import { NotificationSettings, PreferenceSwitch, SettingsRow } from "@/components/shared/settings";
+import { applyTheme, getStoredTheme, subscribeToThemeChanges } from "@/lib/theme";
 import { getAlumiaPresenceEnabled, setAlumiaPresenceEnabled } from "@/lib/alumia-presence";
-
-function PreferenceSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
-  return (
-    <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange} disabled={disabled} className={`relative flex h-11 w-14 shrink-0 items-center rounded-full p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${checked ? "bg-primary" : "bg-muted"}`}>
-      <span className={`h-6 w-6 rounded-full bg-surface shadow-sm transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`} />
-    </button>
-  );
-}
+import { signOut } from "@/services/authService";
 
 export function SettingsPage() {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(false);
-  const [notificationStatus, setNotificationStatus] = useState<"loading" | "ready" | "saving" | "denied" | "unsupported" | "unconfigured" | "error">(
-    isOneSignalConfigured() ? "loading" : "unconfigured",
-  );
   const [language, setLanguage] = useState("pt-BR");
   const [alumiaPresence, setAlumiaPresence] = useState(true);
 
@@ -39,62 +35,10 @@ export function SettingsPage() {
     return subscribeToThemeChanges((theme) => setDarkMode(theme === "dark"));
   }, []);
 
-  useEffect(() => {
-    let active = true;
-
-    if (!isOneSignalConfigured()) {
-      setNotificationStatus("unconfigured");
-      return () => { active = false; };
-    }
-
-    getPushNotificationState()
-      .then((state) => {
-        if (!active) return;
-        setNotifications(state.enabled);
-        setNotificationStatus(state.supported ? "ready" : "unsupported");
-      })
-      .catch(() => {
-        if (active) setNotificationStatus("error");
-      });
-
-    return () => { active = false; };
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    applyTheme(next ? "dark" : "light");
+  const toggleTheme = (enabled: boolean) => {
+    setDarkMode(enabled);
+    applyTheme(enabled ? "dark" : "light");
   };
-
-  const toggleNotifications = async () => {
-    if (notificationStatus === "saving" || notificationStatus === "loading") return;
-
-    setNotificationStatus("saving");
-    try {
-      const state = notifications ? await disablePushNotifications() : await enablePushNotifications();
-      setNotifications(state.enabled);
-      if (!notifications && state.enabled) {
-        await getTasks()
-          .then(synchronizeTaskReminders)
-          .catch((error) => console.error("Não foi possível sincronizar os lembretes locais:", error));
-      }
-      setNotificationStatus(
-        !state.supported ? "unsupported" : !notifications && !state.permission ? "denied" : "ready",
-      );
-    } catch {
-      setNotificationStatus("error");
-    }
-  };
-
-  const notificationDescription = {
-    loading: "Verificando a permissão deste dispositivo…",
-    saving: "Atualizando sua preferência…",
-    ready: "Ative somente se quiser receber lembretes.",
-    denied: "Permissão bloqueada no navegador. Libere-a nas configurações do site.",
-    unsupported: "Este navegador não oferece suporte a notificações.",
-    unconfigured: "As notificações estarão disponíveis em breve.",
-    error: "Não foi possível atualizar agora. Tente novamente.",
-  }[notificationStatus];
 
   const logout = async () => {
     await signOut();
@@ -102,61 +46,90 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="space-y-4">
-        <section>
-          <SectionHeader icon={Settings01Icon} iconClassName="text-primary" title="Preferências" description="Ajuste a Alumia para ficar confortável para você." />
-          <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
-            <AlumiaContextPreference settings />
-            <AlumiaMemory settings />
-            <div className="flex min-h-14 items-center gap-3 px-3 py-2">
-              <div className="flex min-w-0 flex-1 items-start gap-3">
-                <AlumiaIcon icon={SparklesIcon} size="md" className="mt-0.5 shrink-0 text-tone-sun-fg" />
-                <div className="min-w-0"><p className="text-sm font-semibold">Alumia flutuante</p><p className="mt-0.5 text-xs text-muted-foreground">Mostra a personagem e seus atalhos contextuais no celular.</p></div>
-              </div>
-              <PreferenceSwitch checked={alumiaPresence} onChange={() => { const next = !alumiaPresence; setAlumiaPresence(next); setAlumiaPresenceEnabled(next); }} label="Mostrar Alumia flutuante" />
-            </div>
-            <div className="flex min-h-14 items-center gap-3 px-3 py-2">
-              <div className="flex min-w-0 flex-1 items-start gap-3">
-                <AlumiaIcon icon={BellIcon} size="md" className="mt-0.5 shrink-0 text-primary" />
-                <div className="min-w-0"><p className="text-sm font-semibold">Notificações</p><p className="mt-0.5 text-xs text-muted-foreground">{notificationDescription}</p></div>
-              </div>
-              <PreferenceSwitch checked={notifications} onChange={toggleNotifications} label="Ativar notificações" disabled={["loading", "saving", "unsupported", "unconfigured"].includes(notificationStatus)} />
-            </div>
-            <div className="flex min-h-14 items-center gap-3 px-3 py-2">
-              <div className="flex min-w-0 flex-1 items-start gap-3">
-                <AlumiaIcon icon={darkMode ? Moon01Icon : Sun01Icon} size="md" className="mt-0.5 shrink-0 text-tone-sky-fg" />
-                <div className="min-w-0"><p className="text-sm font-semibold">Tema escuro</p><p className="mt-0.5 text-xs text-muted-foreground">Use uma aparência mais confortável em ambientes escuros.</p></div>
-              </div>
-              <PreferenceSwitch checked={darkMode} onChange={toggleTheme} label="Ativar tema escuro" />
-            </div>
-            <label className="flex min-h-14 items-center gap-3 px-3 py-2">
-              <span className="flex min-w-0 flex-1 items-start gap-3">
-                <AlumiaIcon icon={GlobeIcon} size="md" className="mt-0.5 shrink-0 text-tone-peach-fg" />
-                <span className="min-w-0"><span className="block text-sm font-semibold">Idioma</span><span className="mt-0.5 block text-xs text-muted-foreground">Idioma usado na interface.</span></span>
-              </span>
-              <select value={language} onChange={(event) => { setLanguage(event.target.value); window.localStorage.setItem("language", event.target.value); }} className="min-h-11 rounded-xl border border-input bg-background px-3 text-sm font-semibold focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"><option value="pt-BR">Português</option><option value="en" disabled>English — em breve</option><option value="es" disabled>Español — em breve</option></select>
-            </label>
-          </Surface>
-        </section>
+    <div className="space-y-5">
+      <section>
+        <SectionHeader
+          icon={darkMode ? Moon01Icon : Sun01Icon}
+          iconClassName="text-tone-sky-fg"
+          title="Aparência e experiência"
+          description="Preferências salvas somente neste dispositivo."
+        />
+        <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
+          <SettingsRow title="Tema escuro" description="Use uma aparência mais confortável em ambientes escuros." icon={darkMode ? Moon01Icon : Sun01Icon} iconClassName="text-tone-sky-fg">
+            <PreferenceSwitch checked={darkMode} onCheckedChange={toggleTheme} label="Ativar tema escuro" />
+          </SettingsRow>
+          <SettingsRow title="Idioma" description="Idioma usado na interface." icon={GlobeIcon} iconClassName="text-tone-peach-fg">
+            <select
+              value={language}
+              onChange={(event) => {
+                setLanguage(event.target.value);
+                window.localStorage.setItem("language", event.target.value);
+              }}
+              aria-label="Idioma da interface"
+              className="min-h-11 w-40 rounded-xl border border-input bg-background px-3 text-sm font-semibold focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
+            >
+              <option value="pt-BR">Português</option>
+              <option value="en" disabled>English — em breve</option>
+              <option value="es" disabled>Español — em breve</option>
+            </select>
+          </SettingsRow>
+          <SettingsRow title="Alumia flutuante" description="Mostra a personagem e seus atalhos contextuais no celular." icon={SparklesIcon} iconClassName="text-tone-sun-fg">
+            <PreferenceSwitch
+              checked={alumiaPresence}
+              onCheckedChange={(enabled) => {
+                setAlumiaPresence(enabled);
+                setAlumiaPresenceEnabled(enabled);
+              }}
+              label="Mostrar Alumia flutuante"
+            />
+          </SettingsRow>
+          <SettingsRow
+            title="Acessibilidade do dispositivo"
+            description="A Alumia respeita redução de movimento, zoom, tamanho do texto e contraste configurados no sistema."
+            icon={AccessibilityIcon}
+            iconClassName="text-primary"
+            className="bg-surface-subtle/50"
+          />
+        </Surface>
+      </section>
 
-        <section className="grid gap-2.5 lg:grid-cols-2">
-          <div>
-            <SectionHeader icon={AccessibilityIcon} iconClassName="text-tone-sky-fg" title="Acessibilidade" />
-            <Surface variant="subtle" className="mt-2 flex items-start gap-2.5 p-3 shadow-none"><AlumiaIcon icon={AccessibilityIcon} size="sm" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Preferências do dispositivo</h3><p className="mt-0.5 text-sm leading-snug text-muted-foreground">A Alumia respeita redução de movimento, zoom e configurações de contraste do seu dispositivo.</p></div></Surface>
-          </div>
-          <div>
-            <SectionHeader icon={LockIcon} iconClassName="text-primary" title="Privacidade e segurança" />
-            <Surface variant="subtle" className="mt-2 flex items-start gap-2.5 p-3 shadow-none"><AlumiaIcon icon={LockIcon} size="sm" className="mt-0.5 shrink-0 text-primary" /><div><h3 className="text-sm font-semibold">Seu cuidado é privado</h3><p className="mt-0.5 text-sm leading-snug text-muted-foreground">Tarefas, hidratação e informações pessoais pertencem à sua conta.</p></div></Surface>
-          </div>
-        </section>
+      <NotificationSettings />
 
-        <section>
-          <SectionHeader icon={Settings01Icon} iconClassName="text-tone-peach-fg" title="Conta" />
-          <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
-            <button type="button" onClick={() => navigate({ to: "/completar-perfil" })} className="flex min-h-14 w-full items-center gap-3 px-3 text-left transition-colors hover:bg-muted sm:px-4"><AlumiaIcon icon={Settings01Icon} size="sm" className="text-primary" /><span className="flex-1 text-sm font-semibold">Editar dados do perfil</span><AlumiaIcon icon={ChevronRightIcon} size="sm" className="text-muted-foreground" /></button>
-            <button type="button" onClick={logout} className="flex min-h-14 w-full items-center gap-3 px-3 text-left text-destructive transition-colors hover:bg-destructive/10 sm:px-4"><AlumiaIcon icon={Logout01Icon} size="sm" /><span className="flex-1 text-sm font-semibold">Sair da conta</span><AlumiaIcon icon={ChevronRightIcon} size="sm" /></button>
-          </Surface>
-        </section>
+      <section>
+        <SectionHeader
+          icon={LockIcon}
+          iconClassName="text-primary"
+          title="Alum.IA e privacidade"
+          description="Escolhas de contexto e aprendizado que acompanham sua conta."
+        />
+        <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
+          <AlumiaContextPreference settings />
+          <AlumiaMemory settings />
+          <SettingsRow
+            title="Seus cuidados continuam privados"
+            description="Tarefas, hidratação e informações pessoais pertencem à sua conta. Você controla o que a Alum.IA pode usar."
+            icon={LockIcon}
+            iconClassName="text-primary"
+            className="bg-surface-subtle/50"
+          />
+        </Surface>
+      </section>
+
+      <section>
+        <SectionHeader icon={Settings01Icon} iconClassName="text-tone-peach-fg" title="Conta" description="Dados do perfil e acesso à sua conta." />
+        <Surface className="mt-2.5 divide-y divide-border overflow-hidden">
+          <button type="button" onClick={() => navigate({ to: "/completar-perfil" })} className="flex min-h-14 w-full items-center gap-3 px-3 text-left transition-colors hover:bg-muted sm:px-4">
+            <AlumiaIcon icon={Settings01Icon} size="sm" className="text-primary" />
+            <span className="flex-1 text-sm font-semibold">Editar dados do perfil</span>
+            <AlumiaIcon icon={ChevronRightIcon} size="sm" className="text-muted-foreground" />
+          </button>
+          <button type="button" onClick={logout} className="flex min-h-14 w-full items-center gap-3 px-3 text-left text-destructive transition-colors hover:bg-destructive/10 sm:px-4">
+            <AlumiaIcon icon={Logout01Icon} size="sm" />
+            <span className="flex-1 text-sm font-semibold">Sair da conta</span>
+            <AlumiaIcon icon={ChevronRightIcon} size="sm" />
+          </button>
+        </Surface>
+      </section>
     </div>
   );
 }

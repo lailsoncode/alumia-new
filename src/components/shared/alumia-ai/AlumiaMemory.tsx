@@ -3,6 +3,7 @@ import { AiBrain01Icon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { PreferenceSwitch } from "@/components/shared/settings/PreferenceSwitch";
 import { forgetAllMemories, forgetMemory, getMemories, getMemoryEnabled, saveMemory, setMemoryEnabled, type AlumiaMemory } from "@/services/alumiaMemoryService";
 
 export function AlumiaMemory({ settings = false }: { settings?: boolean }) {
@@ -73,9 +74,7 @@ function MemoryManager() {
   return <div className="space-y-3">
     <div className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
       <div><p className="text-sm font-semibold">Permitir que a Alum.IA aprenda comigo</p><p className="mt-0.5 text-xs text-muted-foreground">Personalizar conversas usando preferências, objetivos e rotinas.</p></div>
-      <button type="button" role="switch" aria-label="Permitir aprendizado pessoal da Alum.IA" aria-checked={enabled} disabled={loading || busy} onClick={() => void run(async () => { await setMemoryEnabled(!enabled); setEnabled(!enabled); })} className={`relative flex h-11 w-14 shrink-0 items-center rounded-full p-1 transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 ${enabled ? "bg-primary" : "bg-muted"}`}>
-        <span className={`h-6 w-6 rounded-full bg-surface shadow-sm transition-transform ${enabled ? "translate-x-5" : "translate-x-0"}`} />
-      </button>
+      <PreferenceSwitch checked={enabled} onCheckedChange={(value) => void run(async () => { await setMemoryEnabled(value); setEnabled(value); })} label="Permitir aprendizado pessoal da Alum.IA" disabled={loading || busy} />
     </div>
     <details className="text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3 font-semibold text-primary">Saiba mais</summary>
       <div className="space-y-2 leading-relaxed">

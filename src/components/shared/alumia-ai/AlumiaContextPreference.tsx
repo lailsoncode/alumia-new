@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LockIcon } from "@hugeicons/core-free-icons";
 import { AlumiaIcon } from "@/components/ui/alumia-icon";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { PreferenceSwitch } from "@/components/shared/settings/PreferenceSwitch";
 import { getAlumiaContextPreference, setAlumiaContextPreference } from "@/services/alumiaPreferencesService";
 
 export function AlumiaContextPreference({ settings = false }: { settings?: boolean }) {
@@ -38,9 +39,7 @@ export function AlumiaContextPreference({ settings = false }: { settings?: boole
           <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{settings ? "Usar mensagens recentes para acompanhar a conversa." : "Posso usar as mensagens recentes desta conversa?"}</p>
         </div>
         {settings && (
-          <button type="button" role="switch" aria-checked={enabled === true} aria-label="Permitir contexto da conversa" disabled={saving || loading} onClick={() => void save(enabled !== true)} className={`relative flex h-11 w-14 shrink-0 items-center rounded-full p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 ${enabled ? "bg-primary" : "bg-muted"}`}>
-            <span className={`h-6 w-6 rounded-full bg-surface shadow-sm transition-transform ${enabled ? "translate-x-5" : "translate-x-0"}`} />
-          </button>
+          <PreferenceSwitch checked={enabled === true} onCheckedChange={(value) => void save(value)} label="Permitir contexto da conversa" disabled={saving || loading} />
         )}
       </div>
       <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pl-8">

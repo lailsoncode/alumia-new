@@ -1,10 +1,25 @@
 import { Capacitor } from "@capacitor/core";
+import {
+  getNotificationSoundFile,
+  getSoundForNotificationKind,
+  type LocalNotificationKind,
+  type NotificationSound,
+} from "@/services/notificationPreferencesService";
 
-// Keep this ID versioned. Android does not allow an app to raise the importance
-// of a channel after it has been created on a device.
-export const HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID = "alumia_alarms_v2";
-export const ALARM_NOTIFICATION_SOUND = "alumia_alarm.wav";
 const ONESIGNAL_FALLBACK_NOTIFICATION_CHANNEL_ID = "fcm_fallback_notification_channel";
+
+const channelIds: Record<LocalNotificationKind, Record<NotificationSound, string>> = {
+  notification: {
+    device: "alumia_notifications_device_v1",
+    alumia: "alumia_notifications_alumia_v1",
+    gentle: "alumia_notifications_gentle_v1",
+  },
+  reminder: {
+    device: "alumia_reminders_device_v1",
+    alumia: "alumia_reminders_alumia_v1",
+    gentle: "alumia_reminders_gentle_v1",
+  },
+};
 
 let channelPromise: Promise<boolean> | null = null;
 
@@ -14,17 +29,6 @@ export function ensureHighPriorityNotificationChannel() {
 
   channelPromise = import("@capacitor/local-notifications")
     .then(({ LocalNotifications }) => Promise.all([
-      LocalNotifications.createChannel({
-        id: HIGH_PRIORITY_NOTIFICATION_CHANNEL_ID,
-        name: "Alertas e lembretes",
-        description: "Avisos importantes e lembretes da Alumia",
-        importance: 4,
-        visibility: 1,
-        sound: ALARM_NOTIFICATION_SOUND,
-        vibration: true,
-        lights: true,
-        lightColor: "#8B5CF6",
-      }),
       // OneSignal uses this channel when a push has no category. Creating it
       // before the SDK gives uncategorized pushes heads-up behavior on new installs.
       LocalNotifications.createChannel({
@@ -37,6 +41,25 @@ export function ensureHighPriorityNotificationChannel() {
         lights: true,
         lightColor: "#8B5CF6",
       }),
+      ...(["notification", "reminder"] as const).flatMap((kind) =>
+        (["device", "alumia", "gentle"] as const).map((sound) => {
+          const soundFile = getNotificationSoundFile(sound);
+          const soundName = sound === "device" ? "padrão do dispositivo" : sound === "alumia" ? "Alumia" : "Alumia suave";
+          return LocalNotifications.createChannel({
+            id: channelIds[kind][sound],
+            name: `${kind === "notification" ? "Avisos" : "Lembretes"} — ${soundName}`,
+            description: kind === "notification"
+              ? "Avisos de tarefas e outros cuidados"
+              : "Lembretes antecipados e recorrentes",
+            importance: 4,
+            visibility: 1,
+            ...(soundFile ? { sound: soundFile } : {}),
+            vibration: true,
+            lights: true,
+            lightColor: "#8B5CF6",
+          });
+        }),
+      ),
     ]))
     .then(() => true)
     .catch((error) => {
@@ -47,4 +70,14 @@ export function ensureHighPriorityNotificationChannel() {
     });
 
   return channelPromise;
+}
+
+export function getLocalNotificationDelivery(kind: LocalNotificationKind, useAndroidChannel = true) {
+  const sound = getSoundForNotificationKind(kind);
+  const soundFile = getNotificationSoundFile(sound);
+  return {
+    // An empty filename asks iOS and Android 7 to fall back to the system sound.
+    sound: soundFile,
+    ...(Capacitor.getPlatform() === "android" && useAndroidChannel ? { channelId: channelIds[kind][sound] } : {}),
+  };
 }
